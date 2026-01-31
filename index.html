@@ -222,41 +222,68 @@
             box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
         }
         
-    <head>部分的<style>标签中添加图片背景样式 -->
-<style>
- .hero {
-    background: 
-        linear-gradient(135deg, rgba(255, 182, 193, 0.2), rgba(255, 107, 157, 0.2)),
-        url('https://th.bing.com/th/id/R.6e5e3405a6c544c3d2c0f615c37b0153?rik=pATb8vM2hNYqfA&riu=http%3a%2f%2fimg.mp.itc.cn%2fupload%2f20170316%2f28985d826c114d848ce7d2a34c6d6997_th.jpeg&ehk=teT1kYqNgb69M6%2fWCAw1%2f1V4cfKekzvsC%2bRUKNJM0po%3d&risl=&pid=ImgRaw&r=0') 
-        center center / cover no-repeat;
-    border-radius: 20px;
-    padding: 50px 40px;
-    margin: 30px 0;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-    border: 2px solid var(--primary);
-    /* 移除z-index: 1; */
-}
-
-.hero::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(255, 255, 255, 0.5); /* 50%透明度白色遮罩 */
-    backdrop-filter: blur(2px);
-    z-index: 1; /* 改为1，位于背景之上，内容之下 */
-    border-radius: 20px;
-}
-
-.hero-title, .hero-subtitle, .hero button {
-    position: relative;
-    z-index: 2; /* 确保内容在遮罩层之上 */
-}
-</style>
+        /* 5. 首页横幅 - 修复背景图片 */
+        .hero {
+            background: 
+                linear-gradient(135deg, rgba(255, 182, 193, 0.2), rgba(255, 107, 157, 0.2)),
+                url('https://th.bing.com/th/id/R.6e5e3405a6c544c3d2c0f615c37b0153?rik=pATb8vM2hNYqfA&riu=http%3a%2f%2fimg.mp.itc.cn%2fupload%2f20170316%2f28985d826c114d848ce7d2a34c6d6997_th.jpeg&ehk=teT1kYqNgb69M6%2fWCAw1%2f1V4cfKekzvsC%2bRUKNJM0po%3d&risl=&pid=ImgRaw&r=0') 
+                center center / cover no-repeat;
+            border-radius: 20px;
+            padding: 50px 40px;
+            margin: 30px 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid var(--primary);
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.5); /* 50%透明度白色遮罩 */
+            backdrop-filter: blur(2px);
+            z-index: 1;
+            border-radius: 20px;
+        }
+        
+        .hero-title, .hero-subtitle, .hero button {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .hero-title {
+            font-family: var(--font-zh);
+            color: var(--primary);
+            font-size: 48px;
+            margin-bottom: 15px;
+            position: relative;
+            display: inline-block;
+            font-weight: bold;
+            letter-spacing: 3px;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .hero-subtitle {
+            font-size: 20px;
+            color: #777;
+            max-width: 800px;
+            margin: 0 auto 30px;
+            font-family: var(--font-smooth);
+            line-height: 1.8;
+            letter-spacing: 0.5px;
+            font-smooth: always;
+            font-weight: 400;
+        }
+        
         /* 6. 博客文章区域 - 修复重叠问题 */
         .blog-section {
             margin: 40px 0;
@@ -1604,542 +1631,290 @@
             return data;
         }
         
-// 增强的 GitHubManager 类，添加 SHA 检测和自动修复
-class GitHubManager {
-    constructor() {
-        this.token = localStorage.getItem('github_token') || '';
-        this.repoOwner = localStorage.getItem('github_repo_owner') || '';
-        this.repoName = localStorage.getItem('github_repo_name') || '';
-        this.repoBranch = localStorage.getItem('github_repo_branch') || 'main';
-        this.dataPath = 'data/articles.json';
-        this.apiBase = 'https://api.github.com';
-        this.lastKnownSha = localStorage.getItem('github_last_sha') || '';
-    }
-
-    // 保存配置
-    saveConfig(token, owner, name, branch) {
-        localStorage.setItem('github_token', token);
-        localStorage.setItem('github_repo_owner', owner);
-        localStorage.setItem('github_repo_name', name);
-        localStorage.setItem('github_repo_branch', branch);
-        
-        this.token = token;
-        this.repoOwner = owner;
-        this.repoName = name;
-        this.repoBranch = branch;
-        
-        return this.isConfigured();
-    }
-
-    // 检查是否配置完成
-    isConfigured() {
-        return this.token && this.repoOwner && this.repoName;
-    }
-
-    // 获取文件信息（包括 SHA）
-    async getFileInfo() {
-        if (!this.isConfigured()) {
-            return null;
-        }
-
-        try {
-            const response = await fetch(
-                `${this.apiBase}/repos/${this.repoOwner}/${this.repoName}/contents/${this.dataPath}?ref=${this.repoBranch}`,
-                {
-                    headers: {
-                        'Authorization': `token ${this.token}`,
-                        'Accept': 'application/vnd.github.v3+json'
-                    }
-                }
-            );
-
-            if (response.ok) {
-                const fileData = await response.json();
-                this.lastKnownSha = fileData.sha;
-                localStorage.setItem('github_last_sha', fileData.sha);
-                return {
-                    sha: fileData.sha,
-                    content: fileData.content,
-                    exists: true
-                };
-            } else if (response.status === 404) {
-                this.lastKnownSha = '';
-                localStorage.removeItem('github_last_sha');
-                return {
-                    sha: null,
-                    content: null,
-                    exists: false
-                };
-            } else {
-                throw new Error(`获取文件信息失败：${response.status}`);
-            }
-        } catch (error) {
-            console.error('获取文件信息失败：', error);
-            return null;
-        }
-    }
-
-    // 从GitHub获取文章（改进版）
-    async fetchArticles() {
-        if (!this.isConfigured()) {
-            console.log('GitHub未配置，使用本地存储');
-            return this.getLocalArticles();
-        }
-
-        try {
-            console.log('正在从GitHub获取文章...');
-
-            const fileInfo = await this.getFileInfo();
-            
-            if (!fileInfo) {
-                console.log('无法获取文件信息，使用本地存储');
-                return this.getLocalArticles();
+        // ========== GitHub管理器类 ==========
+        class GitHubManager {
+            constructor() {
+                this.token = localStorage.getItem('github_token') || '';
+                this.repoOwner = localStorage.getItem('github_repo_owner') || '';
+                this.repoName = localStorage.getItem('github_repo_name') || '';
+                this.repoBranch = localStorage.getItem('github_repo_branch') || 'main';
+                this.dataPath = 'data/articles.json';
+                this.apiBase = 'https://api.github.com';
+                this.lastKnownSha = localStorage.getItem('github_last_sha') || '';
             }
 
-            if (!fileInfo.exists) {
-                console.log('文章文件不存在');
-                return [];
-            }
-
-            // 解码内容
-            const decodedContent = safeBase64Decode(fileInfo.content);
-            
-            // 尝试解析JSON
-            let articles;
-            try {
-                articles = JSON.parse(decodedContent || '[]');
-            } catch (error) {
-                console.error('JSON解析失败:', error);
+            // 保存配置
+            saveConfig(token, owner, name, branch) {
+                localStorage.setItem('github_token', token);
+                localStorage.setItem('github_repo_owner', owner);
+                localStorage.setItem('github_repo_name', name);
+                localStorage.setItem('github_repo_branch', branch);
                 
-                // 尝试修复JSON
+                this.token = token;
+                this.repoOwner = owner;
+                this.repoName = name;
+                this.repoBranch = branch;
+                
+                return this.isConfigured();
+            }
+
+            // 检查是否配置完成
+            isConfigured() {
+                return this.token && this.repoOwner && this.repoName;
+            }
+
+            // 获取文件信息（包括 SHA）
+            async getFileInfo() {
+                if (!this.isConfigured()) {
+                    return null;
+                }
+
                 try {
-                    const fixedContent = this.fixJsonString(decodedContent);
-                    articles = JSON.parse(fixedContent);
-                } catch (fixError) {
-                    console.error('JSON修复失败:', fixError);
-                    articles = [];
+                    const response = await fetch(
+                        `${this.apiBase}/repos/${this.repoOwner}/${this.repoName}/contents/${this.dataPath}?ref=${this.repoBranch}`,
+                        {
+                            headers: {
+                                'Authorization': `token ${this.token}`,
+                                'Accept': 'application/vnd.github.v3+json'
+                            }
+                        }
+                    );
+
+                    if (response.ok) {
+                        const fileData = await response.json();
+                        this.lastKnownSha = fileData.sha;
+                        localStorage.setItem('github_last_sha', fileData.sha);
+                        return {
+                            sha: fileData.sha,
+                            content: fileData.content,
+                            exists: true
+                        };
+                    } else if (response.status === 404) {
+                        this.lastKnownSha = '';
+                        localStorage.removeItem('github_last_sha');
+                        return {
+                            sha: null,
+                            content: null,
+                            exists: false
+                        };
+                    } else {
+                        throw new Error(`获取文件信息失败：${response.status}`);
+                    }
+                } catch (error) {
+                    console.error('获取文件信息失败：', error);
+                    return null;
                 }
             }
 
-            // 修复数据格式
-            const fixedArticles = checkAndFixData(articles);
-            
-            // 保存到本地存储作为备份
-            localStorage.setItem('fuwakoArticles', JSON.stringify(fixedArticles));
-            
-            return fixedArticles;
-            
-        } catch (error) {
-            console.error('从GitHub获取文章失败：', error);
-            return this.getLocalArticles();
-        }
-    }
-
-    // 获取本地文章
-    getLocalArticles() {
-        return JSON.parse(localStorage.getItem('fuwakoArticles') || '[]');
-    }
-
-    // 修复JSON字符串
-    fixJsonString(jsonString) {
-        if (!jsonString) return '[]';
-        
-        let fixed = jsonString;
-        
-        // 1. 移除BOM
-        fixed = fixed.replace(/^\uFEFF/, '');
-        
-        // 2. 移除尾随逗号（JSON不允许对象或数组最后一个元素后有逗号）
-        fixed = fixed.replace(/,\s*([\]}])/g, '$1');
-        
-        // 3. 修复未闭合的引号
-        fixed = fixed.replace(/([^\\])"([^"]*?)(?=,|\s*[}\]])/g, '$1"$2"');
-        
-        // 4. 修复单引号（JSON标准要求双引号）
-        fixed = fixed.replace(/'([^']+)'/g, '"$1"');
-        
-        // 5. 修复未转义的特殊字符
-        fixed = fixed.replace(/\\'/g, "'")
-                     .replace(/\\"/g, '"')
-                     .replace(/\\n/g, '\n')
-                     .replace(/\\r/g, '\r')
-                     .replace(/\\t/g, '\t');
-        
-        // 6. 移除注释（JSON不允许注释）
-        fixed = fixed.replace(/\/\/.*$/gm, '')
-                     .replace(/\/\*[\s\S]*?\*\//g, '');
-        
-        // 7. 确保是有效的数组
-        if (!fixed.trim().startsWith('[')) {
-            fixed = '[' + fixed + ']';
-        }
-        
-        return fixed;
-    }
-
-    // 保存文章到GitHub（自动处理SHA冲突）
-    async saveArticles(articles, maxRetries = 3) {
-        console.log('开始保存文章到GitHub...');
-        
-        const cleanedArticles = checkAndFixData(articles);
-        
-        // 保存到本地
-        localStorage.setItem('fuwakoArticles', JSON.stringify(cleanedArticles));
-
-        if (!this.isConfigured()) {
-            console.log('GitHub未配置，仅保存到本地');
-            return { 
-                success: true, 
-                message: '文章已保存到本地（GitHub未配置）' 
-            };
-        }
-
-        let retryCount = 0;
-        
-        while (retryCount <= maxRetries) {
-            try {
-                // 获取当前文件信息
-                const fileInfo = await this.getFileInfo();
-                
-                // 准备要保存的内容
-                const jsonString = JSON.stringify(cleanedArticles, null, 2);
-                const content = safeBase64Encode(jsonString);
-                
-                // 构建请求体
-                const requestBody = {
-                    message: `更新文章 - ${formatDate(new Date())}`,
-                    content: content,
-                    branch: this.repoBranch
-                };
-                
-                // 如果文件存在，添加SHA
-                if (fileInfo && fileInfo.exists && fileInfo.sha) {
-                    requestBody.sha = fileInfo.sha;
+            // 从GitHub获取文章（改进版）
+            async fetchArticles() {
+                if (!this.isConfigured()) {
+                    console.log('GitHub未配置，使用本地存储');
+                    return this.getLocalArticles();
                 }
-                
-                console.log('发送保存请求，SHA:', requestBody.sha || '新文件');
-                
-                // 发送请求
-                const response = await fetch(
-                    `${this.apiBase}/repos/${this.repoOwner}/${this.repoName}/contents/${this.dataPath}`,
-                    {
-                        method: 'PUT',
-                        headers: {
-                            'Authorization': `token ${this.token}`,
-                            'Accept': 'application/vnd.github.v3+json',
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(requestBody)
-                    }
-                );
 
-                if (response.ok) {
-                    const result = await response.json();
-                    this.lastKnownSha = result.content.sha;
-                    localStorage.setItem('github_last_sha', result.content.sha);
+                try {
+                    console.log('正在从GitHub获取文章...');
+
+                    const fileInfo = await this.getFileInfo();
                     
-                    console.log('保存成功！新的SHA:', result.content.sha);
-                    return {
-                        success: true,
-                        message: '✓ 文章已成功保存到GitHub！',
-                        sha: result.content.sha
-                    };
-                } else {
-                    const errorData = await response.json();
+                    if (!fileInfo) {
+                        console.log('无法获取文件信息，使用本地存储');
+                        return this.getLocalArticles();
+                    }
+
+                    if (!fileInfo.exists) {
+                        console.log('文章文件不存在');
+                        return [];
+                    }
+
+                    // 解码内容
+                    const decodedContent = safeBase64Decode(fileInfo.content);
                     
-                    // 如果是SHA冲突，重试
-                    if (errorData.message && errorData.message.includes('does not match')) {
-                        console.log(`SHA冲突，尝试重试 (${retryCount + 1}/${maxRetries})`);
-                        retryCount++;
+                    // 尝试解析JSON
+                    let articles;
+                    try {
+                        articles = JSON.parse(decodedContent || '[]');
+                    } catch (error) {
+                        console.error('JSON解析失败:', error);
                         
-                        // 等待一会儿再重试
-                        await new Promise(resolve => setTimeout(resolve, 1000 * retryCount));
-                        continue;
+                        // 尝试修复JSON
+                        try {
+                            const fixedContent = this.fixJsonString(decodedContent);
+                            articles = JSON.parse(fixedContent);
+                        } catch (fixError) {
+                            console.error('JSON修复失败:', fixError);
+                            articles = [];
+                        }
                     }
+
+                    // 修复数据格式
+                    const fixedArticles = checkAndFixData(articles);
                     
-                    throw new Error(errorData.message || `保存失败: ${response.status}`);
+                    // 保存到本地存储作为备份
+                    localStorage.setItem('fuwakoArticles', JSON.stringify(fixedArticles));
+                    
+                    return fixedArticles;
+                    
+                } catch (error) {
+                    console.error('从GitHub获取文章失败：', error);
+                    return this.getLocalArticles();
+                }
+            }
+
+            // 获取本地文章
+            getLocalArticles() {
+                return JSON.parse(localStorage.getItem('fuwakoArticles') || '[]');
+            }
+
+            // 修复JSON字符串
+            fixJsonString(jsonString) {
+                if (!jsonString) return '[]';
+                
+                let fixed = jsonString;
+                
+                // 1. 移除BOM
+                fixed = fixed.replace(/^\uFEFF/, '');
+                
+                // 2. 移除尾随逗号（JSON不允许对象或数组最后一个元素后有逗号）
+                fixed = fixed.replace(/,\s*([\]}])/g, '$1');
+                
+                // 3. 修复未闭合的引号
+                fixed = fixed.replace(/([^\\])"([^"]*?)(?=,|\s*[}\]])/g, '$1"$2"');
+                
+                // 4. 修复单引号（JSON标准要求双引号）
+                fixed = fixed.replace(/'([^']+)'/g, '"$1"');
+                
+                // 5. 修复未转义的特殊字符
+                fixed = fixed.replace(/\\'/g, "'")
+                             .replace(/\\"/g, '"')
+                             .replace(/\\n/g, '\n')
+                             .replace(/\\r/g, '\r')
+                             .replace(/\\t/g, '\t');
+                
+                // 6. 移除注释（JSON不允许注释）
+                fixed = fixed.replace(/\/\/.*$/gm, '')
+                             .replace(/\/\*[\s\S]*?\*\//g, '');
+                
+                // 7. 确保是有效的数组
+                if (!fixed.trim().startsWith('[')) {
+                    fixed = '[' + fixed + ']';
                 }
                 
-            } catch (error) {
-                // 如果是最后一次重试，抛出错误
-                if (retryCount >= maxRetries) {
-                    console.error('保存到GitHub失败（重试次数用完）：', error);
-                    return {
-                        success: false,
-                        message: `保存到GitHub失败：${error.message}（文章已保存在本地）`
+                return fixed;
+            }
+
+            // 保存文章到GitHub（自动处理SHA冲突）
+            async saveArticles(articles, maxRetries = 3) {
+                console.log('开始保存文章到GitHub...');
+                
+                const cleanedArticles = checkAndFixData(articles);
+                
+                // 保存到本地
+                localStorage.setItem('fuwakoArticles', JSON.stringify(cleanedArticles));
+
+                if (!this.isConfigured()) {
+                    console.log('GitHub未配置，仅保存到本地');
+                    return { 
+                        success: true, 
+                        message: '文章已保存到本地（GitHub未配置）' 
                     };
                 }
+
+                let retryCount = 0;
                 
-                // 网络错误或其他错误，也重试
-                if (error.message.includes('Network') || error.message.includes('Failed to fetch')) {
-                    console.log(`网络错误，重试 (${retryCount + 1}/${maxRetries})`);
-                    retryCount++;
-                    await new Promise(resolve => setTimeout(resolve, 1000 * retryCount));
-                    continue;
-                }
-                
-                // 其他错误直接返回
-                console.error('保存到GitHub失败：', error);
-                return {
-                    success: false,
-                    message: `保存到GitHub失败：${error.message}（文章已保存在本地）`
-                };
-            }
-        }
-    }
-}
+                while (retryCount <= maxRetries) {
+                    try {
+                        // 获取当前文件信息
+                        const fileInfo = await this.getFileInfo();
+                        
+                        // 准备要保存的内容
+                        const jsonString = JSON.stringify(cleanedArticles, null, 2);
+                        const content = safeBase64Encode(jsonString);
+                        
+                        // 构建请求体
+                        const requestBody = {
+                            message: `更新文章 - ${formatDate(new Date())}`,
+                            content: content,
+                            branch: this.repoBranch
+                        };
+                        
+                        // 如果文件存在，添加SHA
+                        if (fileInfo && fileInfo.exists && fileInfo.sha) {
+                            requestBody.sha = fileInfo.sha;
+                        }
+                        
+                        console.log('发送保存请求，SHA:', requestBody.sha || '新文件');
+                        
+                        // 发送请求
+                        const response = await fetch(
+                            `${this.apiBase}/repos/${this.repoOwner}/${this.repoName}/contents/${this.dataPath}`,
+                            {
+                                method: 'PUT',
+                                headers: {
+                                    'Authorization': `token ${this.token}`,
+                                    'Accept': 'application/vnd.github.v3+json',
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify(requestBody)
+                            }
+                        );
 
-// 添加手动修复SHA的功能
-async function fixGitHubSHA() {
-    if (!gitHubManager.isConfigured()) {
-        showNotification('请先配置GitHub', 'warning');
-        return;
-    }
-    
-    showNotification('正在修复SHA冲突...', 'info');
-    
-    try {
-        // 1. 获取当前文章
-        const articles = await gitHubManager.fetchArticles();
-        
-        // 2. 获取最新的文件信息（强制刷新SHA）
-        const fileInfo = await gitHubManager.getFileInfo();
-        
-        if (!fileInfo) {
-            showNotification('无法获取文件信息', 'error');
-            return;
-        }
-        
-        // 3. 重新保存
-        const result = await gitHubManager.saveArticles(articles);
-        
-        if (result.success) {
-            showNotification('✅ SHA冲突已修复，文章已成功同步到GitHub', 'success');
-            loadArticles();
-        } else {
-            showNotification(`修复失败: ${result.message}`, 'error');
-        }
-    } catch (error) {
-        showNotification(`修复失败: ${error.message}`, 'error');
-    }
-}
-
-// 添加强制刷新按钮
-function addForceRefreshButton() {
-    const forceRefreshBtn = document.createElement('div');
-    forceRefreshBtn.className = 'home-icon';
-    forceRefreshBtn.style.cssText = 'bottom: 300px; right: 30px; background: #2196F3;';
-    forceRefreshBtn.innerHTML = '<i class="fas fa-redo-alt"></i>';
-    forceRefreshBtn.title = '强制刷新SHA';
-    forceRefreshBtn.onclick = fixGitHubSHA;
-    document.body.appendChild(forceRefreshBtn);
-}
-
-// 在保存文章时添加更好的错误处理
-async function handleArticleSubmit(e) {
-    e.preventDefault();
-    
-    if (!isAdmin) {
-        showNotification('🔒 请先登录管理员账户才能发布文章', 'warning');
-        return;
-    }
-    
-    const submitBtn = document.getElementById('submitBtn');
-    const originalText = submitBtn.innerHTML;
-    
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 保存中...';
-    submitBtn.disabled = true;
-    
-    const title = document.getElementById('articleTitle').value;
-    const content = document.getElementById('articleContent').value;
-    const tags = document.getElementById('articleTags').value;
-    
-    if (!title || !content) {
-        showNotification('请填写标题和内容！', 'warning');
-        submitBtn.innerHTML = originalText;
-        submitBtn.disabled = false;
-        return;
-    }
-    
-    try {
-        let articles = await gitHubManager.fetchArticles();
-        
-        const articleData = {
-            id: editingArticleId ? parseInt(editingArticleId) : Date.now(),
-            title,
-            category: "个人随笔",
-            content,
-            excerpt: content.length > 150 ? content.substring(0, 150) + '...' : content,
-            tags: tags ? tags.split(',').map(tag => tag.trim()).filter(tag => tag) : [],
-            date: formatDate(new Date())
-        };
-        
-        if (editingArticleId) {
-            const articleIndex = articles.findIndex(a => a.id == editingArticleId);
-            if (articleIndex !== -1) {
-                articles[articleIndex] = articleData;
-                showNotification(`❤️ 文章"${title}"已更新！`, 'success');
-            } else {
-                showNotification('文章更新失败，未找到原文章！', 'error');
-                submitBtn.innerHTML = originalText;
-                submitBtn.disabled = false;
-                return;
-            }
-        } else {
-            articles.unshift(articleData);
-            showNotification(`❤️ 文章"${title}"已创建！`, 'success');
-        }
-        
-        // 保存到GitHub（会自动重试）
-        const saveResult = await gitHubManager.saveArticles(articles);
-        
-        createParticles(document.getElementById('articleForm'), '❤️', 25);
-        
-        cancelEdit();
-        
-        submitBtn.innerHTML = originalText;
-        submitBtn.disabled = false;
-        
-        loadArticles();
-        
-        if (saveResult.success) {
-            showNotification(saveResult.message, 'success');
-        } else {
-            // 如果是SHA错误，提供修复建议
-            if (saveResult.message.includes('does not match')) {
-                showNotification('检测到SHA冲突，已自动保存到本地。是否尝试修复？', 'warning', 10000, () => {
-                    if (confirm('检测到GitHub SHA冲突，是否尝试自动修复？')) {
-                        fixGitHubSHA();
+                        if (response.ok) {
+                            const result = await response.json();
+                            this.lastKnownSha = result.content.sha;
+                            localStorage.setItem('github_last_sha', result.content.sha);
+                            
+                            console.log('保存成功！新的SHA:', result.content.sha);
+                            return {
+                                success: true,
+                                message: '✓ 文章已成功保存到GitHub！',
+                                sha: result.content.sha
+                            };
+                        } else {
+                            const errorData = await response.json();
+                            
+                            // 如果是SHA冲突，重试
+                            if (errorData.message && errorData.message.includes('does not match')) {
+                                console.log(`SHA冲突，尝试重试 (${retryCount + 1}/${maxRetries})`);
+                                retryCount++;
+                                
+                                // 等待一会儿再重试
+                                await new Promise(resolve => setTimeout(resolve, 1000 * retryCount));
+                                continue;
+                            }
+                            
+                            throw new Error(errorData.message || `保存失败: ${response.status}`);
+                        }
+                        
+                    } catch (error) {
+                        // 如果是最后一次重试，抛出错误
+                        if (retryCount >= maxRetries) {
+                            console.error('保存到GitHub失败（重试次数用完）：', error);
+                            return {
+                                success: false,
+                                message: `保存到GitHub失败：${error.message}（文章已保存在本地）`
+                            };
+                        }
+                        
+                        // 网络错误或其他错误，也重试
+                        if (error.message.includes('Network') || error.message.includes('Failed to fetch')) {
+                            console.log(`网络错误，重试 (${retryCount + 1}/${maxRetries})`);
+                            retryCount++;
+                            await new Promise(resolve => setTimeout(resolve, 1000 * retryCount));
+                            continue;
+                        }
+                        
+                        // 其他错误直接返回
+                        console.error('保存到GitHub失败：', error);
+                        return {
+                            success: false,
+                            message: `保存到GitHub失败：${error.message}（文章已保存在本地）`
+                        };
                     }
-                });
-            } else {
-                showNotification(saveResult.message, 'warning');
+                }
             }
         }
-        
-        setTimeout(() => {
-            showHome();
-        }, 1500);
-        
-    } catch (error) {
-        console.error('保存文章时出错:', error);
-        showNotification(`保存失败: ${error.message}`, 'error');
-        submitBtn.innerHTML = originalText;
-        submitBtn.disabled = false;
-    }
-}
-
-// 改进的显示通知函数，支持操作
-function showNotification(message, type = 'success', duration = 4000, action = null) {
-    const notification = document.getElementById('notification');
-    notification.innerHTML = message;
-    
-    if (action) {
-        const actionBtn = document.createElement('button');
-        actionBtn.textContent = '修复';
-        actionBtn.style.cssText = `
-            margin-left: 10px;
-            background: white;
-            color: var(--secondary);
-            border: 1px solid var(--secondary);
-            border-radius: 5px;
-            padding: 2px 8px;
-            cursor: pointer;
-        `;
-        actionBtn.onclick = function() {
-            notification.style.display = 'none';
-            action();
-        };
-        notification.appendChild(actionBtn);
-    }
-    
-    notification.style.display = 'flex';
-    notification.style.alignItems = 'center';
-    notification.style.justifyContent = 'space-between';
-    
-    let borderColor = '#98fb98';
-    if (type === 'warning') borderColor = '#ffb347';
-    if (type === 'error') borderColor = '#ff6b6b';
-    if (type === 'info') borderColor = '#87ceeb';
-    
-    notification.style.borderLeftColor = borderColor;
-    
-    setTimeout(() => {
-        if (notification.style.display !== 'none') {
-            notification.style.display = 'none';
-        }
-    }, duration);
-}
-
-// 在页面加载时添加按钮
-window.addEventListener('DOMContentLoaded', function() {
-    // ... 其他初始化代码 ...
-    
-    // 添加强制刷新按钮
-    addForceRefreshButton();
-    
-    // 检查是否有SHA错误记录
-    const lastError = localStorage.getItem('github_last_error');
-    if (lastError && lastError.includes('does not match')) {
-        setTimeout(() => {
-            showNotification('检测到之前的SHA冲突错误。建议点击蓝色刷新按钮修复。', 'warning', 10000);
-        }, 3000);
-    }
-});
-
-// 添加一个手动同步按钮，用于强制同步
-async function forceSyncToGitHub() {
-    if (!gitHubManager.isConfigured()) {
-        showNotification('请先配置GitHub', 'warning');
-        openGitHubConfig();
-        return;
-    }
-    
-    const syncBtn = document.getElementById('syncBtn');
-    const originalHtml = syncBtn.innerHTML;
-    
-    syncBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 强制同步中...';
-    syncBtn.classList.add('syncing');
-    
-    try {
-        // 先获取本地文章
-        const localArticles = gitHubManager.getLocalArticles();
-        
-        if (localArticles.length === 0) {
-            showNotification('没有需要同步的文章', 'info');
-            return;
-        }
-        
-        // 强制获取最新的SHA
-        await gitHubManager.getFileInfo();
-        
-        // 保存文章（会重试3次）
-        const result = await gitHubManager.saveArticles(localArticles);
-        
-        if (result.success) {
-            showNotification(result.message, 'success');
-        } else {
-            showNotification(result.message, 'warning');
-        }
-        
-    } catch (error) {
-        showNotification(`同步失败：${error.message}`, 'error');
-    } finally {
-        syncBtn.innerHTML = originalHtml;
-        syncBtn.classList.remove('syncing');
-    }
-}
-
-// 更新同步按钮的点击事件
-document.getElementById('syncBtn').addEventListener('click', async function(e) {
-    if (e.shiftKey) {
-        // Shift+点击 = 强制同步
-        forceSyncToGitHub();
-    } else {
-        // 正常点击 = 普通同步
-        syncToGitHub();
-    }
-});
 
         // 全局GitHub管理器实例
         const gitHubManager = new GitHubManager();
@@ -2337,7 +2112,7 @@ document.getElementById('syncBtn').addEventListener('click', async function(e) {
             }
         }
 
-        // 6. 加载文章列表
+        // 6. 加载文章列表 - 修复显示ID问题
         async function loadArticles() {
             const articlesGrid = document.getElementById('articlesGrid');
             
@@ -2384,6 +2159,9 @@ document.getElementById('syncBtn').addEventListener('click', async function(e) {
                     </div>
                 ` : '';
                 
+                // 修复：移除显示ID的部分
+                const displayTitle = article.title || "未命名文章";
+                
                 articleCard.innerHTML = `
                     <div class="article-header">
                         <div class="article-date">
@@ -2392,7 +2170,7 @@ document.getElementById('syncBtn').addEventListener('click', async function(e) {
                         <div class="article-category">${article.category || "个人随笔"}</div>
                         ${actionsHtml}
                     </div>
-                    <h3 class="article-title">${article.title || "未命名文章"}</h3>
+                    <h3 class="article-title">${displayTitle}</h3>
                     <p class="article-excerpt">${article.excerpt || (article.content ? article.content.substring(0, 150) + '...' : "暂无内容")}</p>
                     <button class="read-more" data-id="${article.id}">
                         阅读全文 <i class="fas fa-arrow-right"></i>
@@ -2556,339 +2334,44 @@ document.getElementById('syncBtn').addEventListener('click', async function(e) {
             document.getElementById('articleModal').classList.remove('active');
             document.body.style.overflow = 'auto';
         }
-// 修复编辑函数，使用从GitHub获取的文章数组
-async function editArticle(articleId) {
-    if (!isAdmin) {
-        showNotification('🔒 请先登录管理员账户才能编辑文章', 'warning');
-        return;
-    }
-    
-    console.log('开始编辑文章，ID:', articleId);
-    
-    try {
-        // 1. 从GitHub获取文章（确保使用最新数据）
-        const articles = await gitHubManager.fetchArticles();
-        console.log('获取到的文章列表:', articles);
-        
-        // 2. 查找要编辑的文章
-        const article = articles.find(a => {
-            console.log('检查文章:', a.id, '类型:', typeof a.id, '目标:', articleId, '类型:', typeof articleId);
-            return a.id == articleId; // 使用==因为可能一个是数字一个是字符串
-        });
-        
-        if (!article) {
-            showNotification('文章不存在！', 'error');
-            return;
-        }
-        
-        console.log('找到要编辑的文章:', article);
-        
-        // 3. 设置编辑状态
-        editingArticleId = articleId;
-        isEditing = true;
-        
-        // 4. 填充表单
-        document.getElementById('articleId').value = articleId;
-        document.getElementById('articleTitle').value = article.title || "";
-        document.getElementById('articleContent').value = article.content || "";
-        document.getElementById('articleTags').value = article.tags ? article.tags.join(', ') : '';
-        
-        // 5. 更新UI
-        document.getElementById('formTitle').innerHTML = '<i class="fas fa-edit"></i> 编辑文章';
-        document.getElementById('submitBtn').innerHTML = '<i class="fas fa-save"></i> 保存修改';
-        document.getElementById('cancelBtn').style.display = 'inline-flex';
-        
-        // 6. 显示创建表单区域
-        showCreateForm();
-        
-        showNotification(`✏️ 正在编辑：${article.title || "未命名文章"}`, 'success');
-        
-    } catch (error) {
-        console.error('编辑文章时出错:', error);
-        showNotification(`编辑失败: ${error.message}`, 'error');
-    }
-}
 
-// 同时修复文章详情页中的编辑按钮
-async function showArticle(articleId) {
-    const articles = await gitHubManager.fetchArticles();
-    const article = articles.find(a => a.id == articleId);
-    
-    if (!article) {
-        showNotification('文章不存在！', 'error');
-        return;
-    }
-    
-    // 处理内容换行
-    const contentWithLineBreaks = formatTextWithLineBreaks(article.content);
-    
-    const editDeleteButtons = isAdmin ? `
-        <div class="article-actions-detail">
-            <button class="detail-edit-btn" data-id="${article.id}">
-                <i class="fas fa-edit"></i> 编辑文章
-            </button>
-            <button class="detail-delete-btn" data-id="${article.id}">
-                <i class="fas fa-trash"></i> 删除文章
-            </button>
-        </div>
-    ` : '';
-    
-    const cloudIcon = gitHubManager.isConfigured() ? '<span style="color:#6e8efb; margin-left:10px;"><i class="fas fa-cloud"></i> 已同步</span>' : '';
-    
-    const articleDetail = document.getElementById('articleDetail');
-    articleDetail.innerHTML = `
-        <div class="article-header-detail">
-            <h1 class="article-title-detail">${article.title || "未命名文章"}</h1>
-            <div class="article-meta">
-                <div>
-                    <span style="margin-right: 20px;"><i class="far fa-calendar"></i> ${article.date} ${cloudIcon}</span>
-                    <span><i class="fas fa-folder"></i> ${article.category || "个人随笔"}</span>
-                </div>
-                <div class="article-category">${article.category || "个人随笔"}</div>
-            </div>
-        </div>
-        <div class="article-content-detail">
-            ${contentWithLineBreaks}
-        </div>
-        ${article.tags && article.tags.length > 0 ? `
-            <div style="margin-top: 30px; display: flex; flex-wrap: wrap; gap: 10px;">
-                <strong style="margin-right: 10px;">关键词：</strong>
-                ${article.tags.map(tag => `<span style="background: rgba(255, 182, 193, 0.2); padding: 5px 10px; border-radius: 15px; font-size: 14px;">${tag}</span>`).join('')}
-            </div>
-        ` : ''}
-        ${editDeleteButtons}
-    `;
-    
-    document.getElementById('articleModal').classList.add('active');
-    document.body.style.overflow = 'hidden';
-    
-    // 绑定编辑和删除按钮事件
-    const editBtn = document.querySelector('.detail-edit-btn');
-    const deleteBtn = document.querySelector('.detail-delete-btn');
-    
-    if (editBtn) {
-        editBtn.addEventListener('click', function() {
-            const articleId = this.getAttribute('data-id');
-            closeArticleModal();
-            editArticle(articleId);
-        });
-    }
-    
-    if (deleteBtn) {
-        deleteBtn.addEventListener('click', function() {
-            const articleId = this.getAttribute('data-id');
-            closeArticleModal();
-            deleteArticle(articleId);
-        });
-    }
-    
-    showNotification(`📖 正在阅读：${article.title || "未命名文章"}`, 'success');
-}
-
-// 添加调试函数，查看文章列表
-async function debugArticles() {
-    try {
-        const articles = await gitHubManager.fetchArticles();
-        console.group('文章列表调试信息');
-        console.log('文章总数:', articles.length);
-        console.log('文章列表:', articles);
-        
-        // 显示每个文章的ID和标题
-        articles.forEach((article, index) => {
-            console.log(`文章 ${index + 1}: ID=${article.id} (${typeof article.id}), 标题="${article.title}"`);
-        });
-        console.groupEnd();
-        
-        // 在页面上显示一个简单的调试面板
-        const debugInfo = `
-            <div style="position: fixed; top: 100px; left: 20px; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); z-index: 1000; max-width: 300px;">
-                <h3 style="color: var(--primary); margin-bottom: 10px;">调试信息</h3>
-                <p>文章总数: ${articles.length}</p>
-                <div style="max-height: 200px; overflow-y: auto; margin-top: 10px;">
-                    ${articles.map(article => `
-                        <div style="padding: 5px; border-bottom: 1px solid #eee;">
-                            <strong>ID:</strong> ${article.id}<br>
-                            <strong>标题:</strong> ${article.title || "无标题"}
-                        </div>
-                    `).join('')}
-                </div>
-                <button onclick="this.parentNode.remove()" style="margin-top: 10px; padding: 5px 10px; background: var(--secondary); color: white; border: none; border-radius: 5px;">关闭</button>
-            </div>
-        `;
-        
-        // 移除之前的调试面板
-        const oldDebug = document.querySelector('.debug-panel');
-        if (oldDebug) oldDebug.remove();
-        
-        // 添加新的调试面板
-        const debugDiv = document.createElement('div');
-        debugDiv.className = 'debug-panel';
-        debugDiv.innerHTML = debugInfo;
-        document.body.appendChild(debugDiv);
-        
-    } catch (error) {
-        console.error('调试失败:', error);
-        showNotification(`调试失败: ${error.message}`, 'error');
-    }
-}
-
-// 在文章网格中的编辑按钮也需要修复
-function bindGridEvents() {
-    const articlesGrid = document.getElementById('articlesGrid');
-    
-    articlesGrid.addEventListener('click', function(e) {
-        // 阅读全文按钮
-        if (e.target.classList.contains('read-more') || e.target.closest('.read-more')) {
-            const articleId = e.target.getAttribute('data-id') || 
-                             e.target.closest('.read-more').getAttribute('data-id');
-            showArticle(articleId);
-        }
-        
-        // 编辑按钮 - 使用异步函数
-        if (e.target.classList.contains('edit-btn') || e.target.closest('.edit-btn')) {
-            const articleId = e.target.getAttribute('data-id') || 
-                             e.target.closest('.edit-btn').getAttribute('data-id');
+        // 10. 编辑文章
+        async function editArticle(articleId) {
+            if (!isAdmin) {
+                showNotification('🔒 请先登录管理员账户才能编辑文章', 'warning');
+                return;
+            }
             
-            // 添加加载状态
-            const editBtn = e.target.classList.contains('edit-btn') ? e.target : e.target.closest('.edit-btn');
-            const originalHtml = editBtn.innerHTML;
-            editBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            console.log('开始编辑文章，ID:', articleId);
             
-            // 异步调用编辑函数
-            setTimeout(async () => {
-                try {
-                    await editArticle(articleId);
-                } catch (error) {
-                    console.error('编辑失败:', error);
-                    showNotification(`编辑失败: ${error.message}`, 'error');
-                } finally {
-                    editBtn.innerHTML = originalHtml;
-                }
-            }, 100);
+            const articles = await gitHubManager.fetchArticles();
+            const article = articles.find(a => a.id == articleId);
+            
+            if (!article) {
+                showNotification('文章不存在！', 'error');
+                return;
+            }
+            
+            editingArticleId = articleId;
+            isEditing = true;
+            
+            setTimeout(() => {
+                document.getElementById('articleId').value = articleId;
+                document.getElementById('articleTitle').value = article.title || "";
+                document.getElementById('articleContent').value = article.content || "";
+                document.getElementById('articleTags').value = article.tags ? article.tags.join(', ') : '';
+                
+                document.getElementById('formTitle').innerHTML = '<i class="fas fa-edit"></i> 编辑文章';
+                document.getElementById('submitBtn').innerHTML = '<i class="fas fa-save"></i> 保存修改';
+                
+                document.getElementById('cancelBtn').style.display = 'inline-flex';
+            }, 50);
+            
+            showCreateForm();
+            
+            showNotification(`✏️ 正在编辑：${article.title || "未命名文章"}`, 'success');
         }
-        
-        // 删除按钮
-        if (e.target.classList.contains('delete-btn') || e.target.closest('.delete-btn')) {
-            const articleId = e.target.getAttribute('data-id') || 
-                             e.target.closest('.delete-btn').getAttribute('data-id');
-            deleteArticle(articleId);
-        }
-        
-        // 点击文章卡片（除按钮外）
-        if (e.target.closest('.article-card') && 
-            !e.target.classList.contains('read-more') && 
-            !e.target.closest('.read-more') &&
-            !e.target.classList.contains('edit-btn') && 
-            !e.target.closest('.edit-btn') &&
-            !e.target.classList.contains('delete-btn') && 
-            !e.target.closest('.delete-btn')) {
-            const articleCard = e.target.closest('.article-card');
-            const articleId = articleCard.getAttribute('data-id');
-            showArticle(articleId);
-        }
-    });
-}
 
-// 更新绑定事件的函数
-function bindEvents() {
-    // ... 其他绑定代码 ...
-    
-    // 使用新的网格事件绑定
-    bindGridEvents();
-    
-    // 添加调试快捷键
-    document.addEventListener('keydown', function(e) {
-        // Ctrl+Shift+D 打开调试
-        if (e.ctrlKey && e.shiftKey && e.key === 'D') {
-            e.preventDefault();
-            debugArticles();
-        }
-    });
-}
-
-// 在加载文章时添加调试信息
-async function loadArticles() {
-    const articlesGrid = document.getElementById('articlesGrid');
-    
-    const articles = await gitHubManager.fetchArticles();
-    
-    console.log('加载文章，总数:', articles.length);
-    
-    // 为每个文章添加调试信息
-    articles.forEach(article => {
-        console.log(`文章: ID=${article.id}, 标题="${article.title}"`);
-    });
-    
-    articles.sort((a, b) => {
-        // 确保排序正确，使用数字ID
-        const idA = Number(a.id) || 0;
-        const idB = Number(b.id) || 0;
-        return idB - idA;
-    });
-    
-    articlesGrid.innerHTML = '';
-    
-    if (articles.length === 0) {
-        // ... 空状态代码 ...
-        return;
-    }
-    
-    articles.forEach(article => {
-        const articleCard = document.createElement('article');
-        articleCard.className = 'article-card';
-        articleCard.setAttribute('data-id', article.id);
-        
-        // 添加调试信息到标题
-        const debugInfo = isAdmin ;
-        const displayTitle = article.title || "未命名文章";
-        
-        const cloudIcon = gitHubManager.isConfigured() ? '<i class="fas fa-cloud cloud-icon" title="已同步到GitHub"></i>' : '';
-        
-        const actionsHtml = isAdmin ? `
-            <div class="article-actions">
-                <button class="edit-btn" data-id="${article.id}" title="编辑文章">
-                    <i class="fas fa-edit"></i>
-                </button>
-                <button class="delete-btn" data-id="${article.id}" title="删除文章">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </div>
-        ` : '';
-        
-        articleCard.innerHTML = `
-            <div class="article-header">
-                <div class="article-date">
-                    <i class="far fa-calendar"></i> ${article.date} ${cloudIcon}
-                </div>
-                <div class="article-category">${article.category || "个人随笔"}</div>
-                ${actionsHtml}
-            </div>
-            <h3 class="article-title">${displayTitle}${debugInfo}</h3>
-            <p class="article-excerpt">${article.excerpt || (article.content ? article.content.substring(0, 150) + '...' : "暂无内容")}</p>
-            <button class="read-more" data-id="${article.id}">
-                阅读全文 <i class="fas fa-arrow-right"></i>
-            </button>
-        `;
-        
-        articlesGrid.appendChild(articleCard);
-    });
-}
-
-// 页面加载时添加调试按钮
-window.addEventListener('DOMContentLoaded', function() {
-    // ... 其他初始化代码 ...
-    
-    // 在页面底部添加调试按钮
-    const debugBtn = document.createElement('div');
-    debugBtn.className = 'home-icon';
-    debugBtn.style.cssText = 'bottom: 180px; right: 30px; background: #666;';
-    debugBtn.innerHTML = '<i class="fas fa-bug"></i>';
-    debugBtn.title = '调试文章列表';
-    debugBtn.onclick = debugArticles;
-    document.body.appendChild(debugBtn);
-    
-    console.log('页面初始化完成');
-});
         // 11. 取消编辑
         function cancelEdit() {
             editingArticleId = null;
@@ -3224,9 +2707,3 @@ window.addEventListener('DOMContentLoaded', function() {
     </script>
 </body>
 </html>
-
-
-
-
-
-
