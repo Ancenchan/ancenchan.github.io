@@ -2244,44 +2244,339 @@
             document.getElementById('articleModal').classList.remove('active');
             document.body.style.overflow = 'auto';
         }
-
-        // 10. 编辑文章
-        function editArticle(articleId) {
-            if (!isAdmin) {
-                showNotification('🔒 请先登录管理员账户才能编辑文章', 'warning');
-                return;
-            }
-            
-            console.log('开始编辑文章，ID:', articleId);
-            
-            const userArticles = JSON.parse(localStorage.getItem('fuwakoArticles') || '[]');
-            const article = userArticles.find(a => a.id == articleId);
-            
-            if (!article) {
-                showNotification('文章不存在！', 'error');
-                return;
-            }
-            
-            editingArticleId = articleId;
-            isEditing = true;
-            
-            setTimeout(() => {
-                document.getElementById('articleId').value = articleId;
-                document.getElementById('articleTitle').value = article.title || "";
-                document.getElementById('articleContent').value = article.content || "";
-                document.getElementById('articleTags').value = article.tags ? article.tags.join(', ') : '';
-                
-                document.getElementById('formTitle').innerHTML = '<i class="fas fa-edit"></i> 编辑文章';
-                document.getElementById('submitBtn').innerHTML = '<i class="fas fa-save"></i> 保存修改';
-                
-                document.getElementById('cancelBtn').style.display = 'inline-flex';
-            }, 50);
-            
-            showCreateForm();
-            
-            showNotification(`✏️ 正在编辑：${article.title || "未命名文章"}`, 'success');
+// 修复编辑函数，使用从GitHub获取的文章数组
+async function editArticle(articleId) {
+    if (!isAdmin) {
+        showNotification('🔒 请先登录管理员账户才能编辑文章', 'warning');
+        return;
+    }
+    
+    console.log('开始编辑文章，ID:', articleId);
+    
+    try {
+        // 1. 从GitHub获取文章（确保使用最新数据）
+        const articles = await gitHubManager.fetchArticles();
+        console.log('获取到的文章列表:', articles);
+        
+        // 2. 查找要编辑的文章
+        const article = articles.find(a => {
+            console.log('检查文章:', a.id, '类型:', typeof a.id, '目标:', articleId, '类型:', typeof articleId);
+            return a.id == articleId; // 使用==因为可能一个是数字一个是字符串
+        });
+        
+        if (!article) {
+            showNotification('文章不存在！', 'error');
+            return;
         }
+        
+        console.log('找到要编辑的文章:', article);
+        
+        // 3. 设置编辑状态
+        editingArticleId = articleId;
+        isEditing = true;
+        
+        // 4. 填充表单
+        document.getElementById('articleId').value = articleId;
+        document.getElementById('articleTitle').value = article.title || "";
+        document.getElementById('articleContent').value = article.content || "";
+        document.getElementById('articleTags').value = article.tags ? article.tags.join(', ') : '';
+        
+        // 5. 更新UI
+        document.getElementById('formTitle').innerHTML = '<i class="fas fa-edit"></i> 编辑文章';
+        document.getElementById('submitBtn').innerHTML = '<i class="fas fa-save"></i> 保存修改';
+        document.getElementById('cancelBtn').style.display = 'inline-flex';
+        
+        // 6. 显示创建表单区域
+        showCreateForm();
+        
+        showNotification(`✏️ 正在编辑：${article.title || "未命名文章"}`, 'success');
+        
+    } catch (error) {
+        console.error('编辑文章时出错:', error);
+        showNotification(`编辑失败: ${error.message}`, 'error');
+    }
+}
 
+// 同时修复文章详情页中的编辑按钮
+async function showArticle(articleId) {
+    const articles = await gitHubManager.fetchArticles();
+    const article = articles.find(a => a.id == articleId);
+    
+    if (!article) {
+        showNotification('文章不存在！', 'error');
+        return;
+    }
+    
+    // 处理内容换行
+    const contentWithLineBreaks = formatTextWithLineBreaks(article.content);
+    
+    const editDeleteButtons = isAdmin ? `
+        <div class="article-actions-detail">
+            <button class="detail-edit-btn" data-id="${article.id}">
+                <i class="fas fa-edit"></i> 编辑文章
+            </button>
+            <button class="detail-delete-btn" data-id="${article.id}">
+                <i class="fas fa-trash"></i> 删除文章
+            </button>
+        </div>
+    ` : '';
+    
+    const cloudIcon = gitHubManager.isConfigured() ? '<span style="color:#6e8efb; margin-left:10px;"><i class="fas fa-cloud"></i> 已同步</span>' : '';
+    
+    const articleDetail = document.getElementById('articleDetail');
+    articleDetail.innerHTML = `
+        <div class="article-header-detail">
+            <h1 class="article-title-detail">${article.title || "未命名文章"}</h1>
+            <div class="article-meta">
+                <div>
+                    <span style="margin-right: 20px;"><i class="far fa-calendar"></i> ${article.date} ${cloudIcon}</span>
+                    <span><i class="fas fa-folder"></i> ${article.category || "个人随笔"}</span>
+                </div>
+                <div class="article-category">${article.category || "个人随笔"}</div>
+            </div>
+        </div>
+        <div class="article-content-detail">
+            ${contentWithLineBreaks}
+        </div>
+        ${article.tags && article.tags.length > 0 ? `
+            <div style="margin-top: 30px; display: flex; flex-wrap: wrap; gap: 10px;">
+                <strong style="margin-right: 10px;">关键词：</strong>
+                ${article.tags.map(tag => `<span style="background: rgba(255, 182, 193, 0.2); padding: 5px 10px; border-radius: 15px; font-size: 14px;">${tag}</span>`).join('')}
+            </div>
+        ` : ''}
+        ${editDeleteButtons}
+    `;
+    
+    document.getElementById('articleModal').classList.add('active');
+    document.body.style.overflow = 'hidden';
+    
+    // 绑定编辑和删除按钮事件
+    const editBtn = document.querySelector('.detail-edit-btn');
+    const deleteBtn = document.querySelector('.detail-delete-btn');
+    
+    if (editBtn) {
+        editBtn.addEventListener('click', function() {
+            const articleId = this.getAttribute('data-id');
+            closeArticleModal();
+            editArticle(articleId);
+        });
+    }
+    
+    if (deleteBtn) {
+        deleteBtn.addEventListener('click', function() {
+            const articleId = this.getAttribute('data-id');
+            closeArticleModal();
+            deleteArticle(articleId);
+        });
+    }
+    
+    showNotification(`📖 正在阅读：${article.title || "未命名文章"}`, 'success');
+}
+
+// 添加调试函数，查看文章列表
+async function debugArticles() {
+    try {
+        const articles = await gitHubManager.fetchArticles();
+        console.group('文章列表调试信息');
+        console.log('文章总数:', articles.length);
+        console.log('文章列表:', articles);
+        
+        // 显示每个文章的ID和标题
+        articles.forEach((article, index) => {
+            console.log(`文章 ${index + 1}: ID=${article.id} (${typeof article.id}), 标题="${article.title}"`);
+        });
+        console.groupEnd();
+        
+        // 在页面上显示一个简单的调试面板
+        const debugInfo = `
+            <div style="position: fixed; top: 100px; left: 20px; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); z-index: 1000; max-width: 300px;">
+                <h3 style="color: var(--primary); margin-bottom: 10px;">调试信息</h3>
+                <p>文章总数: ${articles.length}</p>
+                <div style="max-height: 200px; overflow-y: auto; margin-top: 10px;">
+                    ${articles.map(article => `
+                        <div style="padding: 5px; border-bottom: 1px solid #eee;">
+                            <strong>ID:</strong> ${article.id}<br>
+                            <strong>标题:</strong> ${article.title || "无标题"}
+                        </div>
+                    `).join('')}
+                </div>
+                <button onclick="this.parentNode.remove()" style="margin-top: 10px; padding: 5px 10px; background: var(--secondary); color: white; border: none; border-radius: 5px;">关闭</button>
+            </div>
+        `;
+        
+        // 移除之前的调试面板
+        const oldDebug = document.querySelector('.debug-panel');
+        if (oldDebug) oldDebug.remove();
+        
+        // 添加新的调试面板
+        const debugDiv = document.createElement('div');
+        debugDiv.className = 'debug-panel';
+        debugDiv.innerHTML = debugInfo;
+        document.body.appendChild(debugDiv);
+        
+    } catch (error) {
+        console.error('调试失败:', error);
+        showNotification(`调试失败: ${error.message}`, 'error');
+    }
+}
+
+// 在文章网格中的编辑按钮也需要修复
+function bindGridEvents() {
+    const articlesGrid = document.getElementById('articlesGrid');
+    
+    articlesGrid.addEventListener('click', function(e) {
+        // 阅读全文按钮
+        if (e.target.classList.contains('read-more') || e.target.closest('.read-more')) {
+            const articleId = e.target.getAttribute('data-id') || 
+                             e.target.closest('.read-more').getAttribute('data-id');
+            showArticle(articleId);
+        }
+        
+        // 编辑按钮 - 使用异步函数
+        if (e.target.classList.contains('edit-btn') || e.target.closest('.edit-btn')) {
+            const articleId = e.target.getAttribute('data-id') || 
+                             e.target.closest('.edit-btn').getAttribute('data-id');
+            
+            // 添加加载状态
+            const editBtn = e.target.classList.contains('edit-btn') ? e.target : e.target.closest('.edit-btn');
+            const originalHtml = editBtn.innerHTML;
+            editBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            
+            // 异步调用编辑函数
+            setTimeout(async () => {
+                try {
+                    await editArticle(articleId);
+                } catch (error) {
+                    console.error('编辑失败:', error);
+                    showNotification(`编辑失败: ${error.message}`, 'error');
+                } finally {
+                    editBtn.innerHTML = originalHtml;
+                }
+            }, 100);
+        }
+        
+        // 删除按钮
+        if (e.target.classList.contains('delete-btn') || e.target.closest('.delete-btn')) {
+            const articleId = e.target.getAttribute('data-id') || 
+                             e.target.closest('.delete-btn').getAttribute('data-id');
+            deleteArticle(articleId);
+        }
+        
+        // 点击文章卡片（除按钮外）
+        if (e.target.closest('.article-card') && 
+            !e.target.classList.contains('read-more') && 
+            !e.target.closest('.read-more') &&
+            !e.target.classList.contains('edit-btn') && 
+            !e.target.closest('.edit-btn') &&
+            !e.target.classList.contains('delete-btn') && 
+            !e.target.closest('.delete-btn')) {
+            const articleCard = e.target.closest('.article-card');
+            const articleId = articleCard.getAttribute('data-id');
+            showArticle(articleId);
+        }
+    });
+}
+
+// 更新绑定事件的函数
+function bindEvents() {
+    // ... 其他绑定代码 ...
+    
+    // 使用新的网格事件绑定
+    bindGridEvents();
+    
+    // 添加调试快捷键
+    document.addEventListener('keydown', function(e) {
+        // Ctrl+Shift+D 打开调试
+        if (e.ctrlKey && e.shiftKey && e.key === 'D') {
+            e.preventDefault();
+            debugArticles();
+        }
+    });
+}
+
+// 在加载文章时添加调试信息
+async function loadArticles() {
+    const articlesGrid = document.getElementById('articlesGrid');
+    
+    const articles = await gitHubManager.fetchArticles();
+    
+    console.log('加载文章，总数:', articles.length);
+    
+    // 为每个文章添加调试信息
+    articles.forEach(article => {
+        console.log(`文章: ID=${article.id}, 标题="${article.title}"`);
+    });
+    
+    articles.sort((a, b) => {
+        // 确保排序正确，使用数字ID
+        const idA = Number(a.id) || 0;
+        const idB = Number(b.id) || 0;
+        return idB - idA;
+    });
+    
+    articlesGrid.innerHTML = '';
+    
+    if (articles.length === 0) {
+        // ... 空状态代码 ...
+        return;
+    }
+    
+    articles.forEach(article => {
+        const articleCard = document.createElement('article');
+        articleCard.className = 'article-card';
+        articleCard.setAttribute('data-id', article.id);
+        
+        // 添加调试信息到标题
+        const debugInfo = isAdmin ? ` (ID: ${article.id})` : '';
+        const displayTitle = article.title || "未命名文章";
+        
+        const cloudIcon = gitHubManager.isConfigured() ? '<i class="fas fa-cloud cloud-icon" title="已同步到GitHub"></i>' : '';
+        
+        const actionsHtml = isAdmin ? `
+            <div class="article-actions">
+                <button class="edit-btn" data-id="${article.id}" title="编辑文章">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="delete-btn" data-id="${article.id}" title="删除文章">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        ` : '';
+        
+        articleCard.innerHTML = `
+            <div class="article-header">
+                <div class="article-date">
+                    <i class="far fa-calendar"></i> ${article.date} ${cloudIcon}
+                </div>
+                <div class="article-category">${article.category || "个人随笔"}</div>
+                ${actionsHtml}
+            </div>
+            <h3 class="article-title">${displayTitle}${debugInfo}</h3>
+            <p class="article-excerpt">${article.excerpt || (article.content ? article.content.substring(0, 150) + '...' : "暂无内容")}</p>
+            <button class="read-more" data-id="${article.id}">
+                阅读全文 <i class="fas fa-arrow-right"></i>
+            </button>
+        `;
+        
+        articlesGrid.appendChild(articleCard);
+    });
+}
+
+// 页面加载时添加调试按钮
+window.addEventListener('DOMContentLoaded', function() {
+    // ... 其他初始化代码 ...
+    
+    // 在页面底部添加调试按钮
+    const debugBtn = document.createElement('div');
+    debugBtn.className = 'home-icon';
+    debugBtn.style.cssText = 'bottom: 180px; right: 30px; background: #666;';
+    debugBtn.innerHTML = '<i class="fas fa-bug"></i>';
+    debugBtn.title = '调试文章列表';
+    debugBtn.onclick = debugArticles;
+    document.body.appendChild(debugBtn);
+    
+    console.log('页面初始化完成');
+});
         // 11. 取消编辑
         function cancelEdit() {
             editingArticleId = null;
@@ -2617,3 +2912,4 @@
     </script>
 </body>
 </html>
+
