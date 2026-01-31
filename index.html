@@ -6,7 +6,6 @@
     <title>🏠 Fuwako的家 | 温馨小窝，记录生活</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        
         /* 1. 导入华文中宋字体并优化渲染 */
         @font-face {
             font-family: '华文中宋';
@@ -25,16 +24,17 @@
             font-smooth: always;
         }
         
-/* 2. 自定义鼠标样式 - 简单爱心图案 */
-* {
-    /* 空心爱心作为默认指针 */
-    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="none" stroke="%23ff6699" stroke-width="1.5"/></svg>'), auto !important;
-}
+        /* 2. 自定义鼠标样式 - 简单爱心图案 */
+        * {
+            /* 空心爱心作为默认指针 */
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="none" stroke="%23ff6699" stroke-width="1.5"/></svg>'), auto !important;
+        }
 
-a, button, .clickable, input, textarea, select {
-    /* 实心爱心作为可点击指针 */
-    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="%23ff6699"/></svg>'), pointer !important;
-}
+        a, button, .clickable, input, textarea, select {
+            /* 实心爱心作为可点击指针 */
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="%23ff6699"/></svg>'), pointer !important;
+        }
+        
         /* 3. 基础样式 - 使用华文中宋并优化 */
         :root {
             --primary: #ffb6c1;
@@ -156,7 +156,7 @@ a, button, .clickable, input, textarea, select {
             font-size: 12px;
         }
         
-        /* 新增：管理员按钮样式 */
+        /* 管理员按钮样式 */
         #adminBtn {
             background: linear-gradient(135deg, var(--secondary), #ff8fab);
             color: white;
@@ -171,7 +171,7 @@ a, button, .clickable, input, textarea, select {
             box-shadow: 0 6px 15px rgba(255, 107, 157, 0.4);
         }
         
-        /* 新增：已登录状态样式 */
+        /* 已登录状态样式 */
         #adminBtn.logged-in {
             background: linear-gradient(135deg, #4CAF50, #45a049);
             box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
@@ -180,6 +180,46 @@ a, button, .clickable, input, textarea, select {
         #adminBtn.logged-in:hover {
             background: linear-gradient(135deg, #45a049, #4CAF50);
             box-shadow: 0 6px 15px rgba(76, 175, 80, 0.4);
+        }
+        
+        /* GitHub相关按钮样式 */
+        #syncBtn {
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            box-shadow: 0 4px 12px rgba(110, 142, 251, 0.3);
+        }
+        
+        #syncBtn:hover {
+            background: linear-gradient(135deg, #5a7dfa, #9666d8);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(110, 142, 251, 0.4);
+        }
+        
+        #syncBtn.syncing {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+        
+        #configBtn {
+            background: linear-gradient(135deg, #333, #555);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        #configBtn:hover {
+            background: linear-gradient(135deg, #555, #333);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
         }
         
         /* 5. 首页横幅 */
@@ -1101,152 +1141,85 @@ a, button, .clickable, input, textarea, select {
             transform: translateY(-3px);
             box-shadow: 0 8px 20px rgba(255, 107, 157, 0.4);
         }
-        /* ========== GitHub同步相关样式 ========== */
-
-/* 同步按钮样式 */
-#syncBtn {
-    background: linear-gradient(135deg, #6e8efb, #a777e3);
-    color: white;
-    padding: 8px 16px;
-    border-radius: 20px;
-    box-shadow: 0 4px 12px rgba(110, 142, 251, 0.3);
-}
-
-#syncBtn:hover {
-    background: linear-gradient(135deg, #5a7dfa, #9666d8);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(110, 142, 251, 0.4);
-}
-
-#syncBtn.syncing {
-    background: linear-gradient(135deg, #4CAF50, #45a049);
-    animation: pulse 1.5s infinite;
-}
-
-@keyframes pulse {
-    0% { opacity: 1; }
-    50% { opacity: 0.7; }
-    100% { opacity: 1; }
-}
-
-/* 配置按钮样式 */
-#configBtn {
-    background: linear-gradient(135deg, #333, #555);
-    color: white;
-    padding: 8px 16px;
-    border-radius: 20px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-#configBtn:hover {
-    background: linear-gradient(135deg, #555, #333);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
-}
-
-/* 同步状态提示 */
-.sync-status {
-    position: fixed;
-    top: 80px;
-    right: 20px;
-    background: white;
-    padding: 15px 20px;
-    border-radius: 10px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-    z-index: 1000;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    animation: slideDown 0.3s ease;
-    font-family: var(--font-zh);
-    letter-spacing: 0.5px;
-}
-
-@keyframes slideDown {
-    from { transform: translateY(-20px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
-}
-
-.sync-status.success {
-    border-left: 5px solid #4CAF50;
-}
-
-.sync-status.error {
-    border-left: 5px solid #f44336;
-}
-
-.sync-status.info {
-    border-left: 5px solid #2196F3;
-}
-
-.sync-status.warning {
-    border-left: 5px solid #ff9800;
-}
-
-/* GitHub配置模态框样式 */
-.github-status-indicator {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 12px;
-    margin-left: 8px;
-}
-
-.github-status-indicator.connected {
-    color: #4CAF50;
-}
-
-.github-status-indicator.disconnected {
-    color: #f44336;
-}
-
-/* 云端图标样式（用于文章日期旁边） */
-.cloud-icon {
-    color: #6e8efb;
-    margin-left: 5px;
-    font-size: 12px;
-}
-
-/* 配置表单样式 */
-.github-config-form {
-    margin-top: 20px;
-}
-
-.github-config-form .form-group {
-    margin-bottom: 20px;
-}
-
-.github-config-form small {
-    color: #666;
-    display: block;
-    margin-top: 5px;
-    font-size: 13px;
-    line-height: 1.5;
-}
-
-.github-config-form a {
-    color: #6e8efb;
-    text-decoration: none;
-}
-
-.github-config-form a:hover {
-    text-decoration: underline;
-}
-
-/* 响应式调整 */
-@media (max-width: 768px) {
-    .sync-status {
-        top: 60px;
-        right: 10px;
-        left: 10px;
-        max-width: calc(100% - 20px);
-    }
-    
-    #syncBtn, #configBtn {
-        padding: 6px 12px;
-        font-size: 14px;
-    }
-}
+        
+        /* 18. GitHub相关样式 */
+        /* 同步状态提示 */
+        .sync-status {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideDown 0.3s ease;
+            font-family: var(--font-zh);
+            letter-spacing: 0.5px;
+        }
+        
+        @keyframes slideDown {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .sync-status.success {
+            border-left: 5px solid #4CAF50;
+        }
+        
+        .sync-status.error {
+            border-left: 5px solid #f44336;
+        }
+        
+        .sync-status.info {
+            border-left: 5px solid #2196F3;
+        }
+        
+        .sync-status.warning {
+            border-left: 5px solid #ff9800;
+        }
+        
+        /* GitHub状态指示器 */
+        .github-status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+        
+        .github-status-indicator.connected {
+            color: #4CAF50;
+        }
+        
+        .github-status-indicator.disconnected {
+            color: #f44336;
+        }
+        
+        /* 云端图标样式（用于文章日期旁边） */
+        .cloud-icon {
+            color: #6e8efb;
+            margin-left: 5px;
+            font-size: 12px;
+        }
+        
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .sync-status {
+                top: 60px;
+                right: 10px;
+                left: 10px;
+                max-width: calc(100% - 20px);
+            }
+            
+            #syncBtn, #configBtn {
+                padding: 6px 12px;
+                font-size: 14px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1264,6 +1237,9 @@ a, button, .clickable, input, textarea, select {
                     <li><a id="navAbout"><i class="fas fa-heart"></i> 关于</a></li>
                     <!-- 新增：我是安尘按钮 -->
                     <li><a id="adminBtn"><i class="fas fa-user-secret"></i> 我是安尘</a></li>
+                    <!-- 新增：GitHub相关按钮 -->
+                    <li><a id="syncBtn"><i class="fas fa-cloud-upload-alt"></i> 同步</a></li>
+                    <li><a id="configBtn"><i class="fab fa-github"></i> 配置</a></li>
                 </ul>
             </nav>
         </div>
@@ -1290,7 +1266,6 @@ a, button, .clickable, input, textarea, select {
             
             <div class="articles-grid" id="articlesGrid">
                 <!-- 文章会动态加载到这里 -->
-                <!-- 没有任何示例文章，只显示用户自己写的文章 -->
             </div>
             
             <!-- 侧边栏区域 -->
@@ -1381,75 +1356,52 @@ a, button, .clickable, input, textarea, select {
         </div>
     </div>
 
-<!-- GitHub配置模态框 -->
-<div id="githubConfigModal" class="article-modal">
-    <div class="modal-content" style="max-width: 600px;">
-        <button class="close-modal" onclick="closeGitHubConfig()">&times;</button>
-        <h2 style="color: var(--primary); margin-bottom: 20px;">
-            <i class="fab fa-github"></i> GitHub配置
-        </h2>
-        
-        <div id="githubStatus" style="margin-bottom: 20px; padding: 15px; border-radius: 10px; background: #f0f8ff; display: none;">
-            <!-- 状态信息会在这里显示 -->
-        </div>
-        
-        <div class="form-group">
-            <label for="githubToken"><i class="fas fa-key"></i> GitHub访问令牌</label>
-            <input type="password" id="githubToken" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" style="font-family: monospace;">
-            <small style="color: #666; display: block; margin-top: 5px;">
-                需要创建具有repo权限的token：<a href="https://github.com/settings/tokens" target="_blank">创建令牌</a>
-            </small>
-        </div>
-        
-        <div class="form-group">
-            <label for="repoOwner"><i class="fas fa-user"></i> 仓库所有者用户名</label>
-            <input type="text" id="repoOwner" placeholder="你的GitHub用户名">
-        </div>
-        
-        <div class="form-group">
-            <label for="repoName"><i class="fas fa-code-branch"></i> 仓库名称</label>
-            <input type="text" id="repoName" placeholder="你的仓库名（如：fuwako-diary）">
-        </div>
-        
-        <div class="form-group">
-            <label for="repoBranch"><i class="fas fa-code-branch"></i> 分支</label>
-            <input type="text" id="repoBranch" value="main" placeholder="main">
-        </div>
-        
-        <div class="button-group" style="margin-top: 30px;">
-            <button onclick="testGitHubConnection()" class="btn" style="background: #333; color: white;">
-                <i class="fas fa-plug"></i> 测试连接
-            </button>
-            <button onclick="saveGitHubConfig()" class="submit-btn">
-                <i class="fas fa-save"></i> 保存配置
-            </button>
+    <!-- GitHub配置模态框 -->
+    <div id="githubConfigModal" class="article-modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <button class="close-modal" id="closeGitHubConfig">&times;</button>
+            <h2 style="color: var(--primary); margin-bottom: 20px;">
+                <i class="fab fa-github"></i> GitHub配置
+            </h2>
+            
+            <div id="githubStatus" style="margin-bottom: 20px; padding: 15px; border-radius: 10px; background: #f0f8ff; display: none;">
+                <!-- 状态信息会在这里显示 -->
+            </div>
+            
+            <div class="form-group">
+                <label for="githubToken"><i class="fas fa-key"></i> GitHub访问令牌</label>
+                <input type="password" id="githubToken" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" style="font-family: monospace;">
+                <small style="color: #666; display: block; margin-top: 5px;">
+                    需要创建具有repo权限的token：<a href="https://github.com/settings/tokens" target="_blank">创建令牌</a>
+                </small>
+            </div>
+            
+            <div class="form-group">
+                <label for="repoOwner"><i class="fas fa-user"></i> 仓库所有者用户名</label>
+                <input type="text" id="repoOwner" placeholder="你的GitHub用户名">
+            </div>
+            
+            <div class="form-group">
+                <label for="repoName"><i class="fas fa-code-branch"></i> 仓库名称</label>
+                <input type="text" id="repoName" placeholder="你的仓库名（如：fuwako-diary）">
+            </div>
+            
+            <div class="form-group">
+                <label for="repoBranch"><i class="fas fa-code-branch"></i> 分支</label>
+                <input type="text" id="repoBranch" value="main" placeholder="main">
+            </div>
+            
+            <div class="button-group" style="margin-top: 30px;">
+                <button id="testGitHubBtn" class="btn" style="background: #333; color: white;">
+                    <i class="fas fa-plug"></i> 测试连接
+                </button>
+                <button id="saveGitHubConfig" class="submit-btn">
+                    <i class="fas fa-save"></i> 保存配置
+                </button>
+            </div>
         </div>
     </div>
-</div>
 
-<!-- 同步按钮（添加到导航栏） -->
-<script>
-// 在导航栏添加同步按钮
-window.addEventListener('DOMContentLoaded', function() {
-    const nav = document.querySelector('nav ul');
-    const syncLi = document.createElement('li');
-    syncLi.innerHTML = `
-        <a id="syncBtn" title="同步到GitHub">
-            <i class="fas fa-cloud-upload-alt"></i> 同步
-        </a>
-    `;
-    nav.appendChild(syncLi);
-    
-    // 添加配置按钮
-    const configLi = document.createElement('li');
-    configLi.innerHTML = `
-        <a onclick="openGitHubConfig()" title="GitHub设置">
-            <i class="fab fa-github"></i> 配置
-        </a>
-    `;
-    nav.appendChild(configLi);
-});
-</script>
     <!-- 底部 -->
     <footer>
         <div class="container">
@@ -1489,6 +1441,9 @@ window.addEventListener('DOMContentLoaded', function() {
             
             <div class="copyright">
                 <p>© 2024 Fuwako的家 | 本页面由纯HTML/CSS/JavaScript构建</p>
+                <p id="githubStatusFooter" style="font-size: 12px; margin-top: 5px; color: #888;">
+                    <i class="fas fa-cloud"></i> GitHub同步：未配置
+                </p>
             </div>
         </div>
     </footer>
@@ -1506,67 +1461,301 @@ window.addEventListener('DOMContentLoaded', function() {
     <!-- 提示消息 -->
     <div id="notification" class="notification"></div>
 
+    <!-- GitHub API脚本（内联方式） -->
     <script>
-        // 当前编辑的文章ID
+        // GitHub API 配置和操作
+        class GitHubManager {
+            constructor() {
+                this.token = localStorage.getItem('github_token') || '';
+                this.repoOwner = localStorage.getItem('github_repo_owner') || '';
+                this.repoName = localStorage.getItem('github_repo_name') || '';
+                this.repoBranch = localStorage.getItem('github_repo_branch') || 'main';
+                this.dataPath = 'data/articles.json';
+                this.apiBase = 'https://api.github.com';
+            }
+
+            // 保存配置
+            saveConfig(token, owner, name, branch) {
+                localStorage.setItem('github_token', token);
+                localStorage.setItem('github_repo_owner', owner);
+                localStorage.setItem('github_repo_name', name);
+                localStorage.setItem('github_repo_branch', branch);
+                
+                this.token = token;
+                this.repoOwner = owner;
+                this.repoName = name;
+                this.repoBranch = branch;
+                
+                return this.isConfigured();
+            }
+
+            // 检查是否配置完成
+            isConfigured() {
+                return this.token && this.repoOwner && this.repoName;
+            }
+
+            // 显示配置状态
+            showConfigStatus() {
+                const statusDiv = document.getElementById('githubStatus');
+                if (!this.isConfigured()) {
+                    statusDiv.innerHTML = `
+                        <div style="color: #f44336;">
+                            <i class="fas fa-exclamation-triangle"></i> 
+                            GitHub配置未完成！请填写所有信息。
+                        </div>
+                    `;
+                    statusDiv.style.display = 'block';
+                    return false;
+                }
+                
+                statusDiv.innerHTML = `
+                    <div style="color: #4CAF50;">
+                        <i class="fas fa-check-circle"></i> 
+                        GitHub已配置！仓库：${this.repoOwner}/${this.repoName}
+                    </div>
+                `;
+                statusDiv.style.display = 'block';
+                return true;
+            }
+
+            // 测试连接
+            async testConnection() {
+                if (!this.isConfigured()) {
+                    throw new Error('请先完成GitHub配置');
+                }
+
+                try {
+                    const response = await fetch(`${this.apiBase}/repos/${this.repoOwner}/${this.repoName}`, {
+                        headers: {
+                            'Authorization': `token ${this.token}`,
+                            'Accept': 'application/vnd.github.v3+json'
+                        }
+                    });
+
+                    if (response.ok) {
+                        const repoInfo = await response.json();
+                        return {
+                            success: true,
+                            message: `✓ 连接成功！仓库：${repoInfo.full_name}`,
+                            repo: repoInfo
+                        };
+                    } else {
+                        throw new Error(`GitHub API错误：${response.status}`);
+                    }
+                } catch (error) {
+                    throw new Error(`连接失败：${error.message}`);
+                }
+            }
+
+            // 从GitHub获取文章
+            async fetchArticles() {
+                if (!this.isConfigured()) {
+                    console.log('GitHub未配置，使用本地存储');
+                    return JSON.parse(localStorage.getItem('fuwakoArticles') || '[]');
+                }
+
+                try {
+                    // 获取文件内容
+                    const response = await fetch(
+                        `${this.apiBase}/repos/${this.repoOwner}/${this.repoName}/contents/${this.dataPath}?ref=${this.repoBranch}`,
+                        {
+                            headers: {
+                                'Authorization': `token ${this.token}`,
+                                'Accept': 'application/vnd.github.v3+json'
+                            }
+                        }
+                    );
+
+                    if (response.status === 404) {
+                        console.log('文章文件不存在，创建新文件');
+                        return [];
+                    }
+
+                    if (!response.ok) {
+                        throw new Error(`获取失败：${response.status}`);
+                    }
+
+                    const fileData = await response.json();
+                    const content = atob(fileData.content); // base64解码
+                    return JSON.parse(content || '[]');
+                    
+                } catch (error) {
+                    console.error('从GitHub获取文章失败：', error);
+                    // 失败时使用本地存储
+                    return JSON.parse(localStorage.getItem('fuwakoArticles') || '[]');
+                }
+            }
+
+            // 保存文章到GitHub
+            async saveArticles(articles) {
+                // 先保存到本地存储作为备份
+                localStorage.setItem('fuwakoArticles', JSON.stringify(articles));
+
+                if (!this.isConfigured()) {
+                    console.log('GitHub未配置，仅保存到本地');
+                    return { success: true, message: '文章已保存到本地（GitHub未配置）' };
+                }
+
+                try {
+                    // 先检查文件是否存在
+                    let sha = null;
+                    try {
+                        const getResponse = await fetch(
+                            `${this.apiBase}/repos/${this.repoOwner}/${this.repoName}/contents/${this.dataPath}?ref=${this.repoBranch}`,
+                            {
+                                headers: {
+                                    'Authorization': `token ${this.token}`,
+                                    'Accept': 'application/vnd.github.v3+json'
+                                }
+                            }
+                        );
+                        
+                        if (getResponse.ok) {
+                            const fileData = await getResponse.json();
+                            sha = fileData.sha;
+                        }
+                    } catch (e) {
+                        // 文件不存在是正常的，sha保持null
+                    }
+
+                    // 创建或更新文件
+                    const content = btoa(unescape(encodeURIComponent(JSON.stringify(articles, null, 2))));
+                    const response = await fetch(
+                        `${this.apiBase}/repos/${this.repoOwner}/${this.repoName}/contents/${this.dataPath}`,
+                        {
+                            method: 'PUT',
+                            headers: {
+                                'Authorization': `token ${this.token}`,
+                                'Accept': 'application/vnd.github.v3+json',
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                message: `更新日记 - ${new Date().toLocaleString('zh-CN')}`,
+                                content: content,
+                                branch: this.repoBranch,
+                                sha: sha // 如果文件已存在，需要提供sha
+                            })
+                        }
+                    );
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || '保存失败');
+                    }
+
+                    return {
+                        success: true,
+                        message: '✓ 文章已成功保存到GitHub！'
+                    };
+
+                } catch (error) {
+                    console.error('保存到GitHub失败：', error);
+                    return {
+                        success: false,
+                        message: `保存到GitHub失败：${error.message}（文章已保存在本地）`
+                    };
+                }
+            }
+
+            // 获取原始JSON文件的URL（用于直接访问）
+            getRawUrl() {
+                return `https://raw.githubusercontent.com/${this.repoOwner}/${this.repoName}/${this.repoBranch}/${this.dataPath}`;
+            }
+        }
+
+        // 全局GitHub管理器实例
+        const gitHubManager = new GitHubManager();
+
+        // 更新GitHub UI状态
+        function updateGitHubUI() {
+            const syncBtn = document.getElementById('syncBtn');
+            const configBtn = document.getElementById('configBtn');
+            const footerStatus = document.getElementById('githubStatusFooter');
+            
+            if (gitHubManager.isConfigured()) {
+                syncBtn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> 同步';
+                syncBtn.title = '同步文章到GitHub';
+                configBtn.innerHTML = '<i class="fab fa-github"></i> 已配置';
+                configBtn.style.background = 'linear-gradient(135deg, #4CAF50, #45a049)';
+                footerStatus.innerHTML = '<i class="fas fa-cloud"></i> GitHub同步：已配置';
+                footerStatus.style.color = '#4CAF50';
+            } else {
+                syncBtn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> 同步';
+                syncBtn.title = '请先配置GitHub';
+                configBtn.innerHTML = '<i class="fab fa-github"></i> 配置';
+                configBtn.style.background = 'linear-gradient(135deg, #333, #555)';
+                footerStatus.innerHTML = '<i class="fas fa-cloud"></i> GitHub同步：未配置';
+                footerStatus.style.color = '#888';
+            }
+        }
+    </script>
+
+    <!-- 主应用脚本 -->
+    <script>
+        // 当前编辑的文章ID和管理员状态
         let editingArticleId = null;
         let isEditing = false;
-        let isAdmin = false; // 新增：管理员状态
-        
-        // 注意：这里完全删除了示例文章数组！
+        let isAdmin = false;
 
-        // 2. 页面加载完成后初始化
+        // 1. 页面加载完成后初始化
         window.addEventListener('DOMContentLoaded', function() {
+            // 加载GitHub配置并更新UI
+            updateGitHubUI();
+            
+            // 检查是否已有管理员状态
+            checkAdminStatus();
+            
             // 加载文章列表
             loadArticles();
             
             // 绑定事件
             bindEvents();
             
-            // 检查是否已有管理员状态
-            checkAdminStatus();
-            
             // 显示欢迎消息
             setTimeout(() => {
-                showNotification('❤️ 欢迎来到Fuwako的家！点击写文章开始记录你的生活吧～', 'success');
+                showNotification('❤️ 欢迎来到Fuwako的家！', 'success');
+                if (!gitHubManager.isConfigured()) {
+                    showNotification('💡 请点击"配置"按钮设置GitHub同步，这样你的文章就能在任何设备访问了！', 'info');
+                }
             }, 1000);
             
             // 初始化返回顶部按钮
             initScrollTop();
         });
-        
-        // 新增：检查管理员状态
+
+        // 2. 检查管理员状态
         function checkAdminStatus() {
             const savedAdmin = localStorage.getItem('fuwakoAdmin');
             if (savedAdmin === 'true') {
                 isAdmin = true;
                 document.getElementById('adminBtn').classList.add('logged-in');
                 document.getElementById('adminBtn').innerHTML = '<i class="fas fa-user-secret"></i> 退出管理';
-                updateUIForAdmin();
                 showNotification('👑 已自动登录为管理员', 'success');
             }
         }
 
-        // 3. 加载文章列表 - 修改后只从本地存储加载
-        function loadArticles() {
+        // 3. 加载文章列表
+        async function loadArticles() {
             const articlesGrid = document.getElementById('articlesGrid');
             
-            // 只获取用户发布的文章
-            const userArticles = JSON.parse(localStorage.getItem('fuwakoArticles') || '[]');
+            // 从GitHub或本地存储获取文章
+            const articles = await gitHubManager.fetchArticles();
             
             // 按ID倒序排序（新文章在前面）
-            userArticles.sort((a, b) => b.id - a.id);
+            articles.sort((a, b) => b.id - a.id);
             
             // 清空现有内容
             articlesGrid.innerHTML = '';
             
             // 如果没有文章，显示提示信息
-            if (userArticles.length === 0) {
+            if (articles.length === 0) {
                 articlesGrid.innerHTML = `
                     <div class="article-card" style="text-align: center; padding: 50px 30px; grid-column: 1 / -1;">
                         <i class="fas fa-pencil-alt" style="font-size: 60px; color: var(--primary); margin-bottom: 20px;"></i>
                         <h3 style="font-size: 24px; margin-bottom: 15px;">还没有文章呢</h3>
                         <p style="line-height: 1.8; color: #666; margin-bottom: 25px;">
                             点击右上角的"写文章"开始记录你的生活吧～
+                            ${gitHubManager.isConfigured() ? '' : '<br><br>💡 请先点击"配置"按钮设置GitHub同步'}
                         </p>
                         <button id="startWriting" class="btn" style="margin: 0 auto;">
                             <i class="fas fa-pencil-alt"></i> 开始写第一篇文章
@@ -1574,21 +1763,18 @@ window.addEventListener('DOMContentLoaded', function() {
                     </div>
                 `;
                 
-                // 为开始写作按钮添加事件
-                document.getElementById('startWriting')?.addEventListener('click', function() {
-                    showCreateForm();
-                });
-                
+                document.getElementById('startWriting')?.addEventListener('click', showCreateForm);
                 return;
             }
             
             // 生成文章卡片
-            userArticles.forEach(article => {
+            articles.forEach(article => {
                 const articleCard = document.createElement('article');
                 articleCard.className = 'article-card';
                 articleCard.setAttribute('data-id', article.id);
                 
-                // 判断是否显示编辑和删除按钮
+                const cloudIcon = gitHubManager.isConfigured() ? '<i class="fas fa-cloud cloud-icon" title="已同步到GitHub"></i>' : '';
+                
                 const actionsHtml = isAdmin ? `
                     <div class="article-actions">
                         <button class="edit-btn" data-id="${article.id}" title="编辑文章">
@@ -1603,7 +1789,7 @@ window.addEventListener('DOMContentLoaded', function() {
                 articleCard.innerHTML = `
                     <div class="article-header">
                         <div class="article-date">
-                            <i class="far fa-calendar"></i> ${article.date}
+                            <i class="far fa-calendar"></i> ${article.date} ${cloudIcon}
                         </div>
                         <div class="article-category">${article.category}</div>
                         ${actionsHtml}
@@ -1618,21 +1804,6 @@ window.addEventListener('DOMContentLoaded', function() {
                 articlesGrid.appendChild(articleCard);
             });
         }
-        
-        // 新增：更新UI以显示编辑功能
-        function updateUIForAdmin() {
-            // 重新加载文章列表以显示编辑按钮
-            loadArticles();
-            
-            // 如果是管理员，直接显示写文章按钮
-            const navCreate = document.getElementById('navCreate');
-            const footerCreate = document.getElementById('footerCreate');
-            
-            if (isAdmin) {
-                navCreate.style.display = 'block';
-                footerCreate.style.display = 'block';
-            }
-        }
 
         // 4. 绑定所有事件
         function bindEvents() {
@@ -1643,34 +1814,38 @@ window.addEventListener('DOMContentLoaded', function() {
             document.getElementById('homeLogo').addEventListener('click', showHome);
             document.getElementById('exploreBtn').addEventListener('click', scrollToArticles);
             
-            // 新增：管理员按钮事件
+            // 管理员按钮事件
             document.getElementById('adminBtn').addEventListener('click', function() {
                 if (!isAdmin) {
-                    // 输入密码
                     const password = prompt('请输入管理密码：');
-                    // 这里设置密码，你可以修改为你自己的密码
-                    const ADMIN_PASSWORD = "anchen"; // 修改这里设置你的密码
+                    const ADMIN_PASSWORD = "anchen"; // 默认密码
                     
                     if (password === ADMIN_PASSWORD) {
                         isAdmin = true;
                         localStorage.setItem('fuwakoAdmin', 'true');
                         this.classList.add('logged-in');
                         this.innerHTML = '<i class="fas fa-user-secret"></i> 退出管理';
-                        updateUIForAdmin();
+                        loadArticles();
                         showNotification('👑 欢迎回来，安尘！现在可以编辑和删除文章了。', 'success');
                     } else {
                         showNotification('❌ 密码错误！', 'error');
                     }
                 } else {
-                    // 退出管理员模式
                     isAdmin = false;
                     localStorage.removeItem('fuwakoAdmin');
                     this.classList.remove('logged-in');
                     this.innerHTML = '<i class="fas fa-user-secret"></i> 我是安尘';
-                    loadArticles(); // 重新加载文章，隐藏编辑按钮
+                    loadArticles();
                     showNotification('👋 已退出管理员模式', 'info');
                 }
             });
+            
+            // GitHub按钮事件
+            document.getElementById('syncBtn').addEventListener('click', syncToGitHub);
+            document.getElementById('configBtn').addEventListener('click', openGitHubConfig);
+            document.getElementById('testGitHubBtn').addEventListener('click', testGitHubConnection);
+            document.getElementById('saveGitHubConfig').addEventListener('click', saveGitHubConfig);
+            document.getElementById('closeGitHubConfig').addEventListener('click', closeGitHubConfig);
             
             // 底部链接事件
             document.getElementById('footerHome').addEventListener('click', showHome);
@@ -1736,6 +1911,7 @@ window.addEventListener('DOMContentLoaded', function() {
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape') {
                     closeArticleModal();
+                    closeGitHubConfig();
                 }
             });
         }
@@ -1775,7 +1951,6 @@ window.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('createSection').style.display = 'block';
                 document.getElementById('aboutSection').style.display = 'none';
                 
-                // 滚动到写文章区域
                 setTimeout(() => {
                     document.getElementById('createSection').scrollIntoView({ 
                         behavior: 'smooth',
@@ -1792,7 +1967,6 @@ window.addEventListener('DOMContentLoaded', function() {
             document.getElementById('createSection').style.display = 'block';
             document.getElementById('aboutSection').style.display = 'none';
             
-            // 滚动到写文章区域
             setTimeout(() => {
                 document.getElementById('createSection').scrollIntoView({ 
                     behavior: 'smooth',
@@ -1813,7 +1987,6 @@ window.addEventListener('DOMContentLoaded', function() {
             document.getElementById('createSection').style.display = 'none';
             document.getElementById('aboutSection').style.display = 'block';
             
-            // 滚动到关于区域
             document.getElementById('aboutSection').scrollIntoView({ behavior: 'smooth' });
         }
 
@@ -1821,13 +1994,11 @@ window.addEventListener('DOMContentLoaded', function() {
             document.getElementById('articles').scrollIntoView({ behavior: 'smooth' });
         }
 
-        // 6. 显示文章详情 - 修改后只从用户文章中查找
-        function showArticle(articleId) {
-            // 只获取用户文章
-            const userArticles = JSON.parse(localStorage.getItem('fuwakoArticles') || '[]');
-            
-            // 查找指定文章
-            const article = userArticles.find(a => a.id == articleId);
+        // 6. 显示文章详情
+        async function showArticle(articleId) {
+            // 从GitHub或本地获取文章
+            const articles = await gitHubManager.fetchArticles();
+            const article = articles.find(a => a.id == articleId);
             
             if (!article) {
                 showNotification('文章不存在！', 'error');
@@ -1846,13 +2017,15 @@ window.addEventListener('DOMContentLoaded', function() {
                 </div>
             ` : '';
             
+            const cloudIcon = gitHubManager.isConfigured() ? '<span style="color:#6e8efb; margin-left:10px;"><i class="fas fa-cloud"></i> 已同步</span>' : '';
+            
             const articleDetail = document.getElementById('articleDetail');
             articleDetail.innerHTML = `
                 <div class="article-header-detail">
                     <h1 class="article-title-detail">${article.title}</h1>
                     <div class="article-meta">
                         <div>
-                            <span style="margin-right: 20px;"><i class="far fa-calendar"></i> ${article.date}</span>
+                            <span style="margin-right: 20px;"><i class="far fa-calendar"></i> ${article.date} ${cloudIcon}</span>
                             <span><i class="fas fa-folder"></i> ${article.category}</span>
                         </div>
                         <div class="article-category">${article.category}</div>
@@ -1872,7 +2045,7 @@ window.addEventListener('DOMContentLoaded', function() {
             
             // 显示模态框
             document.getElementById('articleModal').classList.add('active');
-            document.body.style.overflow = 'hidden'; // 防止背景滚动
+            document.body.style.overflow = 'hidden';
             
             // 为详情页的编辑和删除按钮添加事件（仅管理员可见）
             const editBtn = document.querySelector('.detail-edit-btn');
@@ -1900,10 +2073,10 @@ window.addEventListener('DOMContentLoaded', function() {
         // 7. 关闭文章模态框
         function closeArticleModal() {
             document.getElementById('articleModal').classList.remove('active');
-            document.body.style.overflow = 'auto'; // 恢复背景滚动
+            document.body.style.overflow = 'auto';
         }
 
-        // 8. 编辑文章（修复后的版本）
+        // 8. 编辑文章
         function editArticle(articleId) {
             // 检查是否是管理员
             if (!isAdmin) {
@@ -1913,10 +2086,8 @@ window.addEventListener('DOMContentLoaded', function() {
             
             console.log('开始编辑文章，ID:', articleId);
             
-            // 从用户文章中查找
+            // 从本地存储获取文章进行编辑
             const userArticles = JSON.parse(localStorage.getItem('fuwakoArticles') || '[]');
-            
-            // 查找指定文章
             const article = userArticles.find(a => a.id == articleId);
             
             if (!article) {
@@ -1969,8 +2140,8 @@ window.addEventListener('DOMContentLoaded', function() {
             showNotification('已取消编辑', 'info');
         }
 
-        // 10. 文章提交处理（新建或更新）
-        function handleArticleSubmit(e) {
+        // 10. 文章提交处理
+        async function handleArticleSubmit(e) {
             e.preventDefault();
             
             // 检查是否是管理员
@@ -1998,26 +2169,26 @@ window.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             
+            // 获取现有文章
+            let articles = await gitHubManager.fetchArticles();
+            
             // 创建文章对象
             const articleData = {
                 id: editingArticleId ? parseInt(editingArticleId) : Date.now(),
                 title,
-                category: "个人随笔", // 固定分类
+                category: "个人随笔",
                 content,
                 excerpt: content.length > 150 ? content.substring(0, 150) + '...' : content,
                 tags: tags ? tags.split(',').map(tag => tag.trim()).filter(tag => tag) : [],
                 date: editingArticleId ? 
-                    // 如果是编辑，保持原日期
                     (() => {
-                        const userArticles = JSON.parse(localStorage.getItem('fuwakoArticles') || '[]');
-                        const oldArticle = userArticles.find(a => a.id == editingArticleId);
+                        const oldArticle = articles.find(a => a.id == editingArticleId);
                         return oldArticle ? oldArticle.date : new Date().toLocaleDateString('zh-CN', {
                             year: 'numeric',
                             month: 'long',
                             day: 'numeric'
                         });
                     })() :
-                    // 如果是新建，使用当前日期
                     new Date().toLocaleDateString('zh-CN', {
                         year: 'numeric',
                         month: 'long',
@@ -2025,15 +2196,12 @@ window.addEventListener('DOMContentLoaded', function() {
                     })
             };
             
-            // 获取现有用户文章
-            let articles = JSON.parse(localStorage.getItem('fuwakoArticles') || '[]');
-            
             if (editingArticleId) {
-                // 更新文章 - 找到并替换
+                // 更新文章
                 const articleIndex = articles.findIndex(a => a.id == editingArticleId);
                 if (articleIndex !== -1) {
                     articles[articleIndex] = articleData;
-                    showNotification(`❤️ 文章"${title}"已成功更新！`, 'success');
+                    showNotification(`❤️ 文章"${title}"已更新！`, 'success');
                 } else {
                     showNotification('文章更新失败，未找到原文章！', 'error');
                     submitBtn.innerHTML = originalText;
@@ -2043,11 +2211,11 @@ window.addEventListener('DOMContentLoaded', function() {
             } else {
                 // 新建文章
                 articles.unshift(articleData);
-                showNotification(`❤️ 文章"${title}"已成功保存到你的家中！`, 'success');
+                showNotification(`❤️ 文章"${title}"已创建！`, 'success');
             }
             
-            // 保存到本地存储
-            localStorage.setItem('fuwakoArticles', JSON.stringify(articles));
+            // 保存到GitHub
+            const saveResult = await gitHubManager.saveArticles(articles);
             
             // 添加庆祝粒子效果
             createParticles(document.getElementById('articleForm'), '❤️', 25);
@@ -2056,13 +2224,18 @@ window.addEventListener('DOMContentLoaded', function() {
             cancelEdit();
             
             // 恢复按钮状态
-            setTimeout(() => {
-                submitBtn.innerHTML = originalText;
-                submitBtn.disabled = false;
-            }, 500);
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
             
             // 重新加载文章列表
             loadArticles();
+            
+            // 显示保存结果
+            if (saveResult.success) {
+                showNotification(saveResult.message, 'success');
+            } else {
+                showNotification(saveResult.message, 'warning');
+            }
             
             // 切换到首页
             setTimeout(() => {
@@ -2070,8 +2243,8 @@ window.addEventListener('DOMContentLoaded', function() {
             }, 1500);
         }
 
-        // 11. 删除文章 - 简化版本，不需要检查示例文章
-        function deleteArticle(articleId) {
+        // 11. 删除文章
+        async function deleteArticle(articleId) {
             // 检查是否是管理员
             if (!isAdmin) {
                 showNotification('🔒 请先登录管理员账户才能删除文章', 'warning');
@@ -2082,12 +2255,14 @@ window.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             
-            // 获取用户文章
-            const userArticles = JSON.parse(localStorage.getItem('fuwakoArticles') || '[]');
+            // 获取文章列表
+            const articles = await gitHubManager.fetchArticles();
             
-            // 删除用户文章
-            const updatedArticles = userArticles.filter(a => a.id != articleId);
-            localStorage.setItem('fuwakoArticles', JSON.stringify(updatedArticles));
+            // 删除文章
+            const updatedArticles = articles.filter(a => a.id != articleId);
+            
+            // 保存到GitHub
+            const saveResult = await gitHubManager.saveArticles(updatedArticles);
             
             // 如果正在编辑这篇文章，取消编辑状态
             if (editingArticleId == articleId) {
@@ -2098,7 +2273,11 @@ window.addEventListener('DOMContentLoaded', function() {
             // 重新加载文章列表
             loadArticles();
             
-            showNotification('🗑️ 文章已删除', 'success');
+            if (saveResult.success) {
+                showNotification('🗑️ 文章已删除并同步到GitHub', 'success');
+            } else {
+                showNotification(`文章已从本地删除，但GitHub同步失败：${saveResult.message}`, 'warning');
+            }
         }
 
         // 12. 提示消息
@@ -2183,7 +2362,111 @@ window.addEventListener('DOMContentLoaded', function() {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             });
         }
+
+        // 16. GitHub配置相关函数
+        function openGitHubConfig() {
+            document.getElementById('githubConfigModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+            
+            // 填充现有配置
+            document.getElementById('githubToken').value = gitHubManager.token || '';
+            document.getElementById('repoOwner').value = gitHubManager.repoOwner || '';
+            document.getElementById('repoName').value = gitHubManager.repoName || '';
+            document.getElementById('repoBranch').value = gitHubManager.repoBranch || 'main';
+            
+            // 显示状态
+            gitHubManager.showConfigStatus();
+        }
+
+        function closeGitHubConfig() {
+            document.getElementById('githubConfigModal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        async function testGitHubConnection() {
+            const token = document.getElementById('githubToken').value;
+            const owner = document.getElementById('repoOwner').value;
+            const name = document.getElementById('repoName').value;
+            const branch = document.getElementById('repoBranch').value || 'main';
+            
+            if (!token || !owner || !name) {
+                showNotification('请填写所有配置信息！', 'warning');
+                return;
+            }
+            
+            gitHubManager.saveConfig(token, owner, name, branch);
+            
+            try {
+                const result = await gitHubManager.testConnection();
+                showNotification(result.message, 'success');
+                
+                // 更新状态显示
+                gitHubManager.showConfigStatus();
+            } catch (error) {
+                showNotification(`测试失败：${error.message}`, 'error');
+            }
+        }
+
+        function saveGitHubConfig() {
+            const token = document.getElementById('githubToken').value;
+            const owner = document.getElementById('repoOwner').value;
+            const name = document.getElementById('repoName').value;
+            const branch = document.getElementById('repoBranch').value || 'main';
+            
+            if (!token || !owner || !name) {
+                showNotification('请填写所有配置信息！', 'warning');
+                return;
+            }
+            
+            const success = gitHubManager.saveConfig(token, owner, name, branch);
+            
+            if (success) {
+                showNotification('GitHub配置已保存！', 'success');
+                updateGitHubUI();
+                loadArticles(); // 重新加载文章，显示云端图标
+                closeGitHubConfig();
+            }
+        }
+
+        // 17. 手动同步到GitHub
+        async function syncToGitHub() {
+            if (!gitHubManager.isConfigured()) {
+                showNotification('请先配置GitHub信息！', 'warning');
+                openGitHubConfig();
+                return;
+            }
+            
+            const syncBtn = document.getElementById('syncBtn');
+            const originalHtml = syncBtn.innerHTML;
+            
+            syncBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 同步中...';
+            syncBtn.classList.add('syncing');
+            
+            try {
+                // 获取本地文章
+                const articles = JSON.parse(localStorage.getItem('fuwakoArticles') || '[]');
+                
+                if (articles.length === 0) {
+                    showNotification('没有需要同步的文章', 'info');
+                    return;
+                }
+                
+                // 保存到GitHub
+                const result = await gitHubManager.saveArticles(articles);
+                
+                if (result.success) {
+                    showNotification(result.message, 'success');
+                } else {
+                    showNotification(result.message, 'warning');
+                }
+                
+            } catch (error) {
+                showNotification(`同步失败：${error.message}`, 'error');
+            } finally {
+                syncBtn.innerHTML = originalHtml;
+                syncBtn.classList.remove('syncing');
+            }
+        }
     </script>
 </body>
 </html>
-
