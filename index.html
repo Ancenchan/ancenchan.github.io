@@ -26,7 +26,7 @@
         
         /* 2. 自定义鼠标样式 - 樱花图案 */
         * {
-            cursor: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE2IDVDMTguNDA0IDUgMjAuNTY1IDYuMTY1IDIxLjk0MiA4SDE2VjVaIiBmaWxsPSIjRkY4Q0NEIi8+CjxwYXRoIGQ9Ik0xMCAxNUMxMCAxOC44NjYgMTMuMTM0IDIyIDE3IDIyQzIwLjg2NiAyMiAyNCAxOC44NjYgMjQgMTVDMjQgMTMuNTYxIDIzLjU2NSAxMi4yMjkgMjIuODE1IDExLjA4OEwyMS45NDIgOEgxMC4wNThMOS4xODUxMSAxMS4wODhDOC40MzUzNiAxMi4yMjkgOCAxMy41NjEgOCAxNUM4IDE4Ljg2NiAxMS4xMzQgMjIgMTUgMjJDMTAuNzYxIDIyIDguMzM5NCAxOS42NzEgOC4yMDk5NiAxNy4yODJMOCAxN1Y4QzQuNjg2MjkgOS4yNjQ2OCAyLjUgMTEuODYzIDIuNSAxNUMxLjY3MTU3IDE1IDAgMTUgMCAxNUMwIDkuNDc3MTUgNy4xNjM0NCA1IDE2IDVaIiBmaWxsPSIjRkY2Njk5Ii8+CjxwYXRoIGQ9Ik0yMC41IDE0LjVDMjAuNSAxMy4xMTkgMTkuMzgxIDEyIDE4IDEyQzE2LjYxOSAxMiAxNS41IDEzLjExOSAxNS41IDE0LjVDMTUuNSAxNS44ODEgMTYuNjE5IDE3IDE4IDE3QzE5LjM4MSAxNyAyMC41IDE1Ljg4MSAyMC41IDE0LjVaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4='), auto !important;
+            cursor: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE2IDVDMTguNDA0IDUgMjAuNTY1IDYuMTY1IDIxLjk0MiA4SDE2VjVaIiBmaWxsPSIjRkY4Q0NEIi8+CjxwYXRoIGQ9Ik0xMCAxNUMxMCAxOC44NjYgMTMuMTM0IDIyIDE3IDIyQzIwLjg2NiAyMiAyNCAxOC44NjYgMjQgMTVDMjQgMTMuNTYxIDIzLjU2NSAxMi4yMjkgMjIuODE1IDExLjA4OEwyMS45NDIgOEgxMC4wNThMOS4xODUxMSAxMS4wODhDOC40MzUzNiAxMi4yMjkgOCAxMy41NjEgOCAxNUM4IDE4Ljg2NiAxMS4xMzQgMjIgMTUgMjJDMTAuNzYxIDIyIDguMzM5NCAxOS42NzEgOC4yMDk5NiAxNy4yODJMOCAxN1Y4QzQuNjg2MjkgOS4yNjQ2OCAyLjUgMTEuODYzIDIuNSAxNUMxLjY3MTU3IDE1IDAgMTUgMCAxNUMwIDkuNDc3MTUgNy4xNjM0IDUgMTYgNVoiIGZpbGw9IiNGRjY2OTkiLz4KPHBhdGggZD0iTTIwLjUgMTQuNUMyMC41IDEzLjExOSAxOS4zODEgMTIgMTggMTJDMTYuNjE5IDEyIDE1LjUgMTMuMTE5IDE1LjUgMTQuNUMxNS41IDE1Ljg4MSAxNi42MTkgMTcgMTggMTdDMTkuMzgxIDE3IDIwLjUgMTUuODgxIDIwLjUgMTQuNVoiIGZpbGw9IndoaXRlIi8+Cjwvc3ZnPg=='), auto !important;
         }
         
         a, button, .clickable, input, textarea, select {
@@ -1080,6 +1080,7 @@
             
             <div class="articles-grid" id="articlesGrid">
                 <!-- 文章会动态加载到这里 -->
+                <!-- 没有任何示例文章，只显示用户自己写的文章 -->
             </div>
             
             <!-- 侧边栏区域 -->
@@ -1232,7 +1233,9 @@
         // 当前编辑的文章ID
         let editingArticleId = null;
         let isEditing = false;
-    
+        
+        // 注意：这里完全删除了示例文章数组！
+
         // 2. 页面加载完成后初始化
         window.addEventListener('DOMContentLoaded', function() {
             // 加载文章列表
@@ -1243,46 +1246,64 @@
             
             // 显示欢迎消息
             setTimeout(() => {
-                showNotification('🌸 欢迎来到Fuwako的家！点击文章可以查看完整内容哦～', 'success');
+                showNotification('🌸 欢迎来到Fuwako的家！点击写文章开始记录你的生活吧～', 'success');
             }, 1000);
             
             // 初始化返回顶部按钮
             initScrollTop();
         });
 
-        // 3. 加载文章列表
+        // 3. 加载文章列表 - 修改后只从本地存储加载
         function loadArticles() {
             const articlesGrid = document.getElementById('articlesGrid');
             
-            // 获取所有文章（示例文章 + 用户发布的文章）
+            // 只获取用户发布的文章
             const userArticles = JSON.parse(localStorage.getItem('fuwakoArticles') || '[]');
-            const allArticles = [ ...userArticles];
             
-            // 按日期排序（简单的按id倒序）
-            allArticles.sort((a, b) => b.id - a.id);
+            // 按ID倒序排序（新文章在前面）
+            userArticles.sort((a, b) => b.id - a.id);
             
             // 清空现有内容
             articlesGrid.innerHTML = '';
             
+            // 如果没有文章，显示提示信息
+            if (userArticles.length === 0) {
+                articlesGrid.innerHTML = `
+                    <div class="article-card" style="text-align: center; padding: 50px 30px; grid-column: 1 / -1;">
+                        <i class="fas fa-pencil-alt" style="font-size: 60px; color: var(--primary); margin-bottom: 20px;"></i>
+                        <h3 style="font-size: 24px; margin-bottom: 15px;">还没有文章呢</h3>
+                        <p style="line-height: 1.8; color: #666; margin-bottom: 25px;">
+                            点击右上角的"写文章"开始记录你的生活吧～
+                        </p>
+                        <button id="startWriting" class="btn" style="margin: 0 auto;">
+                            <i class="fas fa-pencil-alt"></i> 开始写第一篇文章
+                        </button>
+                    </div>
+                `;
+                
+                // 为开始写作按钮添加事件
+                document.getElementById('startWriting')?.addEventListener('click', function() {
+                    showCreateForm();
+                });
+                
+                return;
+            }
+            
             // 生成文章卡片
-            allArticles.forEach(article => {
+            userArticles.forEach(article => {
                 const articleCard = document.createElement('article');
                 articleCard.className = 'article-card';
                 articleCard.setAttribute('data-id', article.id);
                 
-                // 判断是否是用户文章（示例文章ID较小）
-                const isUserArticle = article.id > 1000;
-                
+                // 所有文章都是用户文章，都显示编辑和删除按钮
                 articleCard.innerHTML = `
                     <div class="article-actions">
-                        ${isUserArticle ? `
-                            <button class="edit-btn" data-id="${article.id}" title="编辑文章">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="delete-btn" data-id="${article.id}" title="删除文章">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        ` : ''}
+                        <button class="edit-btn" data-id="${article.id}" title="编辑文章">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="delete-btn" data-id="${article.id}" title="删除文章">
+                            <i class="fas fa-trash"></i>
+                        </button>
                     </div>
                     <div class="article-header">
                         <div class="article-date">
@@ -1391,6 +1412,9 @@
             document.getElementById('createSection').style.display = 'none';
             document.getElementById('aboutSection').style.display = 'none';
             
+            // 重新加载文章列表
+            loadArticles();
+            
             // 滚动到顶部
             window.scrollTo({ top: 0, behavior: 'smooth' });
             
@@ -1450,22 +1474,18 @@
             document.getElementById('articles').scrollIntoView({ behavior: 'smooth' });
         }
 
-        // 6. 显示文章详情
+        // 6. 显示文章详情 - 修改后只从用户文章中查找
         function showArticle(articleId) {
-            // 获取所有文章
+            // 只获取用户文章
             const userArticles = JSON.parse(localStorage.getItem('fuwakoArticles') || '[]');
-            const allArticles = [ ...userArticles];
             
             // 查找指定文章
-            const article = allArticles.find(a => a.id == articleId);
+            const article = userArticles.find(a => a.id == articleId);
             
             if (!article) {
                 showNotification('文章不存在！', 'error');
                 return;
             }
-            
-            // 判断是否是用户文章
-            const isUserArticle = article.id > 1000;
             
             // 生成文章详情HTML
             const articleDetail = document.getElementById('articleDetail');
@@ -1489,16 +1509,14 @@
                         ${article.tags.map(tag => `<span style="background: rgba(255, 182, 193, 0.2); padding: 5px 10px; border-radius: 15px; font-size: 14px;">${tag}</span>`).join('')}
                     </div>
                 ` : ''}
-                ${isUserArticle ? `
-                    <div class="article-actions-detail">
-                        <button class="detail-edit-btn" data-id="${article.id}">
-                            <i class="fas fa-edit"></i> 编辑文章
-                        </button>
-                        <button class="detail-delete-btn" data-id="${article.id}">
-                            <i class="fas fa-trash"></i> 删除文章
-                        </button>
-                    </div>
-                ` : ''}
+                <div class="article-actions-detail">
+                    <button class="detail-edit-btn" data-id="${article.id}">
+                        <i class="fas fa-edit"></i> 编辑文章
+                    </button>
+                    <button class="detail-delete-btn" data-id="${article.id}">
+                        <i class="fas fa-trash"></i> 删除文章
+                    </button>
+                </div>
             `;
             
             // 显示模态框
@@ -1536,21 +1554,18 @@
 
         // 8. 编辑文章（修复后的版本）
         function editArticle(articleId) {
-            console.log('开始编辑文章，ID:', articleId); // 调试信息
+            console.log('开始编辑文章，ID:', articleId);
             
-            // 首先从用户文章中查找（因为只有用户文章可以编辑）
+            // 从用户文章中查找
             const userArticles = JSON.parse(localStorage.getItem('fuwakoArticles') || '[]');
-            console.log('用户文章列表:', userArticles); // 调试信息
             
             // 查找指定文章
             const article = userArticles.find(a => a.id == articleId);
             
             if (!article) {
-                showNotification('文章不存在或无法编辑！', 'error');
+                showNotification('文章不存在！', 'error');
                 return;
             }
-            
-            console.log('找到的文章:', article); // 调试信息
             
             // 设置编辑状态
             editingArticleId = articleId;
@@ -1563,12 +1578,6 @@
                 document.getElementById('articleTitle').value = article.title;
                 document.getElementById('articleContent').value = article.content;
                 document.getElementById('articleTags').value = article.tags ? article.tags.join(', ') : '';
-                
-                console.log('表单填充完成:', {
-                    title: article.title,
-                    contentLength: article.content.length,
-                    tags: article.tags
-                }); // 调试信息
                 
                 // 更新表单标题和按钮文字
                 document.getElementById('formTitle').innerHTML = '<i class="fas fa-edit"></i> 编辑文章';
@@ -1698,7 +1707,7 @@
             }, 1500);
         }
 
-        // 11. 删除文章
+        // 11. 删除文章 - 简化版本，不需要检查示例文章
         function deleteArticle(articleId) {
             if (!confirm('确定要删除这篇文章吗？此操作不可恢复。')) {
                 return;
@@ -1808,4 +1817,3 @@
     </script>
 </body>
 </html>
-
