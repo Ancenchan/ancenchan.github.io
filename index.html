@@ -360,6 +360,10 @@
             font-family: var(--font-smooth);
             letter-spacing: 0.5px;
             font-weight: 400;
+            /* 添加换行支持 */
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            word-break: break-word;
         }
         
         .read-more {
@@ -538,6 +542,10 @@
             color: #444;
             margin-top: 30px;
             font-smooth: always;
+            /* 修复：添加换行支持 */
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            word-break: break-word;
         }
         
         .article-content-detail p {
@@ -624,6 +632,8 @@
             min-height: 250px;
             resize: vertical;
             line-height: 1.8;
+            /* 确保文本区域内的换行正常显示 */
+            white-space: pre-wrap;
         }
         
         .submit-btn {
@@ -1468,11 +1478,26 @@
         let isEditing = false;
         let isAdmin = false;
         
-        // ========== 工具函数：修复编码问题 ==========
+        // ========== 工具函数：修复换行问题 ==========
         
-        // 修复日期格式 - 使用纯数字格式避免编码问题
+        // 修复文本换行 - 将换行符转换为HTML换行标签
+        function formatTextWithLineBreaks(text) {
+            if (!text) return "";
+            
+            // 首先确保文本是字符串
+            let textStr = String(text);
+            
+            // 将连续多个换行符转换为段落分隔
+            textStr = textStr.replace(/\n\s*\n\s*\n/g, '\n\n');
+            
+            // 将单个换行符转换为<br>标签
+            textStr = textStr.replace(/\n/g, '<br>');
+            
+            return textStr;
+        }
+        
+        // 修复日期格式
         function formatDate(dateString) {
-            // 如果是日期对象
             if (dateString instanceof Date) {
                 const year = dateString.getFullYear();
                 const month = dateString.getMonth() + 1;
@@ -1480,21 +1505,11 @@
                 return `${year}年${month}月${day}日`;
             }
             
-            // 如果是字符串
             if (typeof dateString === 'string') {
-                // 尝试修复乱码日期
-                const decodedDate = decodeURIComponent(escape(dateString));
-                if (decodedDate !== dateString) {
-                    console.log('修复了乱码日期:', dateString, '->', decodedDate);
-                    return decodedDate;
-                }
-                
-                // 检查是否已经是中文格式
                 if (dateString.includes('年') && dateString.includes('月') && dateString.includes('日')) {
                     return dateString;
                 }
                 
-                // 尝试解析各种格式
                 try {
                     const date = new Date(dateString);
                     if (!isNaN(date.getTime())) {
@@ -1507,11 +1522,9 @@
                     console.warn('日期解析失败:', dateString, e);
                 }
                 
-                // 返回原始字符串
                 return dateString;
             }
             
-            // 默认返回当前日期
             const now = new Date();
             const year = now.getFullYear();
             const month = now.getMonth() + 1;
@@ -1522,7 +1535,6 @@
         // 安全的Base64编码
         function safeBase64Encode(str) {
             try {
-                // 使用TextEncoder处理UTF-8字符
                 const encoder = new TextEncoder();
                 const data = encoder.encode(str);
                 let binary = '';
@@ -1532,7 +1544,6 @@
                 return btoa(binary);
             } catch (e) {
                 console.error('Base64编码失败:', e);
-                // 降级方案：直接返回原字符串，让GitHub处理
                 return btoa(unescape(encodeURIComponent(str)));
             }
         }
@@ -1540,7 +1551,6 @@
         // 安全的Base64解码
         function safeBase64Decode(base64Str) {
             try {
-                // 移除可能的空格和换行
                 const cleanBase64 = base64Str.replace(/\s/g, '');
                 const binaryString = atob(cleanBase64);
                 const bytes = new Uint8Array(binaryString.length);
@@ -1550,7 +1560,6 @@
                 return new TextDecoder('utf-8').decode(bytes);
             } catch (e) {
                 console.error('Base64解码失败:', e);
-                // 降级方案
                 try {
                     return decodeURIComponent(escape(atob(base64Str)));
                 } catch (e2) {
@@ -1563,11 +1572,9 @@
         // 检查和修复数据
         function checkAndFixData(data) {
             if (typeof data === 'string') {
-                // 检查是否是Base64编码的字符串
                 if (/^[A-Za-z0-9+/=]+$/.test(data) && data.length % 4 === 0) {
                     try {
                         const decoded = safeBase64Decode(data);
-                        // 如果解码后的字符串看起来像是中文内容，返回解码后的内容
                         if (/[\u4e00-\u9fa5]/.test(decoded)) {
                             return decoded;
                         }
@@ -1584,8 +1591,11 @@
                 const fixed = {};
                 for (const key in data) {
                     if (key === 'date') {
-                        // 特别处理日期字段
                         fixed[key] = formatDate(checkAndFixData(data[key]));
+                    } else if (key === 'content') {
+                        // 修复内容换行
+                        const content = checkAndFixData(data[key]);
+                        fixed[key] = content;
                     } else {
                         fixed[key] = checkAndFixData(data[key]);
                     }
@@ -1687,7 +1697,6 @@
                 }
 
                 try {
-                    // 获取文件内容
                     const response = await fetch(
                         `${this.apiBase}/repos/${this.repoOwner}/${this.repoName}/contents/${this.dataPath}?ref=${this.repoBranch}`,
                         {
@@ -1709,16 +1718,13 @@
 
                     const fileData = await response.json();
                     
-                    // 使用安全的Base64解码
                     const content = safeBase64Decode(fileData.content);
                     
-                    // 解析JSON
                     let articles;
                     try {
                         articles = JSON.parse(content || '[]');
                     } catch (parseError) {
                         console.error('JSON解析失败:', parseError);
-                        // 尝试修复JSON
                         try {
                             const fixedContent = content.replace(/[^\x20-\x7E\u4e00-\u9fa5\u3000-\u303F\uff00-\uffef]/g, '');
                             articles = JSON.parse(fixedContent);
@@ -1728,31 +1734,32 @@
                         }
                     }
                     
-                    // 修复数据
                     return checkAndFixData(articles);
                     
                 } catch (error) {
                     console.error('从GitHub获取文章失败：', error);
-                    // 失败时使用本地存储
                     return JSON.parse(localStorage.getItem('fuwakoArticles') || '[]');
                 }
             }
 
             // 保存文章到GitHub
             async saveArticles(articles) {
-                // 先修复和清理数据
                 const cleanedArticles = checkAndFixData(articles);
                 
-                // 确保所有日期都是正确格式
                 cleanedArticles.forEach(article => {
                     if (article.date) {
                         article.date = formatDate(article.date);
                     } else {
                         article.date = formatDate(new Date());
                     }
+                    
+                    // 确保内容中的换行符被正确保存
+                    if (article.content) {
+                        // 保留原始换行符
+                        article.content = article.content.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+                    }
                 });
                 
-                // 保存到本地存储作为备份
                 localStorage.setItem('fuwakoArticles', JSON.stringify(cleanedArticles));
 
                 if (!this.isConfigured()) {
@@ -1761,7 +1768,6 @@
                 }
 
                 try {
-                    // 先检查文件是否存在
                     let sha = null;
                     try {
                         const getResponse = await fetch(
@@ -1779,10 +1785,9 @@
                             sha = fileData.sha;
                         }
                     } catch (e) {
-                        // 文件不存在是正常的，sha保持null
+                        // 文件不存在是正常的
                     }
 
-                    // 创建或更新文件
                     const jsonString = JSON.stringify(cleanedArticles, null, 2);
                     const content = safeBase64Encode(jsonString);
                     
@@ -1836,12 +1841,10 @@
                 let needsFix = false;
                 
                 const fixedArticles = localArticles.map(article => {
-                    // 修复日期乱码
                     if (article.date && article.date.includes('Ã')) {
                         needsFix = true;
                         console.log('发现乱码日期，尝试修复：', article.date);
                         try {
-                            // 尝试修复常见的乱码模式
                             const fixedDate = decodeURIComponent(escape(article.date));
                             if (fixedDate !== article.date) {
                                 article.date = fixedDate;
@@ -1852,7 +1855,6 @@
                         }
                     }
                     
-                    // 修复内容乱码
                     if (article.content && article.content.includes('Ã')) {
                         needsFix = true;
                         console.log('发现乱码内容，尝试修复：', article.title);
@@ -1889,13 +1891,11 @@
                 modal.classList.add('active');
                 document.body.style.overflow = 'hidden';
                 
-                // 填充现有配置
                 document.getElementById('githubToken').value = gitHubManager.token || '';
                 document.getElementById('repoOwner').value = gitHubManager.repoOwner || '';
                 document.getElementById('repoName').value = gitHubManager.repoName || '';
                 document.getElementById('repoBranch').value = gitHubManager.repoBranch || 'main';
                 
-                // 显示状态
                 gitHubManager.showConfigStatus();
             }
         }
@@ -1926,7 +1926,6 @@
                 const result = await gitHubManager.testConnection();
                 showNotification(result.message, 'success');
                 
-                // 更新状态显示
                 gitHubManager.showConfigStatus();
             } catch (error) {
                 showNotification(`测试失败：${error.message}`, 'error');
@@ -1949,7 +1948,7 @@
             if (success) {
                 showNotification('GitHub配置已保存！', 'success');
                 updateGitHubUI();
-                loadArticles(); // 重新加载文章，显示云端图标
+                loadArticles();
                 closeGitHubConfig();
             }
         }
@@ -1992,7 +1991,6 @@
             syncBtn.classList.add('syncing');
             
             try {
-                // 获取本地文章
                 const articles = await gitHubManager.fetchArticles();
                 
                 if (articles.length === 0) {
@@ -2000,7 +1998,6 @@
                     return;
                 }
                 
-                // 保存到GitHub
                 const result = await gitHubManager.saveArticles(articles);
                 
                 if (result.success) {
@@ -2032,16 +2029,12 @@
         async function loadArticles() {
             const articlesGrid = document.getElementById('articlesGrid');
             
-            // 从GitHub或本地存储获取文章
             const articles = await gitHubManager.fetchArticles();
             
-            // 按ID倒序排序（新文章在前面）
             articles.sort((a, b) => b.id - a.id);
             
-            // 清空现有内容
             articlesGrid.innerHTML = '';
             
-            // 如果没有文章，显示提示信息
             if (articles.length === 0) {
                 articlesGrid.innerHTML = `
                     <div class="article-card" style="text-align: center; padding: 50px 30px; grid-column: 1 / -1;">
@@ -2061,7 +2054,6 @@
                 return;
             }
             
-            // 生成文章卡片
             articles.forEach(article => {
                 const articleCard = document.createElement('article');
                 articleCard.className = 'article-card';
@@ -2112,24 +2104,20 @@
             document.getElementById('createSection').style.display = 'none';
             document.getElementById('aboutSection').style.display = 'none';
             
-            // 重新加载文章列表
             loadArticles();
             
-            // 滚动到顶部
             window.scrollTo({ top: 0, behavior: 'smooth' });
             
             showNotification('❤️ 欢迎回家！', 'success');
         }
 
         function showCreateForm() {
-            // 检查是否是管理员
             if (!isAdmin) {
                 showNotification('🔒 请先点击"我是安尘"按钮登录管理员账户', 'warning');
                 return;
             }
             
             if (isEditing && editingArticleId) {
-                // 如果正在编辑，直接显示编辑表单
                 document.getElementById('articles').style.display = 'none';
                 document.getElementById('createSection').style.display = 'block';
                 document.getElementById('aboutSection').style.display = 'none';
@@ -2144,7 +2132,6 @@
                 return;
             }
             
-            // 新建文章模式
             cancelEdit();
             document.getElementById('articles').style.display = 'none';
             document.getElementById('createSection').style.display = 'block';
@@ -2177,9 +2164,8 @@
             document.getElementById('articles').scrollIntoView({ behavior: 'smooth' });
         }
 
-        // 8. 显示文章详情
+        // 8. 显示文章详情 - 修复换行显示
         async function showArticle(articleId) {
-            // 从GitHub或本地获取文章
             const articles = await gitHubManager.fetchArticles();
             const article = articles.find(a => a.id == articleId);
             
@@ -2188,7 +2174,9 @@
                 return;
             }
             
-            // 生成文章详情HTML，根据管理员状态显示编辑按钮
+            // 处理内容换行
+            const contentWithLineBreaks = formatTextWithLineBreaks(article.content);
+            
             const editDeleteButtons = isAdmin ? `
                 <div class="article-actions-detail">
                     <button class="detail-edit-btn" data-id="${article.id}">
@@ -2215,7 +2203,7 @@
                     </div>
                 </div>
                 <div class="article-content-detail">
-                    ${article.content || "暂无内容"}
+                    ${contentWithLineBreaks}
                 </div>
                 ${article.tags && article.tags.length > 0 ? `
                     <div style="margin-top: 30px; display: flex; flex-wrap: wrap; gap: 10px;">
@@ -2226,11 +2214,9 @@
                 ${editDeleteButtons}
             `;
             
-            // 显示模态框
             document.getElementById('articleModal').classList.add('active');
             document.body.style.overflow = 'hidden';
             
-            // 为详情页的编辑和删除按钮添加事件（仅管理员可见）
             const editBtn = document.querySelector('.detail-edit-btn');
             const deleteBtn = document.querySelector('.detail-delete-btn');
             
@@ -2261,7 +2247,6 @@
 
         // 10. 编辑文章
         function editArticle(articleId) {
-            // 检查是否是管理员
             if (!isAdmin) {
                 showNotification('🔒 请先登录管理员账户才能编辑文章', 'warning');
                 return;
@@ -2269,7 +2254,6 @@
             
             console.log('开始编辑文章，ID:', articleId);
             
-            // 从本地存储获取文章进行编辑
             const userArticles = JSON.parse(localStorage.getItem('fuwakoArticles') || '[]');
             const article = userArticles.find(a => a.id == articleId);
             
@@ -2278,27 +2262,21 @@
                 return;
             }
             
-            // 设置编辑状态
             editingArticleId = articleId;
             isEditing = true;
             
-            // 确保DOM已加载后再填充表单
             setTimeout(() => {
-                // 填充表单
                 document.getElementById('articleId').value = articleId;
                 document.getElementById('articleTitle').value = article.title || "";
                 document.getElementById('articleContent').value = article.content || "";
                 document.getElementById('articleTags').value = article.tags ? article.tags.join(', ') : '';
                 
-                // 更新表单标题和按钮文字
                 document.getElementById('formTitle').innerHTML = '<i class="fas fa-edit"></i> 编辑文章';
                 document.getElementById('submitBtn').innerHTML = '<i class="fas fa-save"></i> 保存修改';
                 
-                // 显示取消按钮
                 document.getElementById('cancelBtn').style.display = 'inline-flex';
             }, 50);
             
-            // 切换到编辑页面
             showCreateForm();
             
             showNotification(`✏️ 正在编辑：${article.title || "未命名文章"}`, 'success');
@@ -2309,15 +2287,12 @@
             editingArticleId = null;
             isEditing = false;
             
-            // 重置表单
             document.getElementById('articleForm').reset();
             document.getElementById('articleId').value = '';
             
-            // 重置表单标题和按钮文字
             document.getElementById('formTitle').innerHTML = '<i class="fas fa-pencil-alt"></i> 写新文章';
             document.getElementById('submitBtn').innerHTML = '<i class="fas fa-home"></i> 将文章放进我的家';
             
-            // 隐藏取消按钮
             document.getElementById('cancelBtn').style.display = 'none';
             
             showNotification('已取消编辑', 'info');
@@ -2327,7 +2302,6 @@
         async function handleArticleSubmit(e) {
             e.preventDefault();
             
-            // 检查是否是管理员
             if (!isAdmin) {
                 showNotification('🔒 请先登录管理员账户才能发布文章', 'warning');
                 return;
@@ -2336,7 +2310,6 @@
             const submitBtn = document.getElementById('submitBtn');
             const originalText = submitBtn.innerHTML;
             
-            // 显示加载状态
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 保存中...';
             submitBtn.disabled = true;
             
@@ -2344,7 +2317,6 @@
             const content = document.getElementById('articleContent').value;
             const tags = document.getElementById('articleTags').value;
             
-            // 简单验证
             if (!title || !content) {
                 showNotification('请填写标题和内容！', 'warning');
                 submitBtn.innerHTML = originalText;
@@ -2352,10 +2324,8 @@
                 return;
             }
             
-            // 获取现有文章
             let articles = await gitHubManager.fetchArticles();
             
-            // 创建文章对象
             const articleData = {
                 id: editingArticleId ? parseInt(editingArticleId) : Date.now(),
                 title,
@@ -2363,11 +2333,10 @@
                 content,
                 excerpt: content.length > 150 ? content.substring(0, 150) + '...' : content,
                 tags: tags ? tags.split(',').map(tag => tag.trim()).filter(tag => tag) : [],
-                date: formatDate(new Date()) // 使用安全的日期格式
+                date: formatDate(new Date())
             };
             
             if (editingArticleId) {
-                // 更新文章
                 const articleIndex = articles.findIndex(a => a.id == editingArticleId);
                 if (articleIndex !== -1) {
                     articles[articleIndex] = articleData;
@@ -2379,35 +2348,27 @@
                     return;
                 }
             } else {
-                // 新建文章
                 articles.unshift(articleData);
                 showNotification(`❤️ 文章"${title}"已创建！`, 'success');
             }
             
-            // 保存到GitHub
             const saveResult = await gitHubManager.saveArticles(articles);
             
-            // 添加庆祝粒子效果
             createParticles(document.getElementById('articleForm'), '❤️', 25);
             
-            // 重置表单和编辑状态
             cancelEdit();
             
-            // 恢复按钮状态
             submitBtn.innerHTML = originalText;
             submitBtn.disabled = false;
             
-            // 重新加载文章列表
             loadArticles();
             
-            // 显示保存结果
             if (saveResult.success) {
                 showNotification(saveResult.message, 'success');
             } else {
                 showNotification(saveResult.message, 'warning');
             }
             
-            // 切换到首页
             setTimeout(() => {
                 showHome();
             }, 1500);
@@ -2415,7 +2376,6 @@
 
         // 13. 删除文章
         async function deleteArticle(articleId) {
-            // 检查是否是管理员
             if (!isAdmin) {
                 showNotification('🔒 请先登录管理员账户才能删除文章', 'warning');
                 return;
@@ -2425,22 +2385,17 @@
                 return;
             }
             
-            // 获取文章列表
             const articles = await gitHubManager.fetchArticles();
             
-            // 删除文章
             const updatedArticles = articles.filter(a => a.id != articleId);
             
-            // 保存到GitHub
             const saveResult = await gitHubManager.saveArticles(updatedArticles);
             
-            // 如果正在编辑这篇文章，取消编辑状态
             if (editingArticleId == articleId) {
                 cancelEdit();
                 showHome();
             }
             
-            // 重新加载文章列表
             loadArticles();
             
             if (saveResult.success) {
@@ -2456,8 +2411,7 @@
             notification.textContent = message;
             notification.style.display = 'block';
             
-            // 根据类型设置颜色
-            let borderColor = '#98fb98'; // 默认success
+            let borderColor = '#98fb98';
             if (type === 'warning') borderColor = '#ffb347';
             if (type === 'error') borderColor = '#ff6b6b';
             if (type === 'info') borderColor = '#87ceeb';
@@ -2487,7 +2441,6 @@
                 
                 document.body.appendChild(particle);
                 
-                // 移除粒子
                 setTimeout(() => {
                     particle.remove();
                 }, 3000);
@@ -2496,7 +2449,6 @@
 
         // 16. 鼠标移动效果 - 爱心飘落
         document.addEventListener('mousemove', function(e) {
-            // 偶尔创建跟随粒子
             if (Math.random() > 0.98) {
                 const emojis = ['❤️', '💕', '💖', '💗', '💓', '💞', '💘'];
                 const particle = document.createElement('div');
@@ -2535,18 +2487,16 @@
 
         // 18. 绑定所有事件
         function bindEvents() {
-            // 导航栏点击事件
             document.getElementById('navHome').addEventListener('click', showHome);
             document.getElementById('navCreate').addEventListener('click', showCreateForm);
             document.getElementById('navAbout').addEventListener('click', showAbout);
             document.getElementById('homeLogo').addEventListener('click', showHome);
             document.getElementById('exploreBtn').addEventListener('click', scrollToArticles);
             
-            // 管理员按钮事件
             document.getElementById('adminBtn').addEventListener('click', function() {
                 if (!isAdmin) {
                     const password = prompt('请输入管理密码：');
-                    const ADMIN_PASSWORD = "anchen"; // 默认密码
+                    const ADMIN_PASSWORD = "anchen";
                     
                     if (password === ADMIN_PASSWORD) {
                         isAdmin = true;
@@ -2568,51 +2518,41 @@
                 }
             });
             
-            // GitHub按钮事件
             document.getElementById('syncBtn').addEventListener('click', syncToGitHub);
             document.getElementById('testGitHubBtn').addEventListener('click', testGitHubConnection);
             document.getElementById('saveGitHubConfig').addEventListener('click', saveGitHubConfig);
             document.getElementById('closeGitHubConfig').addEventListener('click', closeGitHubConfig);
             
-            // 底部链接事件
             document.getElementById('footerHome').addEventListener('click', showHome);
             document.getElementById('footerCreate').addEventListener('click', showCreateForm);
             document.getElementById('footerAbout').addEventListener('click', showAbout);
             document.getElementById('footerLogo').addEventListener('click', showHome);
             
-            // 返回首页按钮
             document.getElementById('homeBtn').addEventListener('click', showHome);
             
-            // 文章发布表单
             document.getElementById('articleForm').addEventListener('submit', handleArticleSubmit);
             
-            // 取消编辑按钮
             document.getElementById('cancelBtn').addEventListener('click', cancelEdit);
             
-            // 文章卡片点击事件（使用事件委托）
             document.getElementById('articlesGrid').addEventListener('click', function(e) {
-                // 检查是否点击了"阅读全文"按钮
                 if (e.target.classList.contains('read-more') || e.target.closest('.read-more')) {
                     const articleId = e.target.getAttribute('data-id') || 
                                      e.target.closest('.read-more').getAttribute('data-id');
                     showArticle(articleId);
                 }
                 
-                // 检查是否点击了编辑按钮（仅管理员可见）
                 if (e.target.classList.contains('edit-btn') || e.target.closest('.edit-btn')) {
                     const articleId = e.target.getAttribute('data-id') || 
                                      e.target.closest('.edit-btn').getAttribute('data-id');
                     editArticle(articleId);
                 }
                 
-                // 检查是否点击了删除按钮（仅管理员可见）
                 if (e.target.classList.contains('delete-btn') || e.target.closest('.delete-btn')) {
                     const articleId = e.target.getAttribute('data-id') || 
                                      e.target.closest('.delete-btn').getAttribute('data-id');
                     deleteArticle(articleId);
                 }
                 
-                // 检查是否点击了整个文章卡片（但不是按钮）
                 if (e.target.closest('.article-card') && 
                     !e.target.classList.contains('read-more') && 
                     !e.target.closest('.read-more') &&
@@ -2626,7 +2566,6 @@
                 }
             });
             
-            // 关闭模态框
             document.getElementById('closeModal').addEventListener('click', closeArticleModal);
             document.getElementById('articleModal').addEventListener('click', function(e) {
                 if (e.target === this) {
@@ -2634,7 +2573,6 @@
                 }
             });
             
-            // 按ESC键关闭模态框
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape') {
                     closeArticleModal();
@@ -2647,7 +2585,6 @@
         window.addEventListener('DOMContentLoaded', function() {
             console.log('页面加载完成，开始初始化...');
             
-            // 修复可能的编码问题
             const fixed = fixEncodingIssues();
             if (fixed) {
                 console.log('已修复乱码数据');
@@ -2656,19 +2593,14 @@
                 }, 500);
             }
             
-            // 加载GitHub配置并更新UI
             updateGitHubUI();
             
-            // 检查管理员状态
             checkAdminStatus();
             
-            // 加载文章列表
             loadArticles();
             
-            // 绑定事件
             bindEvents();
             
-            // 显示欢迎消息
             setTimeout(() => {
                 showNotification('❤️ 欢迎来到Fuwako的家！', 'success');
                 if (!gitHubManager.isConfigured()) {
@@ -2678,7 +2610,6 @@
                 }
             }, 1000);
             
-            // 初始化返回顶部按钮
             initScrollTop();
             
             console.log('初始化完成');
