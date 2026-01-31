@@ -1552,7 +1552,7 @@
                 }
             }
 
-            // 从GitHub获取文章
+            // 从GitHub获取文章 - 修复乱码版本
             async fetchArticles() {
                 if (!this.isConfigured()) {
                     console.log('GitHub未配置，使用本地存储');
@@ -1581,7 +1581,17 @@
                     }
 
                     const fileData = await response.json();
-                    const content = atob(fileData.content); // base64解码
+                    
+                    // ===== 修复：正确处理中文Base64编码 =====
+                    const base64Content = fileData.content.replace(/\s/g, '');
+                    const binaryString = atob(base64Content);
+                    const bytes = new Uint8Array(binaryString.length);
+                    for (let i = 0; i < binaryString.length; i++) {
+                        bytes[i] = binaryString.charCodeAt(i);
+                    }
+                    const content = new TextDecoder('utf-8').decode(bytes);
+                    // ===== 修复结束 =====
+                    
                     return JSON.parse(content || '[]');
                     
                 } catch (error) {
@@ -1591,7 +1601,7 @@
                 }
             }
 
-            // 保存文章到GitHub
+            // 保存文章到GitHub - 修复乱码版本
             async saveArticles(articles) {
                 // 先保存到本地存储作为备份
                 localStorage.setItem('fuwakoArticles', JSON.stringify(articles));
@@ -1623,8 +1633,18 @@
                         // 文件不存在是正常的，sha保持null
                     }
 
+                    // ===== 修复：正确处理中文Base64编码 =====
+                    const jsonString = JSON.stringify(articles, null, 2);
+                    const encoder = new TextEncoder();
+                    const data = encoder.encode(jsonString);
+                    let binary = '';
+                    for (let i = 0; i < data.length; i++) {
+                        binary += String.fromCharCode(data[i]);
+                    }
+                    const content = btoa(binary);
+                    // ===== 修复结束 =====
+                    
                     // 创建或更新文件
-                    const content = btoa(unescape(encodeURIComponent(JSON.stringify(articles, null, 2))));
                     const response = await fetch(
                         `${this.apiBase}/repos/${this.repoOwner}/${this.repoName}/contents/${this.dataPath}`,
                         {
@@ -1668,7 +1688,49 @@
 
         // ========== 全局函数 ==========
         
-        // 1. GitHub配置相关函数
+        // 1. 修复现有数据的乱码问题
+        function fixEncodingIssues() {
+            try {
+                const localArticles = JSON.parse(localStorage.getItem('fuwakoArticles') || '[]');
+                let needsFix = false;
+                
+                const fixedArticles = localArticles.map(article => {
+                    // 检查是否有乱码字符
+                    if (article.content && /[^\u0000-\uFFFF]/.test(article.content)) {
+                        needsFix = true;
+                        console.log('发现乱码文章，尝试修复：', article.title);
+                        
+                        // 如果内容看起来是Base64编码的，尝试解码
+                        try {
+                            if (/^[A-Za-z0-9+/=]+$/.test(article.content)) {
+                                const base64Content = article.content.replace(/\s/g, '');
+                                const binaryString = atob(base64Content);
+                                const bytes = new Uint8Array(binaryString.length);
+                                for (let i = 0; i < binaryString.length; i++) {
+                                    bytes[i] = binaryString.charCodeAt(i);
+                                }
+                                article.content = new TextDecoder('utf-8').decode(bytes);
+                                console.log('文章修复成功：', article.title);
+                            }
+                        } catch (e) {
+                            console.log('修复失败，保留原内容：', e);
+                        }
+                    }
+                    return article;
+                });
+                
+                if (needsFix && fixedArticles.length > 0) {
+                    localStorage.setItem('fuwakoArticles', JSON.stringify(fixedArticles));
+                    console.log('已修复本地存储中的乱码数据');
+                    return true;
+                }
+            } catch (error) {
+                console.error('修复数据时出错：', error);
+            }
+            return false;
+        }
+        
+        // 2. GitHub配置相关函数
         function openGitHubConfig() {
             console.log('打开GitHub配置');
             const modal = document.getElementById('githubConfigModal');
@@ -1741,7 +1803,7 @@
             }
         }
 
-        // 2. 更新GitHub UI状态
+        // 3. 更新GitHub UI状态
         function updateGitHubUI() {
             const syncBtn = document.getElementById('syncBtn');
             const configBtn = document.getElementById('configBtn');
@@ -1764,7 +1826,7 @@
             }
         }
 
-        // 3. 手动同步到GitHub
+        // 4. 手动同步到GitHub
         async function syncToGitHub() {
             if (!gitHubManager.isConfigured()) {
                 showNotification('请先配置GitHub信息！', 'warning');
@@ -1804,7 +1866,7 @@
             }
         }
 
-        // 4. 检查管理员状态
+        // 5. 检查管理员状态
         function checkAdminStatus() {
             const savedAdmin = localStorage.getItem('fuwakoAdmin');
             if (savedAdmin === 'true') {
@@ -1815,7 +1877,7 @@
             }
         }
 
-        // 5. 加载文章列表
+        // 6. 加载文章列表
         async function loadArticles() {
             const articlesGrid = document.getElementById('articlesGrid');
             
@@ -1886,7 +1948,7 @@
             });
         }
 
-        // 6. 页面显示函数
+        // 7. 页面显示函数
         function showHome() {
             if (isEditing) {
                 if (!confirm('您正在编辑文章，确定要放弃编辑吗？')) {
@@ -1964,7 +2026,7 @@
             document.getElementById('articles').scrollIntoView({ behavior: 'smooth' });
         }
 
-        // 7. 显示文章详情
+        // 8. 显示文章详情
         async function showArticle(articleId) {
             // 从GitHub或本地获取文章
             const articles = await gitHubManager.fetchArticles();
@@ -2040,13 +2102,13 @@
             showNotification(`📖 正在阅读：${article.title}`, 'success');
         }
 
-        // 8. 关闭文章模态框
+        // 9. 关闭文章模态框
         function closeArticleModal() {
             document.getElementById('articleModal').classList.remove('active');
             document.body.style.overflow = 'auto';
         }
 
-        // 9. 编辑文章
+        // 10. 编辑文章
         function editArticle(articleId) {
             // 检查是否是管理员
             if (!isAdmin) {
@@ -2091,7 +2153,7 @@
             showNotification(`✏️ 正在编辑：${article.title}`, 'success');
         }
 
-        // 10. 取消编辑
+        // 11. 取消编辑
         function cancelEdit() {
             editingArticleId = null;
             isEditing = false;
@@ -2110,7 +2172,7 @@
             showNotification('已取消编辑', 'info');
         }
 
-        // 11. 文章提交处理
+        // 12. 文章提交处理
         async function handleArticleSubmit(e) {
             e.preventDefault();
             
@@ -2213,7 +2275,7 @@
             }, 1500);
         }
 
-        // 12. 删除文章
+        // 13. 删除文章
         async function deleteArticle(articleId) {
             // 检查是否是管理员
             if (!isAdmin) {
@@ -2250,7 +2312,7 @@
             }
         }
 
-        // 13. 提示消息
+        // 14. 提示消息
         function showNotification(message, type = 'success') {
             const notification = document.getElementById('notification');
             notification.textContent = message;
@@ -2269,7 +2331,7 @@
             }, 4000);
         }
 
-        // 14. 粒子效果 - 爱心
+        // 15. 粒子效果 - 爱心
         function createParticles(element, emoji, count = 20) {
             const rect = element.getBoundingClientRect();
             const x = rect.left + rect.width / 2;
@@ -2294,7 +2356,7 @@
             }
         }
 
-        // 15. 鼠标移动效果 - 爱心飘落
+        // 16. 鼠标移动效果 - 爱心飘落
         document.addEventListener('mousemove', function(e) {
             // 偶尔创建跟随粒子
             if (Math.random() > 0.98) {
@@ -2316,7 +2378,7 @@
             }
         });
 
-        // 16. 返回顶部功能
+        // 17. 返回顶部功能
         function initScrollTop() {
             const scrollTopBtn = document.getElementById('scrollTop');
             
@@ -2333,7 +2395,7 @@
             });
         }
 
-        // 17. 绑定所有事件
+        // 18. 绑定所有事件
         function bindEvents() {
             // 导航栏点击事件
             document.getElementById('navHome').addEventListener('click', showHome);
@@ -2443,9 +2505,16 @@
             });
         }
 
-        // 18. 页面初始化
+        // 19. 页面初始化
         window.addEventListener('DOMContentLoaded', function() {
             console.log('页面加载完成，开始初始化...');
+            
+            // 修复可能的编码问题
+            const fixed = fixEncodingIssues();
+            if (fixed) {
+                console.log('已修复乱码数据');
+                showNotification('🔧 已自动修复现有文章的乱码问题', 'info');
+            }
             
             // 加载GitHub配置并更新UI
             updateGitHubUI();
