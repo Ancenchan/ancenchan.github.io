@@ -1239,7 +1239,7 @@
                     <li><a id="adminBtn"><i class="fas fa-user-secret"></i> 我是安尘</a></li>
                     <!-- 新增：GitHub相关按钮 -->
                     <li><a id="syncBtn"><i class="fas fa-cloud-upload-alt"></i> 同步</a></li>
-                    <li><a id="configBtn"><i class="fab fa-github"></i> 配置</a></li>
+                    <li><a id="configBtn" onclick="openGitHubConfig()"><i class="fab fa-github"></i> 配置</a></li>
                 </ul>
             </nav>
         </div>
@@ -2370,7 +2370,6 @@
             
             // GitHub按钮事件
             document.getElementById('syncBtn').addEventListener('click', syncToGitHub);
-            document.getElementById('configBtn').addEventListener('click', openGitHubConfig);
             document.getElementById('testGitHubBtn').addEventListener('click', testGitHubConnection);
             document.getElementById('saveGitHubConfig').addEventListener('click', saveGitHubConfig);
             document.getElementById('closeGitHubConfig').addEventListener('click', closeGitHubConfig);
