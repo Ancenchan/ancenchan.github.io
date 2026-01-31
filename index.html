@@ -155,6 +155,32 @@ a, button, .clickable, input, textarea, select {
             font-size: 12px;
         }
         
+        /* 新增：管理员按钮样式 */
+        #adminBtn {
+            background: linear-gradient(135deg, var(--secondary), #ff8fab);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            box-shadow: 0 4px 12px rgba(255, 107, 157, 0.3);
+        }
+        
+        #adminBtn:hover {
+            background: linear-gradient(135deg, #ff8fab, var(--secondary));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(255, 107, 157, 0.4);
+        }
+        
+        /* 新增：已登录状态样式 */
+        #adminBtn.logged-in {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+        }
+        
+        #adminBtn.logged-in:hover {
+            background: linear-gradient(135deg, #45a049, #4CAF50);
+            box-shadow: 0 6px 15px rgba(76, 175, 80, 0.4);
+        }
+        
         /* 5. 首页横幅 */
         .hero {
             background: linear-gradient(135deg, rgba(255, 182, 193, 0.2), rgba(255, 107, 157, 0.2));
@@ -1089,6 +1115,8 @@ a, button, .clickable, input, textarea, select {
                     <li><a id="navHome"><i class="fas fa-home"></i> 首页</a></li>
                     <li><a id="navCreate"><i class="fas fa-pencil-alt"></i> 写文章</a></li>
                     <li><a id="navAbout"><i class="fas fa-heart"></i> 关于</a></li>
+                    <!-- 新增：我是安尘按钮 -->
+                    <li><a id="adminBtn"><i class="fas fa-user-secret"></i> 我是安尘</a></li>
                 </ul>
             </nav>
         </div>
@@ -1266,6 +1294,7 @@ a, button, .clickable, input, textarea, select {
         // 当前编辑的文章ID
         let editingArticleId = null;
         let isEditing = false;
+        let isAdmin = false; // 新增：管理员状态
         
         // 注意：这里完全删除了示例文章数组！
 
@@ -1277,6 +1306,9 @@ a, button, .clickable, input, textarea, select {
             // 绑定事件
             bindEvents();
             
+            // 检查是否已有管理员状态
+            checkAdminStatus();
+            
             // 显示欢迎消息
             setTimeout(() => {
                 showNotification('❤️ 欢迎来到Fuwako的家！点击写文章开始记录你的生活吧～', 'success');
@@ -1285,6 +1317,18 @@ a, button, .clickable, input, textarea, select {
             // 初始化返回顶部按钮
             initScrollTop();
         });
+        
+        // 新增：检查管理员状态
+        function checkAdminStatus() {
+            const savedAdmin = localStorage.getItem('fuwakoAdmin');
+            if (savedAdmin === 'true') {
+                isAdmin = true;
+                document.getElementById('adminBtn').classList.add('logged-in');
+                document.getElementById('adminBtn').innerHTML = '<i class="fas fa-user-secret"></i> 退出管理';
+                updateUIForAdmin();
+                showNotification('👑 已自动登录为管理员', 'success');
+            }
+        }
 
         // 3. 加载文章列表 - 修改后只从本地存储加载
         function loadArticles() {
@@ -1328,20 +1372,25 @@ a, button, .clickable, input, textarea, select {
                 articleCard.className = 'article-card';
                 articleCard.setAttribute('data-id', article.id);
                 
+                // 判断是否显示编辑和删除按钮
+                const actionsHtml = isAdmin ? `
+                    <div class="article-actions">
+                        <button class="edit-btn" data-id="${article.id}" title="编辑文章">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="delete-btn" data-id="${article.id}" title="删除文章">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                ` : '';
+                
                 articleCard.innerHTML = `
                     <div class="article-header">
                         <div class="article-date">
                             <i class="far fa-calendar"></i> ${article.date}
                         </div>
                         <div class="article-category">${article.category}</div>
-                        <div class="article-actions">
-                            <button class="edit-btn" data-id="${article.id}" title="编辑文章">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="delete-btn" data-id="${article.id}" title="删除文章">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
+                        ${actionsHtml}
                     </div>
                     <h3 class="article-title">${article.title}</h3>
                     <p class="article-excerpt">${article.excerpt || article.content.substring(0, 150) + '...'}</p>
@@ -1353,6 +1402,21 @@ a, button, .clickable, input, textarea, select {
                 articlesGrid.appendChild(articleCard);
             });
         }
+        
+        // 新增：更新UI以显示编辑功能
+        function updateUIForAdmin() {
+            // 重新加载文章列表以显示编辑按钮
+            loadArticles();
+            
+            // 如果是管理员，直接显示写文章按钮
+            const navCreate = document.getElementById('navCreate');
+            const footerCreate = document.getElementById('footerCreate');
+            
+            if (isAdmin) {
+                navCreate.style.display = 'block';
+                footerCreate.style.display = 'block';
+            }
+        }
 
         // 4. 绑定所有事件
         function bindEvents() {
@@ -1362,6 +1426,35 @@ a, button, .clickable, input, textarea, select {
             document.getElementById('navAbout').addEventListener('click', showAbout);
             document.getElementById('homeLogo').addEventListener('click', showHome);
             document.getElementById('exploreBtn').addEventListener('click', scrollToArticles);
+            
+            // 新增：管理员按钮事件
+            document.getElementById('adminBtn').addEventListener('click', function() {
+                if (!isAdmin) {
+                    // 输入密码
+                    const password = prompt('请输入管理密码：');
+                    // 这里设置密码，你可以修改为你自己的密码
+                    const ADMIN_PASSWORD = "anchen"; // 修改这里设置你的密码
+                    
+                    if (password === ADMIN_PASSWORD) {
+                        isAdmin = true;
+                        localStorage.setItem('fuwakoAdmin', 'true');
+                        this.classList.add('logged-in');
+                        this.innerHTML = '<i class="fas fa-user-secret"></i> 退出管理';
+                        updateUIForAdmin();
+                        showNotification('👑 欢迎回来，安尘！现在可以编辑和删除文章了。', 'success');
+                    } else {
+                        showNotification('❌ 密码错误！', 'error');
+                    }
+                } else {
+                    // 退出管理员模式
+                    isAdmin = false;
+                    localStorage.removeItem('fuwakoAdmin');
+                    this.classList.remove('logged-in');
+                    this.innerHTML = '<i class="fas fa-user-secret"></i> 我是安尘';
+                    loadArticles(); // 重新加载文章，隐藏编辑按钮
+                    showNotification('👋 已退出管理员模式', 'info');
+                }
+            });
             
             // 底部链接事件
             document.getElementById('footerHome').addEventListener('click', showHome);
@@ -1387,14 +1480,14 @@ a, button, .clickable, input, textarea, select {
                     showArticle(articleId);
                 }
                 
-                // 检查是否点击了编辑按钮
+                // 检查是否点击了编辑按钮（仅管理员可见）
                 if (e.target.classList.contains('edit-btn') || e.target.closest('.edit-btn')) {
                     const articleId = e.target.getAttribute('data-id') || 
                                      e.target.closest('.edit-btn').getAttribute('data-id');
                     editArticle(articleId);
                 }
                 
-                // 检查是否点击了删除按钮
+                // 检查是否点击了删除按钮（仅管理员可见）
                 if (e.target.classList.contains('delete-btn') || e.target.closest('.delete-btn')) {
                     const articleId = e.target.getAttribute('data-id') || 
                                      e.target.closest('.delete-btn').getAttribute('data-id');
@@ -1454,6 +1547,12 @@ a, button, .clickable, input, textarea, select {
         }
 
         function showCreateForm() {
+            // 检查是否是管理员
+            if (!isAdmin) {
+                showNotification('🔒 请先点击"我是安尘"按钮登录管理员账户', 'warning');
+                return;
+            }
+            
             if (isEditing && editingArticleId) {
                 // 如果正在编辑，直接显示编辑表单
                 document.getElementById('articles').style.display = 'none';
@@ -1519,7 +1618,18 @@ a, button, .clickable, input, textarea, select {
                 return;
             }
             
-            // 生成文章详情HTML
+            // 生成文章详情HTML，根据管理员状态显示编辑按钮
+            const editDeleteButtons = isAdmin ? `
+                <div class="article-actions-detail">
+                    <button class="detail-edit-btn" data-id="${article.id}">
+                        <i class="fas fa-edit"></i> 编辑文章
+                    </button>
+                    <button class="detail-delete-btn" data-id="${article.id}">
+                        <i class="fas fa-trash"></i> 删除文章
+                    </button>
+                </div>
+            ` : '';
+            
             const articleDetail = document.getElementById('articleDetail');
             articleDetail.innerHTML = `
                 <div class="article-header-detail">
@@ -1541,21 +1651,14 @@ a, button, .clickable, input, textarea, select {
                         ${article.tags.map(tag => `<span style="background: rgba(255, 182, 193, 0.2); padding: 5px 10px; border-radius: 15px; font-size: 14px;">${tag}</span>`).join('')}
                     </div>
                 ` : ''}
-                <div class="article-actions-detail">
-                    <button class="detail-edit-btn" data-id="${article.id}">
-                        <i class="fas fa-edit"></i> 编辑文章
-                    </button>
-                    <button class="detail-delete-btn" data-id="${article.id}">
-                        <i class="fas fa-trash"></i> 删除文章
-                    </button>
-                </div>
+                ${editDeleteButtons}
             `;
             
             // 显示模态框
             document.getElementById('articleModal').classList.add('active');
             document.body.style.overflow = 'hidden'; // 防止背景滚动
             
-            // 为详情页的编辑和删除按钮添加事件
+            // 为详情页的编辑和删除按钮添加事件（仅管理员可见）
             const editBtn = document.querySelector('.detail-edit-btn');
             const deleteBtn = document.querySelector('.detail-delete-btn');
             
@@ -1586,6 +1689,12 @@ a, button, .clickable, input, textarea, select {
 
         // 8. 编辑文章（修复后的版本）
         function editArticle(articleId) {
+            // 检查是否是管理员
+            if (!isAdmin) {
+                showNotification('🔒 请先登录管理员账户才能编辑文章', 'warning');
+                return;
+            }
+            
             console.log('开始编辑文章，ID:', articleId);
             
             // 从用户文章中查找
@@ -1647,6 +1756,12 @@ a, button, .clickable, input, textarea, select {
         // 10. 文章提交处理（新建或更新）
         function handleArticleSubmit(e) {
             e.preventDefault();
+            
+            // 检查是否是管理员
+            if (!isAdmin) {
+                showNotification('🔒 请先登录管理员账户才能发布文章', 'warning');
+                return;
+            }
             
             const submitBtn = document.getElementById('submitBtn');
             const originalText = submitBtn.innerHTML;
@@ -1741,6 +1856,12 @@ a, button, .clickable, input, textarea, select {
 
         // 11. 删除文章 - 简化版本，不需要检查示例文章
         function deleteArticle(articleId) {
+            // 检查是否是管理员
+            if (!isAdmin) {
+                showNotification('🔒 请先登录管理员账户才能删除文章', 'warning');
+                return;
+            }
+            
             if (!confirm('确定要删除这篇文章吗？此操作不可恢复。')) {
                 return;
             }
@@ -1849,5 +1970,3 @@ a, button, .clickable, input, textarea, select {
     </script>
 </body>
 </html>
-
-
