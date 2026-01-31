@@ -1468,7 +1468,9 @@
         let isEditing = false;
         let isAdmin = false;
         
-        // ========== 工具函数：修复日期格式兼容性问题 ==========
+        // ========== 工具函数：修复编码问题 ==========
+        
+        // 修复日期格式 - 使用纯数字格式避免编码问题
         function formatDate(dateString) {
             // 如果是日期对象
             if (dateString instanceof Date) {
@@ -1478,14 +1480,21 @@
                 return `${year}年${month}月${day}日`;
             }
             
-            // 如果是字符串，尝试解析
+            // 如果是字符串
             if (typeof dateString === 'string') {
+                // 尝试修复乱码日期
+                const decodedDate = decodeURIComponent(escape(dateString));
+                if (decodedDate !== dateString) {
+                    console.log('修复了乱码日期:', dateString, '->', decodedDate);
+                    return decodedDate;
+                }
+                
                 // 检查是否已经是中文格式
                 if (dateString.includes('年') && dateString.includes('月') && dateString.includes('日')) {
                     return dateString;
                 }
                 
-                // 尝试解析ISO格式或其它格式
+                // 尝试解析各种格式
                 try {
                     const date = new Date(dateString);
                     if (!isNaN(date.getTime())) {
@@ -1498,7 +1507,7 @@
                     console.warn('日期解析失败:', dateString, e);
                 }
                 
-                // 如果无法解析，返回原始字符串
+                // 返回原始字符串
                 return dateString;
             }
             
@@ -1510,7 +1519,7 @@
             return `${year}年${month}月${day}日`;
         }
         
-        // ========== 工具函数：安全的Base64编码/解码 ==========
+        // 安全的Base64编码
         function safeBase64Encode(str) {
             try {
                 // 使用TextEncoder处理UTF-8字符
@@ -1523,11 +1532,12 @@
                 return btoa(binary);
             } catch (e) {
                 console.error('Base64编码失败:', e);
-                // 降级方案：使用传统的encodeURIComponent
+                // 降级方案：直接返回原字符串，让GitHub处理
                 return btoa(unescape(encodeURIComponent(str)));
             }
         }
         
+        // 安全的Base64解码
         function safeBase64Decode(base64Str) {
             try {
                 // 移除可能的空格和换行
@@ -1540,23 +1550,28 @@
                 return new TextDecoder('utf-8').decode(bytes);
             } catch (e) {
                 console.error('Base64解码失败:', e);
-                // 降级方案：使用传统的decodeURIComponent
+                // 降级方案
                 try {
                     return decodeURIComponent(escape(atob(base64Str)));
                 } catch (e2) {
                     console.error('降级解码也失败:', e2);
-                    return base64Str; // 返回原始字符串
+                    return base64Str;
                 }
             }
         }
         
-        // ========== 工具函数：检查和修复乱码数据 ==========
+        // 检查和修复数据
         function checkAndFixData(data) {
             if (typeof data === 'string') {
                 // 检查是否是Base64编码的字符串
                 if (/^[A-Za-z0-9+/=]+$/.test(data) && data.length % 4 === 0) {
                     try {
-                        return safeBase64Decode(data);
+                        const decoded = safeBase64Decode(data);
+                        // 如果解码后的字符串看起来像是中文内容，返回解码后的内容
+                        if (/[\u4e00-\u9fa5]/.test(decoded)) {
+                            return decoded;
+                        }
+                        return data;
                     } catch (e) {
                         console.warn('尝试修复数据失败:', e);
                         return data;
@@ -1568,7 +1583,12 @@
             } else if (data && typeof data === 'object') {
                 const fixed = {};
                 for (const key in data) {
-                    fixed[key] = checkAndFixData(data[key]);
+                    if (key === 'date') {
+                        // 特别处理日期字段
+                        fixed[key] = formatDate(checkAndFixData(data[key]));
+                    } else {
+                        fixed[key] = checkAndFixData(data[key]);
+                    }
                 }
                 return fixed;
             }
@@ -1659,12 +1679,11 @@
                 }
             }
 
-            // 从GitHub获取文章 - 完全修复乱码版本
+            // 从GitHub获取文章
             async fetchArticles() {
                 if (!this.isConfigured()) {
                     console.log('GitHub未配置，使用本地存储');
-                    const localArticles = JSON.parse(localStorage.getItem('fuwakoArticles') || '[]');
-                    return checkAndFixData(localArticles);
+                    return JSON.parse(localStorage.getItem('fuwakoArticles') || '[]');
                 }
 
                 try {
@@ -1691,33 +1710,35 @@
                     const fileData = await response.json();
                     
                     // 使用安全的Base64解码
-                    const decodedContent = safeBase64Decode(fileData.content);
+                    const content = safeBase64Decode(fileData.content);
                     
+                    // 解析JSON
+                    let articles;
                     try {
-                        const articles = JSON.parse(decodedContent || '[]');
-                        return checkAndFixData(articles);
+                        articles = JSON.parse(content || '[]');
                     } catch (parseError) {
                         console.error('JSON解析失败:', parseError);
-                        // 尝试修复JSON数据
+                        // 尝试修复JSON
                         try {
-                            const fixedContent = decodedContent.replace(/[\u0000-\u001F\u007F-\u009F]/g, '');
-                            const articles = JSON.parse(fixedContent);
-                            return checkAndFixData(articles);
+                            const fixedContent = content.replace(/[^\x20-\x7E\u4e00-\u9fa5\u3000-\u303F\uff00-\uffef]/g, '');
+                            articles = JSON.parse(fixedContent);
                         } catch (e) {
-                            console.error('JSON修复也失败，返回空数组');
-                            return [];
+                            console.error('JSON修复也失败:', e);
+                            articles = [];
                         }
                     }
+                    
+                    // 修复数据
+                    return checkAndFixData(articles);
                     
                 } catch (error) {
                     console.error('从GitHub获取文章失败：', error);
                     // 失败时使用本地存储
-                    const localArticles = JSON.parse(localStorage.getItem('fuwakoArticles') || '[]');
-                    return checkAndFixData(localArticles);
+                    return JSON.parse(localStorage.getItem('fuwakoArticles') || '[]');
                 }
             }
 
-            // 保存文章到GitHub - 完全修复乱码版本
+            // 保存文章到GitHub
             async saveArticles(articles) {
                 // 先修复和清理数据
                 const cleanedArticles = checkAndFixData(articles);
@@ -1761,11 +1782,10 @@
                         // 文件不存在是正常的，sha保持null
                     }
 
-                    // 使用安全的Base64编码
+                    // 创建或更新文件
                     const jsonString = JSON.stringify(cleanedArticles, null, 2);
                     const content = safeBase64Encode(jsonString);
                     
-                    // 创建或更新文件
                     const response = await fetch(
                         `${this.apiBase}/repos/${this.repoOwner}/${this.repoName}/contents/${this.dataPath}`,
                         {
@@ -1779,7 +1799,7 @@
                                 message: `更新日记 - ${formatDate(new Date())}`,
                                 content: content,
                                 branch: this.repoBranch,
-                                sha: sha // 如果文件已存在，需要提供sha
+                                sha: sha
                             })
                         }
                     );
@@ -1812,44 +1832,53 @@
         // 1. 修复现有数据的乱码问题
         function fixEncodingIssues() {
             try {
-                const rawData = localStorage.getItem('fuwakoArticles');
-                if (!rawData) return false;
+                const localArticles = JSON.parse(localStorage.getItem('fuwakoArticles') || '[]');
+                let needsFix = false;
                 
-                // 尝试解析
-                let articles;
-                try {
-                    articles = JSON.parse(rawData);
-                } catch (e) {
-                    console.error('本地存储数据JSON解析失败，尝试修复:', e);
-                    // 尝试清理数据
-                    const cleanedData = rawData.replace(/[\u0000-\u001F\u007F-\u009F]/g, '');
-                    try {
-                        articles = JSON.parse(cleanedData);
-                    } catch (e2) {
-                        console.error('修复也失败，清空数据');
-                        localStorage.removeItem('fuwakoArticles');
-                        return false;
+                const fixedArticles = localArticles.map(article => {
+                    // 修复日期乱码
+                    if (article.date && article.date.includes('Ã')) {
+                        needsFix = true;
+                        console.log('发现乱码日期，尝试修复：', article.date);
+                        try {
+                            // 尝试修复常见的乱码模式
+                            const fixedDate = decodeURIComponent(escape(article.date));
+                            if (fixedDate !== article.date) {
+                                article.date = fixedDate;
+                                console.log('日期修复成功：', article.date);
+                            }
+                        } catch (e) {
+                            console.log('日期修复失败：', e);
+                        }
                     }
-                }
-                
-                // 检查和修复数据
-                const fixedArticles = checkAndFixData(articles);
-                
-                // 确保所有日期格式正确
-                fixedArticles.forEach(article => {
-                    if (article.date) {
-                        article.date = formatDate(article.date);
+                    
+                    // 修复内容乱码
+                    if (article.content && article.content.includes('Ã')) {
+                        needsFix = true;
+                        console.log('发现乱码内容，尝试修复：', article.title);
+                        try {
+                            const fixedContent = decodeURIComponent(escape(article.content));
+                            if (fixedContent !== article.content) {
+                                article.content = fixedContent;
+                                console.log('内容修复成功');
+                            }
+                        } catch (e) {
+                            console.log('内容修复失败：', e);
+                        }
                     }
+                    
+                    return article;
                 });
                 
-                // 保存修复后的数据
-                localStorage.setItem('fuwakoArticles', JSON.stringify(fixedArticles));
-                return true;
-                
+                if (needsFix && fixedArticles.length > 0) {
+                    localStorage.setItem('fuwakoArticles', JSON.stringify(fixedArticles));
+                    console.log('已修复本地存储中的乱码数据');
+                    return true;
+                }
             } catch (error) {
                 console.error('修复数据时出错：', error);
-                return false;
             }
+            return false;
         }
         
         // 2. GitHub配置相关函数
