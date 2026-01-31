@@ -2850,7 +2850,7 @@ async function loadArticles() {
         articleCard.setAttribute('data-id', article.id);
         
         // 添加调试信息到标题
-        const debugInfo = isAdmin ? ` (ID: ${article.id})` : '';
+        const debugInfo = isAdmin ;
         const displayTitle = article.title || "未命名文章";
         
         const cloudIcon = gitHubManager.isConfigured() ? '<i class="fas fa-cloud cloud-icon" title="已同步到GitHub"></i>' : '';
@@ -3235,6 +3235,7 @@ window.addEventListener('DOMContentLoaded', function() {
     </script>
 </body>
 </html>
+
 
 
 
