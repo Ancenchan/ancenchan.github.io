@@ -6,7 +6,7 @@
     <title>🏠 Fuwako的家 | 温馨小窝，记录生活</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* 1. 导入华文中宋字体 */
+        /* 1. 导入华文中宋字体并优化渲染 */
         @font-face {
             font-family: '华文中宋';
             src: local('STZhongsong'), 
@@ -14,6 +14,13 @@
                  local('Microsoft YaHei');
             font-weight: normal;
             font-style: normal;
+        }
+        
+        /* 字体平滑优化 */
+        * {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
         }
         
         /* 2. 自定义鼠标样式 - 樱花图案 */
@@ -25,14 +32,16 @@
             cursor: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE2IDVDMjMuMTgxNyA1IDI5IDEwLjgxODMgMjkgMThDMjkgMjUuMTgxNyAyMy4xODE3IDMxIDE2IDMxQzguODE4MyAzMSAzIDI1LjE4MTcgMyAxOEMzIDEwLjgxODMgOC44MTgzIDUgMTYgNVoiIGZpbGw9IiNGRjY2OTkiLz4KPHBhdGggZD0iTTEwIDE4QzEwIDIxLjMxMzcgMTIuNjg2MyAyNCAxNiAyNEMxOS4zMTM3IDI0IDIyIDIxLjMxMzcgMjIgMThDMjIgMTQuNjg2MyAxOS4zMTM3IDEyIDE2IDEyQzEyLjY4NjMgMTIgMTAgMTQuNjg2MyAxMCAxOFoiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik0yMCAxNUMxOS40NDc3IDE1IDE5IDE0LjU1MjMgMTkgMTRDMTkgMTMuNDQ3NyAxOS40NDc3IDEzIDIwIDEzQzIwLjU1MjMgMTMgMjEgMTMuNDQ3NyAyMSAxNEMyMSAxNC41NTIzIDIwLjU1MjMgMTUgMjAgMTVaIiBmaWxsPSIjMzMzIi8+CjxwYXRoIGQ9Ik0xMiAxNUMxMS40NDc3IDE1IDExIDE0LjU1MjMgMTEgMTRDMTEgMTMuNDQ3NyAxMS40NDc3IDEzIDEyIDEzQzEyLjU1MjMgMTMgMTMgMTMuNDQ3NyAxMyAxNEMxMyAxNC41NTIzIDEyLjU1MjMgMTUgMTIgMTVaIiBmaWxsPSIjMzMzIi8+Cjwvc3ZnPg=='), pointer !important;
         }
         
-        /* 3. 基础样式 - 使用华文中宋 */
+        /* 3. 基础样式 - 使用华文中宋并优化 */
         :root {
             --primary: #ffb6c1;
             --secondary: #ff6b9d;
             --accent: #ffa8d2;
             --text: #555;
             --bg: #fffaf0;
+            --light-bg: rgba(255, 255, 255, 0.8);
             --font-zh: "华文中宋", "STZhongsong", "SimSun", "Microsoft YaHei", "Source Han Serif SC", serif;
+            --font-smooth: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
         }
         
         * {
@@ -57,6 +66,7 @@
             font-family: var(--font-zh);
             font-weight: normal;
             letter-spacing: 1px;
+            font-smooth: always;
         }
         
         .container {
@@ -93,6 +103,7 @@
             font-weight: bold;
             letter-spacing: 2px;
             cursor: pointer;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
         
         .logo i {
@@ -122,11 +133,13 @@
             font-family: var(--font-zh);
             letter-spacing: 1px;
             cursor: pointer;
+            transition: all 0.3s;
         }
         
         nav a:hover {
             color: var(--primary);
             background: rgba(255, 182, 193, 0.1);
+            transform: translateY(-2px);
         }
         
         nav a:hover::after {
@@ -158,6 +171,7 @@
             display: inline-block;
             font-weight: bold;
             letter-spacing: 3px;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
         
         .hero-subtitle {
@@ -168,6 +182,7 @@
             font-family: var(--font-zh);
             line-height: 1.8;
             letter-spacing: 1px;
+            font-smooth: always;
         }
         
         /* 6. 博客文章区域 */
@@ -205,6 +220,7 @@
             display: flex;
             flex-direction: column;
             position: relative;
+            overflow: hidden;
         }
         
         .article-card:hover {
@@ -274,11 +290,13 @@
             cursor: pointer;
             border: none;
             font-size: 16px;
+            transition: all 0.3s;
         }
         
         .read-more:hover {
             color: white;
             background: var(--secondary);
+            transform: translateX(5px);
         }
         
         .article-actions {
@@ -287,6 +305,12 @@
             right: 15px;
             display: flex;
             gap: 8px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .article-card:hover .article-actions {
+            opacity: 1;
         }
         
         .edit-btn, .delete-btn {
@@ -300,28 +324,29 @@
             font-size: 14px;
             border: none;
             transition: all 0.3s;
+            backdrop-filter: blur(5px);
         }
         
         .edit-btn {
-            background: rgba(255, 182, 193, 0.2);
-            color: var(--primary);
+            background: rgba(255, 182, 193, 0.8);
+            color: white;
         }
         
         .edit-btn:hover {
             background: var(--primary);
-            color: white;
-            transform: rotate(15deg);
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 4px 12px rgba(255, 182, 193, 0.3);
         }
         
         .delete-btn {
-            background: rgba(255, 107, 157, 0.1);
-            color: var(--secondary);
+            background: rgba(255, 107, 157, 0.8);
+            color: white;
         }
         
         .delete-btn:hover {
             background: var(--secondary);
-            color: white;
-            transform: rotate(15deg);
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 4px 12px rgba(255, 107, 157, 0.3);
         }
         
         /* 7. 文章详情页（模态框） */
@@ -335,10 +360,13 @@
             background: rgba(0, 0, 0, 0.7);
             z-index: 1000;
             overflow-y: auto;
+            padding: 20px;
         }
         
         .article-modal.active {
-            display: block;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
             animation: fadeIn 0.3s ease;
         }
         
@@ -351,11 +379,13 @@
             background: white;
             width: 90%;
             max-width: 800px;
-            margin: 40px auto;
             border-radius: 20px;
             padding: 40px;
             position: relative;
             animation: slideUp 0.4s ease;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
         }
         
         @keyframes slideUp {
@@ -378,11 +408,13 @@
             cursor: pointer;
             font-size: 20px;
             border: none;
+            z-index: 10;
+            transition: all 0.3s;
         }
         
         .close-modal:hover {
             background: var(--secondary);
-            transform: rotate(90deg);
+            transform: rotate(90deg) scale(1.1);
         }
         
         .article-header-detail {
@@ -398,6 +430,7 @@
             line-height: 1.4;
             font-family: var(--font-zh);
             letter-spacing: 1px;
+            font-smooth: always;
         }
         
         .article-meta {
@@ -413,6 +446,7 @@
             line-height: 1.9;
             color: #444;
             margin-top: 30px;
+            font-smooth: always;
         }
         
         .article-content-detail p {
@@ -429,6 +463,7 @@
             margin: 60px 0 40px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
             border: 2px solid var(--accent);
+            position: relative;
         }
         
         .create-title {
@@ -480,6 +515,7 @@
             transition: all 0.3s;
             background: #f9f9f9;
             letter-spacing: 0.5px;
+            font-smooth: always;
         }
         
         input:focus, textarea:focus, select:focus {
@@ -512,11 +548,12 @@
             transition: all 0.3s;
             margin-top: 10px;
             letter-spacing: 2px;
+            box-shadow: 0 8px 20px rgba(255, 168, 210, 0.3);
         }
         
         .submit-btn:hover {
             transform: translateY(-5px);
-            box-shadow: 0 15px 25px rgba(255, 168, 210, 0.3);
+            box-shadow: 0 15px 25px rgba(255, 168, 210, 0.4);
         }
         
         .cancel-btn {
@@ -536,11 +573,11 @@
             transition: all 0.3s;
             margin-top: 10px;
             letter-spacing: 2px;
-            margin-left: 15px;
         }
         
         .cancel-btn:hover {
             background: #e0e0e0;
+            transform: translateY(-3px);
         }
         
         .button-group {
@@ -593,25 +630,39 @@
             font-family: var(--font-zh);
             letter-spacing: 1px;
             cursor: pointer;
+            border: 1px solid transparent;
         }
         
         .category:hover, .tag:hover {
             background: var(--primary);
             color: white;
             transform: translateY(-3px);
+            border-color: var(--primary);
         }
         
-        /* 10. 底部 */
+        /* 10. 底部 - 美化快速链接和联系我 */
         footer {
-            background: rgba(255, 250, 240, 0.9);
-            padding: 50px 0 30px;
+            background: linear-gradient(135deg, rgba(255, 250, 240, 0.9), rgba(255, 235, 240, 0.9));
+            padding: 60px 0 30px;
             margin-top: 60px;
             border-top: 3px solid var(--secondary);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
         }
         
         .footer-content {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 40px;
             margin-bottom: 40px;
         }
@@ -634,6 +685,23 @@
             line-height: 1.8;
             font-family: var(--font-zh);
             letter-spacing: 0.5px;
+            margin-bottom: 20px;
+        }
+        
+        /* 快速链接美化 */
+        .footer-links-box, .footer-contact-box {
+            background: var(--light-bg);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(255, 182, 193, 0.2);
+            transition: all 0.3s;
+        }
+        
+        .footer-links-box:hover, .footer-contact-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary);
         }
         
         .footer-links h3, .footer-contact h3 {
@@ -646,6 +714,8 @@
             font-family: var(--font-zh);
             font-weight: bold;
             letter-spacing: 1px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(255, 182, 193, 0.3);
         }
         
         .footer-links ul {
@@ -666,17 +736,65 @@
             font-family: var(--font-zh);
             letter-spacing: 0.5px;
             cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 8px;
         }
         
         .footer-links a:hover {
             color: var(--primary);
+            background: rgba(255, 182, 193, 0.1);
             transform: translateX(5px);
+            padding-left: 20px;
+        }
+        
+        .footer-links a i {
+            width: 20px;
+            text-align: center;
+            color: var(--secondary);
+        }
+        
+        /* 联系我美化 */
+        .footer-contact ul {
+            list-style: none;
+        }
+        
+        .footer-contact li {
+            margin-bottom: 15px;
+        }
+        
+        .footer-contact a {
+            color: #777;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s;
+            font-family: var(--font-zh);
+            letter-spacing: 0.5px;
+            padding: 10px 15px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(255, 182, 193, 0.3);
+        }
+        
+        .footer-contact a:hover {
+            color: white;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 107, 157, 0.3);
+            border-color: transparent;
+        }
+        
+        .footer-contact a i {
+            font-size: 18px;
+            width: 24px;
+            text-align: center;
         }
         
         .copyright {
             text-align: center;
             padding-top: 30px;
-            border-top: 1px solid #eee;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
             color: #999;
             font-size: 14px;
             font-family: var(--font-zh);
@@ -719,7 +837,7 @@
             .modal-content {
                 width: 95%;
                 padding: 30px 20px;
-                margin: 20px auto;
+                margin: 0;
             }
             
             .article-title-detail {
@@ -728,6 +846,10 @@
             
             .button-group {
                 flex-direction: column;
+            }
+            
+            .footer-links-box, .footer-contact-box {
+                padding: 20px;
             }
         }
         
@@ -768,6 +890,7 @@
             max-width: 350px;
             font-family: var(--font-zh);
             letter-spacing: 0.5px;
+            backdrop-filter: blur(10px);
         }
         
         @keyframes slideIn {
@@ -822,11 +945,12 @@
             transition: all 0.3s;
             font-family: var(--font-zh);
             letter-spacing: 1px;
+            box-shadow: 0 5px 15px rgba(255, 182, 193, 0.3);
         }
         
         .btn:hover {
             transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(255, 182, 193, 0.3);
+            box-shadow: 0 10px 20px rgba(255, 182, 193, 0.4);
         }
         
         /* 16. 返回顶部按钮 */
@@ -868,6 +992,7 @@
             margin-top: 30px;
             padding-top: 20px;
             border-top: 1px solid #f0f0f0;
+            flex-wrap: wrap;
         }
         
         .detail-edit-btn, .detail-delete-btn {
@@ -885,25 +1010,23 @@
         }
         
         .detail-edit-btn {
-            background: rgba(255, 182, 193, 0.2);
-            color: var(--primary);
+            background: linear-gradient(135deg, var(--primary), #ffc2d1);
+            color: white;
         }
         
         .detail-edit-btn:hover {
-            background: var(--primary);
-            color: white;
             transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 182, 193, 0.4);
         }
         
         .detail-delete-btn {
-            background: rgba(255, 107, 157, 0.1);
-            color: var(--secondary);
+            background: linear-gradient(135deg, var(--secondary), #ff8fab);
+            color: white;
         }
         
         .detail-delete-btn:hover {
-            background: var(--secondary);
-            color: white;
             transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 107, 157, 0.4);
         }
     </style>
 </head>
@@ -1048,22 +1171,30 @@
                     <p class="footer-about">Netgame sekai</p>
                 </div>
                 
-                <div>
-                    <h3><i class="fas fa-link"></i> 快速链接</h3>
-                    <ul class="footer-links">
-                        <li><a id="footerHome"><i class="fas fa-chevron-right"></i> 首页</a></li>
-                        <li><a id="footerCreate"><i class="fas fa-chevron-right"></i> 写文章</a></li>
-                        <li><a id="footerAbout"><i class="fas fa-chevron-right"></i> 关于我</a></li>
-                    </ul>
+                <!-- 快速链接美化 -->
+                <div class="footer-links-box">
+                    <div class="footer-links">
+                        <h3><i class="fas fa-link"></i> 快速链接</h3>
+                        <ul>
+                            <li><a id="footerHome"><i class="fas fa-home"></i> 首页</a></li>
+                            <li><a id="footerCreate"><i class="fas fa-pencil-alt"></i> 写文章</a></li>
+                            <li><a id="footerAbout"><i class="fas fa-heart"></i> 关于我</a></li>
+                            <li><a href="#articles"><i class="fas fa-book-open"></i> 所有文章</a></li>
+                        </ul>
+                    </div>
                 </div>
                 
-                <div>
-                    <h3><i class="fas fa-envelope"></i> 联系我</h3>
-                    <ul class="footer-links">
-                        <li><a href="mailto:example@example.com"><i class="fas fa-envelope"></i> 发送邮件</a></li>
-                        <li><a href="https://github.com" target="_blank"><i class="fab fa-github"></i> GitHub</a></li>
-                        <li><a href="#"><i class="fas fa-rss"></i> RSS订阅</a></li>
-                    </ul>
+                <!-- 联系我美化 -->
+                <div class="footer-contact-box">
+                    <div class="footer-contact">
+                        <h3><i class="fas fa-envelope"></i> 联系我</h3>
+                        <ul>
+                            <li><a href="mailto:example@example.com"><i class="fas fa-envelope"></i> 发送邮件</a></li>
+                            <li><a href="https://github.com" target="_blank"><i class="fab fa-github"></i> GitHub</a></li>
+                            <li><a href="#"><i class="fas fa-rss"></i> RSS订阅</a></li>
+                            <li><a href="#"><i class="fab fa-twitter"></i> Twitter</a></li>
+                        </ul>
+                    </div>
                 </div>
             </div>
             
@@ -1089,6 +1220,7 @@
     <script>
         // 当前编辑的文章ID
         let editingArticleId = null;
+        let isEditing = false;
         
         // 1. 文章数据管理
         // 示例文章数据
@@ -1171,14 +1303,19 @@
                 articleCard.className = 'article-card';
                 articleCard.setAttribute('data-id', article.id);
                 
+                // 判断是否是用户文章（示例文章ID较小）
+                const isUserArticle = article.id > 1000;
+                
                 articleCard.innerHTML = `
                     <div class="article-actions">
-                        <button class="edit-btn" data-id="${article.id}" title="编辑文章">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="delete-btn" data-id="${article.id}" title="删除文章">
-                            <i class="fas fa-trash"></i>
-                        </button>
+                        ${isUserArticle ? `
+                            <button class="edit-btn" data-id="${article.id}" title="编辑文章">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="delete-btn" data-id="${article.id}" title="删除文章">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        ` : ''}
                     </div>
                     <div class="article-header">
                         <div class="article-date">
@@ -1276,7 +1413,13 @@
 
         // 5. 页面显示函数
         function showHome() {
-            cancelEdit(); // 取消编辑状态
+            if (isEditing) {
+                if (!confirm('您正在编辑文章，确定要放弃编辑吗？')) {
+                    return;
+                }
+                cancelEdit();
+            }
+            
             document.getElementById('articles').style.display = 'block';
             document.getElementById('createSection').style.display = 'none';
             document.getElementById('aboutSection').style.display = 'none';
@@ -1288,7 +1431,17 @@
         }
 
         function showCreateForm() {
-            cancelEdit(); // 确保是新建文章模式
+            if (isEditing && editingArticleId) {
+                // 如果正在编辑，直接显示编辑表单
+                document.getElementById('articles').style.display = 'none';
+                document.getElementById('createSection').style.display = 'block';
+                document.getElementById('aboutSection').style.display = 'none';
+                document.getElementById('createSection').scrollIntoView({ behavior: 'smooth' });
+                return;
+            }
+            
+            // 新建文章模式
+            cancelEdit();
             document.getElementById('articles').style.display = 'none';
             document.getElementById('createSection').style.display = 'block';
             document.getElementById('aboutSection').style.display = 'none';
@@ -1298,7 +1451,13 @@
         }
 
         function showAbout() {
-            cancelEdit(); // 取消编辑状态
+            if (isEditing) {
+                if (!confirm('您正在编辑文章，确定要放弃编辑吗？')) {
+                    return;
+                }
+                cancelEdit();
+            }
+            
             document.getElementById('articles').style.display = 'none';
             document.getElementById('createSection').style.display = 'none';
             document.getElementById('aboutSection').style.display = 'block';
@@ -1325,6 +1484,9 @@
                 return;
             }
             
+            // 判断是否是用户文章
+            const isUserArticle = article.id > 1000;
+            
             // 生成文章详情HTML
             const articleDetail = document.getElementById('articleDetail');
             articleDetail.innerHTML = `
@@ -1343,18 +1505,20 @@
                 </div>
                 ${article.tags && article.tags.length > 0 ? `
                     <div style="margin-top: 30px; display: flex; flex-wrap: wrap; gap: 10px;">
-                        <strong style="margin-right: 10px;">标签：</strong>
+                        <strong style="margin-right: 10px;">关键词：</strong>
                         ${article.tags.map(tag => `<span style="background: rgba(255, 182, 193, 0.2); padding: 5px 10px; border-radius: 15px; font-size: 14px;">${tag}</span>`).join('')}
                     </div>
                 ` : ''}
-                <div class="article-actions-detail">
-                    <button class="detail-edit-btn" data-id="${article.id}">
-                        <i class="fas fa-edit"></i> 编辑文章
-                    </button>
-                    <button class="detail-delete-btn" data-id="${article.id}">
-                        <i class="fas fa-trash"></i> 删除文章
-                    </button>
-                </div>
+                ${isUserArticle ? `
+                    <div class="article-actions-detail">
+                        <button class="detail-edit-btn" data-id="${article.id}">
+                            <i class="fas fa-edit"></i> 编辑文章
+                        </button>
+                        <button class="detail-delete-btn" data-id="${article.id}">
+                            <i class="fas fa-trash"></i> 删除文章
+                        </button>
+                    </div>
+                ` : ''}
             `;
             
             // 显示模态框
@@ -1362,17 +1526,24 @@
             document.body.style.overflow = 'hidden'; // 防止背景滚动
             
             // 为详情页的编辑和删除按钮添加事件
-            document.querySelector('.detail-edit-btn').addEventListener('click', function() {
-                const articleId = this.getAttribute('data-id');
-                closeArticleModal();
-                editArticle(articleId);
-            });
+            const editBtn = document.querySelector('.detail-edit-btn');
+            const deleteBtn = document.querySelector('.detail-delete-btn');
             
-            document.querySelector('.detail-delete-btn').addEventListener('click', function() {
-                const articleId = this.getAttribute('data-id');
-                closeArticleModal();
-                deleteArticle(articleId);
-            });
+            if (editBtn) {
+                editBtn.addEventListener('click', function() {
+                    const articleId = this.getAttribute('data-id');
+                    closeArticleModal();
+                    editArticle(articleId);
+                });
+            }
+            
+            if (deleteBtn) {
+                deleteBtn.addEventListener('click', function() {
+                    const articleId = this.getAttribute('data-id');
+                    closeArticleModal();
+                    deleteArticle(articleId);
+                });
+            }
             
             showNotification(`📖 正在阅读：${article.title}`, 'success');
         }
@@ -1383,7 +1554,7 @@
             document.body.style.overflow = 'auto'; // 恢复背景滚动
         }
 
-        // 8. 编辑文章
+        // 8. 编辑文章（真正的编辑功能）
         function editArticle(articleId) {
             // 获取所有文章
             const userArticles = JSON.parse(localStorage.getItem('fuwakoArticles') || '[]');
@@ -1397,8 +1568,15 @@
                 return;
             }
             
+            // 检查是否是示例文章（示例文章ID较小）
+            if (article.id <= 1000) {
+                showNotification('示例文章不能编辑！', 'warning');
+                return;
+            }
+            
             // 设置编辑状态
             editingArticleId = articleId;
+            isEditing = true;
             
             // 填充表单
             document.getElementById('articleId').value = articleId;
@@ -1422,6 +1600,7 @@
         // 9. 取消编辑
         function cancelEdit() {
             editingArticleId = null;
+            isEditing = false;
             
             // 重置表单
             document.getElementById('articleForm').reset();
@@ -1433,6 +1612,8 @@
             
             // 隐藏取消按钮
             document.getElementById('cancelBtn').style.display = 'none';
+            
+            showNotification('已取消编辑', 'info');
         }
 
         // 10. 文章提交处理（新建或更新）
@@ -1451,39 +1632,52 @@
             
             // 创建文章对象
             const articleData = {
+                id: editingArticleId ? parseInt(editingArticleId) : Date.now(),
                 title,
                 category: "个人随笔", // 固定分类
                 content,
                 excerpt: content.length > 150 ? content.substring(0, 150) + '...' : content,
-                tags: tags ? tags.split(',').map(tag => tag.trim()) : [],
-                date: new Date().toLocaleDateString('zh-CN', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                })
+                tags: tags ? tags.split(',').map(tag => tag.trim()).filter(tag => tag) : [],
+                date: editingArticleId ? 
+                    // 如果是编辑，保持原日期
+                    (() => {
+                        const userArticles = JSON.parse(localStorage.getItem('fuwakoArticles') || '[]');
+                        const oldArticle = userArticles.find(a => a.id == editingArticleId);
+                        return oldArticle ? oldArticle.date : new Date().toLocaleDateString('zh-CN', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                        });
+                    })() :
+                    // 如果是新建，使用当前日期
+                    new Date().toLocaleDateString('zh-CN', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    })
             };
             
-            // 获取现有文章
-            const articles = JSON.parse(localStorage.getItem('fuwakoArticles') || '[]');
+            // 获取现有用户文章
+            let articles = JSON.parse(localStorage.getItem('fuwakoArticles') || '[]');
             
             if (editingArticleId) {
-                // 更新文章
+                // 更新文章 - 找到并替换
                 const articleIndex = articles.findIndex(a => a.id == editingArticleId);
                 if (articleIndex !== -1) {
-                    articleData.id = parseInt(editingArticleId);
                     articles[articleIndex] = articleData;
-                    localStorage.setItem('fuwakoArticles', JSON.stringify(articles));
-                    
                     showNotification(`🌸 文章"${title}"已成功更新！`, 'success');
+                } else {
+                    showNotification('文章更新失败，未找到原文章！', 'error');
+                    return;
                 }
             } else {
                 // 新建文章
-                articleData.id = Date.now(); // 使用时间戳作为唯一ID
                 articles.unshift(articleData);
-                localStorage.setItem('fuwakoArticles', JSON.stringify(articles));
-                
                 showNotification(`🌸 文章"${title}"已成功保存到你的家中！`, 'success');
             }
+            
+            // 保存到本地存储
+            localStorage.setItem('fuwakoArticles', JSON.stringify(articles));
             
             // 添加庆祝粒子效果
             createParticles(document.getElementById('articleForm'), '🌸', 25);
@@ -1506,7 +1700,7 @@
                 return;
             }
             
-            // 获取所有文章（示例文章 + 用户发布的文章）
+            // 获取用户文章
             const userArticles = JSON.parse(localStorage.getItem('fuwakoArticles') || '[]');
             
             // 检查是否是示例文章
@@ -1519,6 +1713,12 @@
             // 删除用户文章
             const updatedArticles = userArticles.filter(a => a.id != articleId);
             localStorage.setItem('fuwakoArticles', JSON.stringify(updatedArticles));
+            
+            // 如果正在编辑这篇文章，取消编辑状态
+            if (editingArticleId == articleId) {
+                cancelEdit();
+                showHome();
+            }
             
             // 重新加载文章列表
             loadArticles();
@@ -1536,6 +1736,7 @@
             let borderColor = '#98fb98'; // 默认success
             if (type === 'warning') borderColor = '#ffb347';
             if (type === 'error') borderColor = '#ff6b6b';
+            if (type === 'info') borderColor = '#87ceeb';
             
             notification.style.borderLeftColor = borderColor;
             
