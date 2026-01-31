@@ -1468,6 +1468,113 @@
         let isEditing = false;
         let isAdmin = false;
         
+        // ========== 工具函数：修复日期格式兼容性问题 ==========
+        function formatDate(dateString) {
+            // 如果是日期对象
+            if (dateString instanceof Date) {
+                const year = dateString.getFullYear();
+                const month = dateString.getMonth() + 1;
+                const day = dateString.getDate();
+                return `${year}年${month}月${day}日`;
+            }
+            
+            // 如果是字符串，尝试解析
+            if (typeof dateString === 'string') {
+                // 检查是否已经是中文格式
+                if (dateString.includes('年') && dateString.includes('月') && dateString.includes('日')) {
+                    return dateString;
+                }
+                
+                // 尝试解析ISO格式或其它格式
+                try {
+                    const date = new Date(dateString);
+                    if (!isNaN(date.getTime())) {
+                        const year = date.getFullYear();
+                        const month = date.getMonth() + 1;
+                        const day = date.getDate();
+                        return `${year}年${month}月${day}日`;
+                    }
+                } catch (e) {
+                    console.warn('日期解析失败:', dateString, e);
+                }
+                
+                // 如果无法解析，返回原始字符串
+                return dateString;
+            }
+            
+            // 默认返回当前日期
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth() + 1;
+            const day = now.getDate();
+            return `${year}年${month}月${day}日`;
+        }
+        
+        // ========== 工具函数：安全的Base64编码/解码 ==========
+        function safeBase64Encode(str) {
+            try {
+                // 使用TextEncoder处理UTF-8字符
+                const encoder = new TextEncoder();
+                const data = encoder.encode(str);
+                let binary = '';
+                for (let i = 0; i < data.length; i++) {
+                    binary += String.fromCharCode(data[i]);
+                }
+                return btoa(binary);
+            } catch (e) {
+                console.error('Base64编码失败:', e);
+                // 降级方案：使用传统的encodeURIComponent
+                return btoa(unescape(encodeURIComponent(str)));
+            }
+        }
+        
+        function safeBase64Decode(base64Str) {
+            try {
+                // 移除可能的空格和换行
+                const cleanBase64 = base64Str.replace(/\s/g, '');
+                const binaryString = atob(cleanBase64);
+                const bytes = new Uint8Array(binaryString.length);
+                for (let i = 0; i < binaryString.length; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
+                }
+                return new TextDecoder('utf-8').decode(bytes);
+            } catch (e) {
+                console.error('Base64解码失败:', e);
+                // 降级方案：使用传统的decodeURIComponent
+                try {
+                    return decodeURIComponent(escape(atob(base64Str)));
+                } catch (e2) {
+                    console.error('降级解码也失败:', e2);
+                    return base64Str; // 返回原始字符串
+                }
+            }
+        }
+        
+        // ========== 工具函数：检查和修复乱码数据 ==========
+        function checkAndFixData(data) {
+            if (typeof data === 'string') {
+                // 检查是否是Base64编码的字符串
+                if (/^[A-Za-z0-9+/=]+$/.test(data) && data.length % 4 === 0) {
+                    try {
+                        return safeBase64Decode(data);
+                    } catch (e) {
+                        console.warn('尝试修复数据失败:', e);
+                        return data;
+                    }
+                }
+                return data;
+            } else if (Array.isArray(data)) {
+                return data.map(item => checkAndFixData(item));
+            } else if (data && typeof data === 'object') {
+                const fixed = {};
+                for (const key in data) {
+                    fixed[key] = checkAndFixData(data[key]);
+                }
+                return fixed;
+            }
+            return data;
+        }
+        
         // ========== GitHub管理器类 ==========
         class GitHubManager {
             constructor() {
@@ -1552,11 +1659,12 @@
                 }
             }
 
-            // 从GitHub获取文章 - 修复乱码版本
+            // 从GitHub获取文章 - 完全修复乱码版本
             async fetchArticles() {
                 if (!this.isConfigured()) {
                     console.log('GitHub未配置，使用本地存储');
-                    return JSON.parse(localStorage.getItem('fuwakoArticles') || '[]');
+                    const localArticles = JSON.parse(localStorage.getItem('fuwakoArticles') || '[]');
+                    return checkAndFixData(localArticles);
                 }
 
                 try {
@@ -1582,29 +1690,49 @@
 
                     const fileData = await response.json();
                     
-                    // ===== 修复：正确处理中文Base64编码 =====
-                    const base64Content = fileData.content.replace(/\s/g, '');
-                    const binaryString = atob(base64Content);
-                    const bytes = new Uint8Array(binaryString.length);
-                    for (let i = 0; i < binaryString.length; i++) {
-                        bytes[i] = binaryString.charCodeAt(i);
-                    }
-                    const content = new TextDecoder('utf-8').decode(bytes);
-                    // ===== 修复结束 =====
+                    // 使用安全的Base64解码
+                    const decodedContent = safeBase64Decode(fileData.content);
                     
-                    return JSON.parse(content || '[]');
+                    try {
+                        const articles = JSON.parse(decodedContent || '[]');
+                        return checkAndFixData(articles);
+                    } catch (parseError) {
+                        console.error('JSON解析失败:', parseError);
+                        // 尝试修复JSON数据
+                        try {
+                            const fixedContent = decodedContent.replace(/[\u0000-\u001F\u007F-\u009F]/g, '');
+                            const articles = JSON.parse(fixedContent);
+                            return checkAndFixData(articles);
+                        } catch (e) {
+                            console.error('JSON修复也失败，返回空数组');
+                            return [];
+                        }
+                    }
                     
                 } catch (error) {
                     console.error('从GitHub获取文章失败：', error);
                     // 失败时使用本地存储
-                    return JSON.parse(localStorage.getItem('fuwakoArticles') || '[]');
+                    const localArticles = JSON.parse(localStorage.getItem('fuwakoArticles') || '[]');
+                    return checkAndFixData(localArticles);
                 }
             }
 
-            // 保存文章到GitHub - 修复乱码版本
+            // 保存文章到GitHub - 完全修复乱码版本
             async saveArticles(articles) {
-                // 先保存到本地存储作为备份
-                localStorage.setItem('fuwakoArticles', JSON.stringify(articles));
+                // 先修复和清理数据
+                const cleanedArticles = checkAndFixData(articles);
+                
+                // 确保所有日期都是正确格式
+                cleanedArticles.forEach(article => {
+                    if (article.date) {
+                        article.date = formatDate(article.date);
+                    } else {
+                        article.date = formatDate(new Date());
+                    }
+                });
+                
+                // 保存到本地存储作为备份
+                localStorage.setItem('fuwakoArticles', JSON.stringify(cleanedArticles));
 
                 if (!this.isConfigured()) {
                     console.log('GitHub未配置，仅保存到本地');
@@ -1633,16 +1761,9 @@
                         // 文件不存在是正常的，sha保持null
                     }
 
-                    // ===== 修复：正确处理中文Base64编码 =====
-                    const jsonString = JSON.stringify(articles, null, 2);
-                    const encoder = new TextEncoder();
-                    const data = encoder.encode(jsonString);
-                    let binary = '';
-                    for (let i = 0; i < data.length; i++) {
-                        binary += String.fromCharCode(data[i]);
-                    }
-                    const content = btoa(binary);
-                    // ===== 修复结束 =====
+                    // 使用安全的Base64编码
+                    const jsonString = JSON.stringify(cleanedArticles, null, 2);
+                    const content = safeBase64Encode(jsonString);
                     
                     // 创建或更新文件
                     const response = await fetch(
@@ -1655,7 +1776,7 @@
                                 'Content-Type': 'application/json'
                             },
                             body: JSON.stringify({
-                                message: `更新日记 - ${new Date().toLocaleString('zh-CN')}`,
+                                message: `更新日记 - ${formatDate(new Date())}`,
                                 content: content,
                                 branch: this.repoBranch,
                                 sha: sha // 如果文件已存在，需要提供sha
@@ -1691,43 +1812,44 @@
         // 1. 修复现有数据的乱码问题
         function fixEncodingIssues() {
             try {
-                const localArticles = JSON.parse(localStorage.getItem('fuwakoArticles') || '[]');
-                let needsFix = false;
+                const rawData = localStorage.getItem('fuwakoArticles');
+                if (!rawData) return false;
                 
-                const fixedArticles = localArticles.map(article => {
-                    // 检查是否有乱码字符
-                    if (article.content && /[^\u0000-\uFFFF]/.test(article.content)) {
-                        needsFix = true;
-                        console.log('发现乱码文章，尝试修复：', article.title);
-                        
-                        // 如果内容看起来是Base64编码的，尝试解码
-                        try {
-                            if (/^[A-Za-z0-9+/=]+$/.test(article.content)) {
-                                const base64Content = article.content.replace(/\s/g, '');
-                                const binaryString = atob(base64Content);
-                                const bytes = new Uint8Array(binaryString.length);
-                                for (let i = 0; i < binaryString.length; i++) {
-                                    bytes[i] = binaryString.charCodeAt(i);
-                                }
-                                article.content = new TextDecoder('utf-8').decode(bytes);
-                                console.log('文章修复成功：', article.title);
-                            }
-                        } catch (e) {
-                            console.log('修复失败，保留原内容：', e);
-                        }
+                // 尝试解析
+                let articles;
+                try {
+                    articles = JSON.parse(rawData);
+                } catch (e) {
+                    console.error('本地存储数据JSON解析失败，尝试修复:', e);
+                    // 尝试清理数据
+                    const cleanedData = rawData.replace(/[\u0000-\u001F\u007F-\u009F]/g, '');
+                    try {
+                        articles = JSON.parse(cleanedData);
+                    } catch (e2) {
+                        console.error('修复也失败，清空数据');
+                        localStorage.removeItem('fuwakoArticles');
+                        return false;
                     }
-                    return article;
+                }
+                
+                // 检查和修复数据
+                const fixedArticles = checkAndFixData(articles);
+                
+                // 确保所有日期格式正确
+                fixedArticles.forEach(article => {
+                    if (article.date) {
+                        article.date = formatDate(article.date);
+                    }
                 });
                 
-                if (needsFix && fixedArticles.length > 0) {
-                    localStorage.setItem('fuwakoArticles', JSON.stringify(fixedArticles));
-                    console.log('已修复本地存储中的乱码数据');
-                    return true;
-                }
+                // 保存修复后的数据
+                localStorage.setItem('fuwakoArticles', JSON.stringify(fixedArticles));
+                return true;
+                
             } catch (error) {
                 console.error('修复数据时出错：', error);
+                return false;
             }
-            return false;
         }
         
         // 2. GitHub配置相关函数
@@ -1842,7 +1964,7 @@
             
             try {
                 // 获取本地文章
-                const articles = JSON.parse(localStorage.getItem('fuwakoArticles') || '[]');
+                const articles = await gitHubManager.fetchArticles();
                 
                 if (articles.length === 0) {
                     showNotification('没有需要同步的文章', 'info');
@@ -1934,11 +2056,11 @@
                         <div class="article-date">
                             <i class="far fa-calendar"></i> ${article.date} ${cloudIcon}
                         </div>
-                        <div class="article-category">${article.category}</div>
+                        <div class="article-category">${article.category || "个人随笔"}</div>
                         ${actionsHtml}
                     </div>
-                    <h3 class="article-title">${article.title}</h3>
-                    <p class="article-excerpt">${article.excerpt || article.content.substring(0, 150) + '...'}</p>
+                    <h3 class="article-title">${article.title || "未命名文章"}</h3>
+                    <p class="article-excerpt">${article.excerpt || (article.content ? article.content.substring(0, 150) + '...' : "暂无内容")}</p>
                     <button class="read-more" data-id="${article.id}">
                         阅读全文 <i class="fas fa-arrow-right"></i>
                     </button>
@@ -2054,17 +2176,17 @@
             const articleDetail = document.getElementById('articleDetail');
             articleDetail.innerHTML = `
                 <div class="article-header-detail">
-                    <h1 class="article-title-detail">${article.title}</h1>
+                    <h1 class="article-title-detail">${article.title || "未命名文章"}</h1>
                     <div class="article-meta">
                         <div>
                             <span style="margin-right: 20px;"><i class="far fa-calendar"></i> ${article.date} ${cloudIcon}</span>
-                            <span><i class="fas fa-folder"></i> ${article.category}</span>
+                            <span><i class="fas fa-folder"></i> ${article.category || "个人随笔"}</span>
                         </div>
-                        <div class="article-category">${article.category}</div>
+                        <div class="article-category">${article.category || "个人随笔"}</div>
                     </div>
                 </div>
                 <div class="article-content-detail">
-                    ${article.content}
+                    ${article.content || "暂无内容"}
                 </div>
                 ${article.tags && article.tags.length > 0 ? `
                     <div style="margin-top: 30px; display: flex; flex-wrap: wrap; gap: 10px;">
@@ -2099,7 +2221,7 @@
                 });
             }
             
-            showNotification(`📖 正在阅读：${article.title}`, 'success');
+            showNotification(`📖 正在阅读：${article.title || "未命名文章"}`, 'success');
         }
 
         // 9. 关闭文章模态框
@@ -2135,8 +2257,8 @@
             setTimeout(() => {
                 // 填充表单
                 document.getElementById('articleId').value = articleId;
-                document.getElementById('articleTitle').value = article.title;
-                document.getElementById('articleContent').value = article.content;
+                document.getElementById('articleTitle').value = article.title || "";
+                document.getElementById('articleContent').value = article.content || "";
                 document.getElementById('articleTags').value = article.tags ? article.tags.join(', ') : '';
                 
                 // 更新表单标题和按钮文字
@@ -2150,7 +2272,7 @@
             // 切换到编辑页面
             showCreateForm();
             
-            showNotification(`✏️ 正在编辑：${article.title}`, 'success');
+            showNotification(`✏️ 正在编辑：${article.title || "未命名文章"}`, 'success');
         }
 
         // 11. 取消编辑
@@ -2212,20 +2334,7 @@
                 content,
                 excerpt: content.length > 150 ? content.substring(0, 150) + '...' : content,
                 tags: tags ? tags.split(',').map(tag => tag.trim()).filter(tag => tag) : [],
-                date: editingArticleId ? 
-                    (() => {
-                        const oldArticle = articles.find(a => a.id == editingArticleId);
-                        return oldArticle ? oldArticle.date : new Date().toLocaleDateString('zh-CN', {
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric'
-                        });
-                    })() :
-                    new Date().toLocaleDateString('zh-CN', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                    })
+                date: formatDate(new Date()) // 使用安全的日期格式
             };
             
             if (editingArticleId) {
@@ -2513,7 +2622,9 @@
             const fixed = fixEncodingIssues();
             if (fixed) {
                 console.log('已修复乱码数据');
-                showNotification('🔧 已自动修复现有文章的乱码问题', 'info');
+                setTimeout(() => {
+                    showNotification('🔧 已自动修复现有文章的乱码问题', 'info');
+                }, 500);
             }
             
             // 加载GitHub配置并更新UI
@@ -2532,7 +2643,9 @@
             setTimeout(() => {
                 showNotification('❤️ 欢迎来到Fuwako的家！', 'success');
                 if (!gitHubManager.isConfigured()) {
-                    showNotification('💡 请点击"配置"按钮设置GitHub同步，这样你的文章就能在任何设备访问了！', 'info');
+                    setTimeout(() => {
+                        showNotification('💡 请点击"配置"按钮设置GitHub同步，这样你的文章就能在任何设备访问了！', 'info');
+                    }, 2000);
                 }
             }, 1000);
             
