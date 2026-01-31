@@ -22,7 +22,7 @@
         }
         
         a, button, .clickable {
-            cursor: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3c3Lm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGQ9Ik0xNiA0QzIyLjYyNyA0IDI4IDkuMzczIDI4IDE2QzI4IDIyLjYyNyAyMi42MjcgMjggMTYgMjhDOS4zNzMgMjggNCAyMi42MjcgNCAxNkM0IDkuMzczIDkuMzczIDQgMTYgNFoiIGZpbGw9IiNGRjY2OTkiLz4KPHBhdGggZD0iTTE5IDExSDEzVjE5SDE5VjExWiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+'), pointer !important;
+            cursor: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE2IDRDMjIuNjI3IDQgMjggOS4zNzMgMjggMTZDMjggMjIuNjI3IDIyLjYyNyAyOCAxNiAyOEM5LjM3MyAyOCA0IDIyLjYyNyA0IDE2QzQgOS4zNzMgOS4zNzMgNCAxNiA0WiIgZmlsbD0iI0ZGNjY5OSIvPgo8cGF0aCBkPSJNMTkgMTFIMTNWMTlIMTlWMTFaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4='), pointer !important;
         }
         
         /* 3. 基础样式 - 使用华文中宋 */
@@ -33,7 +33,6 @@
             --text: #555;
             --bg: #fffaf0;
             --font-zh: "华文中宋", "STZhongsong", "SimSun", "Microsoft YaHei", "Source Han Serif SC", serif;
-            --font-en: Georgia, "Times New Roman", serif;
         }
         
         * {
@@ -93,6 +92,7 @@
             color: var(--primary);
             font-weight: bold;
             letter-spacing: 2px;
+            cursor: pointer;
         }
         
         .logo i {
@@ -121,6 +121,7 @@
             position: relative;
             font-family: var(--font-zh);
             letter-spacing: 1px;
+            cursor: pointer;
         }
         
         nav a:hover {
@@ -148,17 +149,6 @@
             border: 2px solid var(--primary);
         }
         
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffb6c1' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
-            opacity: 0.5;
-        }
-        
         .hero-title {
             font-family: var(--font-zh);
             color: var(--primary);
@@ -168,20 +158,6 @@
             display: inline-block;
             font-weight: bold;
             letter-spacing: 3px;
-        }
-        
-        .hero-title::after {
-            content: '🏠';
-            position: absolute;
-            right: -40px;
-            top: -10px;
-            font-size: 30px;
-            animation: float 3s infinite ease-in-out;
-        }
-        
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
         }
         
         .hero-subtitle {
@@ -294,6 +270,9 @@
             align-self: flex-start;
             font-family: var(--font-zh);
             letter-spacing: 1px;
+            cursor: pointer;
+            border: none;
+            font-size: 16px;
         }
         
         .read-more:hover {
@@ -301,7 +280,104 @@
             background: var(--secondary);
         }
         
-        /* 7. 写文章区域（在页面底部） */
+        /* 7. 文章详情页（模态框） */
+        .article-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        
+        .article-modal.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .modal-content {
+            background: white;
+            width: 90%;
+            max-width: 800px;
+            margin: 40px auto;
+            border-radius: 20px;
+            padding: 40px;
+            position: relative;
+            animation: slideUp 0.4s ease;
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--primary);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 20px;
+            border: none;
+        }
+        
+        .close-modal:hover {
+            background: var(--secondary);
+            transform: rotate(90deg);
+        }
+        
+        .article-header-detail {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .article-title-detail {
+            font-size: 36px;
+            color: var(--text);
+            margin-bottom: 15px;
+            line-height: 1.4;
+            font-family: var(--font-zh);
+            letter-spacing: 1px;
+        }
+        
+        .article-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #888;
+            font-size: 16px;
+        }
+        
+        .article-content-detail {
+            font-size: 18px;
+            line-height: 1.9;
+            color: #444;
+            margin-top: 30px;
+        }
+        
+        .article-content-detail p {
+            margin-bottom: 20px;
+            font-family: var(--font-zh);
+            letter-spacing: 0.5px;
+        }
+        
+        /* 8. 写文章区域 */
         .create-section {
             background: white;
             border-radius: 20px;
@@ -406,7 +482,7 @@
             box-shadow: 0 15px 25px rgba(152, 251, 152, 0.3);
         }
         
-        /* 8. 侧边栏 */
+        /* 9. 侧边栏 */
         .sidebar {
             display: flex;
             flex-direction: column;
@@ -450,6 +526,7 @@
             transition: all 0.3s;
             font-family: var(--font-zh);
             letter-spacing: 1px;
+            cursor: pointer;
         }
         
         .category:hover, .tag:hover {
@@ -458,7 +535,7 @@
             transform: translateY(-3px);
         }
         
-        /* 9. 底部 */
+        /* 10. 底部 */
         footer {
             background: rgba(255, 250, 240, 0.9);
             padding: 50px 0 30px;
@@ -483,6 +560,7 @@
             margin-bottom: 20px;
             font-weight: bold;
             letter-spacing: 2px;
+            cursor: pointer;
         }
         
         .footer-about {
@@ -521,6 +599,7 @@
             transition: all 0.3s;
             font-family: var(--font-zh);
             letter-spacing: 0.5px;
+            cursor: pointer;
         }
         
         .footer-links a:hover {
@@ -538,7 +617,7 @@
             letter-spacing: 1px;
         }
         
-        /* 10. 响应式设计 */
+        /* 11. 响应式设计 */
         @media (max-width: 768px) {
             .nav-container {
                 flex-direction: column;
@@ -570,9 +649,19 @@
             .footer-content {
                 grid-template-columns: 1fr;
             }
+            
+            .modal-content {
+                width: 95%;
+                padding: 30px 20px;
+                margin: 20px auto;
+            }
+            
+            .article-title-detail {
+                font-size: 28px;
+            }
         }
         
-        /* 11. 粒子效果 */
+        /* 12. 粒子效果 */
         .particle {
             position: absolute;
             pointer-events: none;
@@ -593,7 +682,7 @@
             }
         }
         
-        /* 12. 提示消息 */
+        /* 13. 提示消息 */
         .notification {
             position: fixed;
             bottom: 20px;
@@ -622,7 +711,7 @@
             }
         }
         
-        /* 13. 装饰元素 */
+        /* 14. 装饰元素 */
         .home-icon {
             position: fixed;
             bottom: 30px;
@@ -647,7 +736,7 @@
             box-shadow: 0 12px 25px rgba(255, 182, 193, 0.6);
         }
         
-        /* 14. 按钮样式 */
+        /* 15. 按钮样式 */
         .btn {
             background: var(--primary);
             color: white;
@@ -669,23 +758,53 @@
             transform: translateY(-3px);
             box-shadow: 0 10px 20px rgba(255, 182, 193, 0.3);
         }
+        
+        /* 16. 返回顶部按钮 */
+        .scroll-top {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            background: var(--secondary);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 5px 15px rgba(135, 206, 235, 0.4);
+            z-index: 99;
+            cursor: pointer;
+            transition: all 0.3s;
+            opacity: 0;
+            visibility: hidden;
+        }
+        
+        .scroll-top.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .scroll-top:hover {
+            background: var(--primary);
+            transform: translateY(-5px);
+        }
     </style>
 </head>
 <body>
     <!-- 顶部导航 -->
     <header>
         <div class="container nav-container">
-            <div class="logo">
+            <div class="logo" id="homeLogo">
                 <i class="fas fa-home"></i>
                 <span>Fuwako的家</span>
             </div>
             <nav>
                 <ul>
-                    <li><a href="#home"><i class="fas fa-home"></i> 首页</a></li>
-                    <li><a href="#articles"><i class="fas fa-book-open"></i> 文章</a></li>
-                    <li><a href="#categories"><i class="fas fa-th-large"></i> 分类</a></li>
-                    <li><a href="#about"><i class="fas fa-heart"></i> 关于我</a></li>
-                    <li><a href="#contact"><i class="fas fa-envelope"></i> 联系</a></li>
+                    <li><a id="navHome"><i class="fas fa-home"></i> 首页</a></li>
+                    <li><a id="navCreate"><i class="fas fa-pencil-alt"></i> 写文章</a></li>
+                    <li><a id="navAbout"><i class="fas fa-heart"></i> 关于</a></li>
                 </ul>
             </nav>
         </div>
@@ -710,42 +829,8 @@
                 <i class="fas fa-feather-alt"></i> 最新文章
             </h2>
             
-            <div class="articles-grid">
-                <article class="article-card">
-                    <div class="article-header">
-                        <div class="article-date">
-                            <i class="far fa-calendar"></i> 2024年3月20日
-                        </div>
-                        <div class="article-category">生活随笔</div>
-                    </div>
-                    <h3 class="article-title">春日午后的一杯茶</h3>
-                    <p class="article-excerpt">阳光透过窗户洒在书桌上，泡了一杯茉莉花茶，看着茶叶在水中慢慢舒展。这样的午后，时间仿佛慢了下来，让人可以静静地思考生活的美好。</p>
-                    <a href="#" class="read-more">阅读全文 <i class="fas fa-arrow-right"></i></a>
-                </article>
-                
-                <article class="article-card">
-                    <div class="article-header">
-                        <div class="article-date">
-                            <i class="far fa-calendar"></i> 2024年3月18日
-                        </div>
-                        <div class="article-category">读书笔记</div>
-                    </div>
-                    <h3 class="article-title">《小王子》中的成长启示</h3>
-                    <p class="article-excerpt">重读《小王子》，发现每个年龄段读都有不同的感悟。小时候觉得是童话，现在读来却满是人生的哲理。真正重要的东西，用眼睛是看不见的。</p>
-                    <a href="#" class="read-more">阅读全文 <i class="fas fa-arrow-right"></i></a>
-                </article>
-                
-                <article class="article-card">
-                    <div class="article-header">
-                        <div class="article-date">
-                            <i class="far fa-calendar"></i> 2024年3月15日
-                        </div>
-                        <div class="article-category">美食记录</div>
-                    </div>
-                    <h3 class="article-title">第一次尝试做日式咖喱</h3>
-                    <p class="article-excerpt">今天尝试做了日式咖喱，加入了苹果和蜂蜜，味道格外温和香甜。烹饪的过程本身就是一种治愈，看着食材慢慢变成美味，心情也变得愉悦。</p>
-                    <a href="#" class="read-more">阅读全文 <i class="fas fa-arrow-right"></i></a>
-                </article>
+            <div class="articles-grid" id="articlesGrid">
+                <!-- 文章会动态加载到这里 -->
             </div>
             
             <!-- 侧边栏区域 -->
@@ -754,12 +839,12 @@
                 <div id="categories" class="sidebar-widget">
                     <h4 class="widget-title"><i class="fas fa-th-large"></i> 文章分类</h4>
                     <div class="categories">
-                        <a href="#" class="category">生活随笔</a>
-                        <a href="#" class="category">读书笔记</a>
-                        <a href="#" class="category">美食记录</a>
-                        <a href="#" class="category">旅行日记</a>
-                        <a href="#" class="category">影视评论</a>
-                        <a href="#" class="category">心情碎片</a>
+                        <span class="category" data-category="生活随笔">生活随笔</span>
+                        <span class="category" data-category="读书笔记">读书笔记</span>
+                        <span class="category" data-category="美食记录">美食记录</span>
+                        <span class="category" data-category="旅行日记">旅行日记</span>
+                        <span class="category" data-category="影视评论">影视评论</span>
+                        <span class="category" data-category="心情碎片">心情碎片</span>
                     </div>
                 </div>
                 
@@ -767,14 +852,14 @@
                 <div class="sidebar-widget">
                     <h4 class="widget-title"><i class="fas fa-tags"></i> 热门标签</h4>
                     <div class="tags">
-                        <a href="#" class="tag">温暖</a>
-                        <a href="#" class="tag">生活</a>
-                        <a href="#" class="tag">读书</a>
-                        <a href="#" class="tag">美食</a>
-                        <a href="#" class="tag">治愈</a>
-                        <a href="#" class="tag">日常</a>
-                        <a href="#" class="tag">思考</a>
-                        <a href="#" class="tag">记录</a>
+                        <span class="tag">温暖</span>
+                        <span class="tag">生活</span>
+                        <span class="tag">读书</span>
+                        <span class="tag">美食</span>
+                        <span class="tag">治愈</span>
+                        <span class="tag">日常</span>
+                        <span class="tag">思考</span>
+                        <span class="tag">记录</span>
                     </div>
                 </div>
                 
@@ -787,65 +872,112 @@
         </section>
         
         <!-- 写文章区域（在页面底部） -->
-        <section id="create" class="create-section">
-            <h2 class="create-title">
-                <i class="fas fa-pencil-alt"></i> 写新文章
-            </h2>
+        <section id="createSection" style="display:none;">
+            <div class="create-section">
+                <h2 class="create-title">
+                    <i class="fas fa-pencil-alt"></i> 写新文章
+                </h2>
+                
+                <form id="articleForm" class="create-form">
+                    <div class="form-group">
+                        <label for="articleTitle"><i class="fas fa-heading"></i> 文章标题</label>
+                        <input type="text" id="articleTitle" placeholder="为你的文章起一个温馨的标题" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="articleCategory"><i class="fas fa-folder"></i> 文章分类</label>
+                        <select id="articleCategory" required>
+                            <option value="">选择分类</option>
+                            <option value="生活随笔">生活随笔</option>
+                            <option value="读书笔记">读书笔记</option>
+                            <option value="美食记录">美食记录</option>
+                            <option value="旅行日记">旅行日记</option>
+                            <option value="影视评论">影视评论</option>
+                            <option value="心情碎片">心情碎片</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group full-width">
+                        <label for="articleContent"><i class="fas fa-edit"></i> 文章内容</label>
+                        <textarea id="articleContent" placeholder="在这里写下你的想法、故事和感悟..." required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="articleTags"><i class="fas fa-tags"></i> 标签（用逗号分隔）</label>
+                        <input type="text" id="articleTags" placeholder="例如：生活, 温暖, 日常">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="articleMood"><i class="fas fa-smile"></i> 此刻心情</label>
+                        <select id="articleMood">
+                            <option value="">选择心情</option>
+                            <option value="开心">😊 开心</option>
+                            <option value="平静">😌 平静</option>
+                            <option value="思考">🤔 思考</option>
+                            <option value="感动">🥲 感动</option>
+                            <option value="期待">🌟 期待</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">
+                        <i class="fas fa-home"></i> 将文章放进我的家
+                    </button>
+                </form>
+            </div>
+        </section>
+        
+        <!-- 关于页内容 -->
+        <section id="aboutSection" style="display:none;">
+            <div class="hero" style="margin-bottom: 40px;">
+                <h1 class="hero-title">关于Fuwako的家</h1>
+                <p class="hero-subtitle">一个小小的网络空间，记录生活点滴，分享温暖故事</p>
+            </div>
             
-            <form id="articleForm" class="create-form">
-                <div class="form-group">
-                    <label for="articleTitle"><i class="fas fa-heading"></i> 文章标题</label>
-                    <input type="text" id="articleTitle" placeholder="为你的文章起一个温馨的标题" required>
+            <div class="articles-grid" style="margin-top: 40px;">
+                <div class="article-card" style="text-align: center; padding: 40px;">
+                    <i class="fas fa-home" style="font-size: 60px; color: var(--primary); margin-bottom: 20px;"></i>
+                    <h3 style="font-size: 24px; margin-bottom: 15px;">我是Fuwako</h3>
+                    <p style="line-height: 1.8; color: #666; margin-bottom: 20px;">
+                        喜欢用文字记录生活中的小确幸。这里是我的小家，分享我的思考、阅读和日常生活。
+                    </p>
+                    <p style="line-height: 1.8; color: #666;">
+                        希望这里的文字能给你带来一丝温暖和灵感，就像家的感觉一样。
+                    </p>
                 </div>
                 
-                <div class="form-group">
-                    <label for="articleCategory"><i class="fas fa-folder"></i> 文章分类</label>
-                    <select id="articleCategory" required>
-                        <option value="">选择分类</option>
-                        <option value="生活随笔">生活随笔</option>
-                        <option value="读书笔记">读书笔记</option>
-                        <option value="美食记录">美食记录</option>
-                        <option value="旅行日记">旅行日记</option>
-                        <option value="影视评论">影视评论</option>
-                        <option value="心情碎片">心情碎片</option>
-                    </select>
+                <div class="article-card" style="padding: 40px;">
+                    <h3 style="font-size: 20px; margin-bottom: 20px; color: var(--secondary);">
+                        <i class="fas fa-heart"></i> 这个家的特色
+                    </h3>
+                    <ul style="list-style: none; line-height: 2;">
+                        <li>✨ 自定义鼠标样式，温馨互动</li>
+                        <li>📝 简单易用的文章发布功能</li>
+                        <li>🏠 温暖的视觉设计</li>
+                        <li>📱 响应式布局，手机电脑都能看</li>
+                        <li>💾 文章自动保存到浏览器</li>
+                        <li>🔍 点击文章可以查看完整内容</li>
+                    </ul>
                 </div>
-                
-                <div class="form-group full-width">
-                    <label for="articleContent"><i class="fas fa-edit"></i> 文章内容</label>
-                    <textarea id="articleContent" placeholder="在这里写下你的想法、故事和感悟..." required></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label for="articleTags"><i class="fas fa-tags"></i> 标签（用逗号分隔）</label>
-                    <input type="text" id="articleTags" placeholder="例如：生活, 温暖, 日常">
-                </div>
-                
-                <div class="form-group">
-                    <label for="articleMood"><i class="fas fa-smile"></i> 此刻心情</label>
-                    <select id="articleMood">
-                        <option value="">选择心情</option>
-                        <option value="开心">😊 开心</option>
-                        <option value="平静">😌 平静</option>
-                        <option value="思考">🤔 思考</option>
-                        <option value="感动">🥲 感动</option>
-                        <option value="期待">🌟 期待</option>
-                    </select>
-                </div>
-                
-                <button type="submit" class="submit-btn">
-                    <i class="fas fa-home"></i> 将文章放进我的家
-                </button>
-            </form>
+            </div>
         </section>
     </main>
+
+    <!-- 文章详情模态框 -->
+    <div id="articleModal" class="article-modal">
+        <div class="modal-content">
+            <button class="close-modal" id="closeModal">&times;</button>
+            <div id="articleDetail">
+                <!-- 文章内容会动态加载到这里 -->
+            </div>
+        </div>
+    </div>
 
     <!-- 底部 -->
     <footer>
         <div class="container">
             <div class="footer-content">
                 <div>
-                    <div class="footer-logo">
+                    <div class="footer-logo" id="footerLogo">
                         <i class="fas fa-home"></i>
                         <span>Fuwako的家</span>
                     </div>
@@ -855,19 +987,17 @@
                 <div>
                     <h3><i class="fas fa-link"></i> 快速链接</h3>
                     <ul class="footer-links">
-                        <li><a href="#home"><i class="fas fa-chevron-right"></i> 首页</a></li>
-                        <li><a href="#articles"><i class="fas fa-chevron-right"></i> 所有文章</a></li>
-                        <li><a href="#categories"><i class="fas fa-chevron-right"></i> 文章分类</a></li>
-                        <li><a href="#about"><i class="fas fa-chevron-right"></i> 关于我</a></li>
+                        <li><a id="footerHome"><i class="fas fa-chevron-right"></i> 首页</a></li>
+                        <li><a id="footerCreate"><i class="fas fa-chevron-right"></i> 写文章</a></li>
+                        <li><a id="footerAbout"><i class="fas fa-chevron-right"></i> 关于我</a></li>
                     </ul>
                 </div>
                 
-                <div id="contact">
+                <div>
                     <h3><i class="fas fa-envelope"></i> 联系我</h3>
                     <ul class="footer-links">
-                        <li><a href="#"><i class="fas fa-envelope"></i> 发送邮件</a></li>
-                        <li><a href="#"><i class="fab fa-github"></i> GitHub</a></li>
-                        <li><a href="#"><i class="fab fa-twitter"></i> Twitter</a></li>
+                        <li><a href="mailto:example@example.com"><i class="fas fa-envelope"></i> 发送邮件</a></li>
+                        <li><a href="https://github.com" target="_blank"><i class="fab fa-github"></i> GitHub</a></li>
                         <li><a href="#"><i class="fas fa-rss"></i> RSS订阅</a></li>
                     </ul>
                 </div>
@@ -879,6 +1009,11 @@
         </div>
     </footer>
 
+    <!-- 返回顶部按钮 -->
+    <div class="scroll-top" id="scrollTop">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+
     <!-- 返回首页按钮 -->
     <div class="home-icon" id="homeBtn">
         <i class="fas fa-home"></i>
@@ -888,10 +1023,263 @@
     <div id="notification" class="notification"></div>
 
     <script>
-        // 1. 文章发布功能
-        const articleForm = document.getElementById('articleForm');
-        
-        articleForm.addEventListener('submit', function(e) {
+        // 1. 文章数据管理
+        // 示例文章数据
+        const sampleArticles = [
+            {
+                id: 1,
+                title: "春日午后的一杯茶",
+                category: "生活随笔",
+                date: "2024年3月20日",
+                excerpt: "阳光透过窗户洒在书桌上，泡了一杯茉莉花茶，看着茶叶在水中慢慢舒展。这样的午后，时间仿佛慢了下来，让人可以静静地思考生活的美好。",
+                content: `<p>阳光透过窗户洒在书桌上，泡了一杯茉莉花茶，看着茶叶在水中慢慢舒展。这样的午后，时间仿佛慢了下来，让人可以静静地思考生活的美好。</p>
+                         <p>窗外的鸟儿在枝头跳跃，偶尔传来几声清脆的鸣叫。微风轻拂，窗帘轻轻摆动，带来一丝春天的气息。</p>
+                         <p>这样的时刻，适合放空自己，不去想工作，不去想烦恼，只是静静地享受这一杯茶，享受这片刻的宁静。</p>
+                         <p>生活中有太多忙碌的时刻，但也要记得给自己一些喘息的空间。就像这杯茶，需要时间去冲泡，去品味，才能感受到它的清香。</p>
+                         <p>希望每个人都能找到属于自己的那一杯茶，在忙碌的生活中，找到一份宁静和喜悦。</p>`,
+                tags: ["生活", "茶", "宁静"],
+                mood: "平静"
+            },
+            {
+                id: 2,
+                title: "《小王子》中的成长启示",
+                category: "读书笔记",
+                date: "2024年3月18日",
+                excerpt: "重读《小王子》，发现每个年龄段读都有不同的感悟。小时候觉得是童话，现在读来却满是人生的哲理。真正重要的东西，用眼睛是看不见的。",
+                content: `<p>重读《小王子》，发现每个年龄段读都有不同的感悟。小时候觉得是童话，现在读来却满是人生的哲理。</p>
+                         <p>"真正重要的东西，用眼睛是看不见的，要用心去感受。"这句话在不同的年龄阶段，有着不同的理解。</p>
+                         <p>小时候觉得重要的可能是玩具、糖果；长大后可能是成绩、工作；而现在，才慢慢明白，真正重要的是那些无形的感情和关系。</p>
+                         <p>小王子对玫瑰的照顾，狐狸对他的驯服，这些关系都需要时间和真心去经营。就像我们生活中的友情、亲情和爱情，都需要用心去维护。</p>
+                         <p>每次读《小王子》，都能让我重新思考生活的意义。在这个快节奏的时代，我们是否还记得那些真正重要的东西？</p>`,
+                tags: ["读书", "成长", "思考"],
+                mood: "思考"
+            },
+            {
+                id: 3,
+                title: "第一次尝试做日式咖喱",
+                category: "美食记录",
+                date: "2024年3月15日",
+                excerpt: "今天尝试做了日式咖喱，加入了苹果和蜂蜜，味道格外温和香甜。烹饪的过程本身就是一种治愈，看着食材慢慢变成美味，心情也变得愉悦。",
+                content: `<p>今天尝试做了日式咖喱，加入了苹果和蜂蜜，味道格外温和香甜。烹饪的过程本身就是一种治愈，看着食材慢慢变成美味，心情也变得愉悦。</p>
+                         <p>准备的食材很简单：洋葱、胡萝卜、土豆、鸡肉，还有日式咖喱块。特别的是，我还加了一个苹果和一点蜂蜜，这是让咖喱变得温和香甜的秘诀。</p>
+                         <p>切洋葱的时候流了不少眼泪，但看到所有的食材在锅里慢慢炖煮，散发出诱人的香气，所有的辛苦都值得了。</p>
+                         <p>烹饪的过程让我感到平静。专注于眼前的食材，看着它们从生到熟，从分散到融合，这种过程本身就很有意义。</p>
+                         <p>最后做出来的咖喱，味道果然不错。家人也都说好吃，这让我很有成就感。以后要多尝试不同的食谱，让生活多些滋味。</p>`,
+                tags: ["美食", "烹饪", "治愈"],
+                mood: "开心"
+            }
+        ];
+
+        // 2. 页面加载完成后初始化
+        window.addEventListener('DOMContentLoaded', function() {
+            // 加载文章列表
+            loadArticles();
+            
+            // 绑定事件
+            bindEvents();
+            
+            // 显示欢迎消息
+            setTimeout(() => {
+                showNotification('🏠 欢迎来到Fuwako的家！点击文章可以查看完整内容哦～', 'success');
+            }, 1000);
+            
+            // 初始化返回顶部按钮
+            initScrollTop();
+        });
+
+        // 3. 加载文章列表
+        function loadArticles() {
+            const articlesGrid = document.getElementById('articlesGrid');
+            
+            // 获取所有文章（示例文章 + 用户发布的文章）
+            const userArticles = JSON.parse(localStorage.getItem('fuwakoArticles') || '[]');
+            const allArticles = [...sampleArticles, ...userArticles];
+            
+            // 按日期排序（简单的按id倒序）
+            allArticles.sort((a, b) => b.id - a.id);
+            
+            // 清空现有内容
+            articlesGrid.innerHTML = '';
+            
+            // 生成文章卡片
+            allArticles.forEach(article => {
+                const articleCard = document.createElement('article');
+                articleCard.className = 'article-card';
+                articleCard.setAttribute('data-id', article.id);
+                
+                articleCard.innerHTML = `
+                    <div class="article-header">
+                        <div class="article-date">
+                            <i class="far fa-calendar"></i> ${article.date}
+                        </div>
+                        <div class="article-category">${article.category}</div>
+                    </div>
+                    <h3 class="article-title">${article.title}</h3>
+                    <p class="article-excerpt">${article.excerpt || article.content.substring(0, 150) + '...'}</p>
+                    <button class="read-more" data-id="${article.id}">
+                        阅读全文 <i class="fas fa-arrow-right"></i>
+                    </button>
+                `;
+                
+                articlesGrid.appendChild(articleCard);
+            });
+        }
+
+        // 4. 绑定所有事件
+        function bindEvents() {
+            // 导航栏点击事件
+            document.getElementById('navHome').addEventListener('click', showHome);
+            document.getElementById('navCreate').addEventListener('click', showCreate);
+            document.getElementById('navAbout').addEventListener('click', showAbout);
+            document.getElementById('homeLogo').addEventListener('click', showHome);
+            document.getElementById('exploreBtn').addEventListener('click', scrollToArticles);
+            
+            // 底部链接事件
+            document.getElementById('footerHome').addEventListener('click', showHome);
+            document.getElementById('footerCreate').addEventListener('click', showCreate);
+            document.getElementById('footerAbout').addEventListener('click', showAbout);
+            document.getElementById('footerLogo').addEventListener('click', showHome);
+            
+            // 返回首页按钮
+            document.getElementById('homeBtn').addEventListener('click', showHome);
+            
+            // 文章发布表单
+            document.getElementById('articleForm').addEventListener('submit', submitArticle);
+            
+            // 文章卡片点击事件（使用事件委托）
+            document.getElementById('articlesGrid').addEventListener('click', function(e) {
+                // 检查是否点击了"阅读全文"按钮
+                if (e.target.classList.contains('read-more') || e.target.closest('.read-more')) {
+                    const articleId = e.target.getAttribute('data-id') || 
+                                     e.target.closest('.read-more').getAttribute('data-id');
+                    showArticle(articleId);
+                }
+                
+                // 检查是否点击了整个文章卡片（但不是按钮）
+                if (e.target.closest('.article-card') && !e.target.classList.contains('read-more') && 
+                    !e.target.closest('.read-more')) {
+                    const articleCard = e.target.closest('.article-card');
+                    const articleId = articleCard.getAttribute('data-id');
+                    showArticle(articleId);
+                }
+            });
+            
+            // 分类标签点击事件
+            document.querySelectorAll('.category').forEach(category => {
+                category.addEventListener('click', function() {
+                    const categoryName = this.getAttribute('data-category');
+                    filterArticlesByCategory(categoryName);
+                });
+            });
+            
+            // 关闭模态框
+            document.getElementById('closeModal').addEventListener('click', closeArticleModal);
+            document.getElementById('articleModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeArticleModal();
+                }
+            });
+            
+            // 按ESC键关闭模态框
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeArticleModal();
+                }
+            });
+        }
+
+        // 5. 页面显示函数
+        function showHome() {
+            document.getElementById('articles').style.display = 'block';
+            document.getElementById('createSection').style.display = 'none';
+            document.getElementById('aboutSection').style.display = 'none';
+            
+            // 滚动到顶部
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            showNotification('🏠 欢迎回家！', 'success');
+        }
+
+        function showCreate() {
+            document.getElementById('articles').style.display = 'none';
+            document.getElementById('createSection').style.display = 'block';
+            document.getElementById('aboutSection').style.display = 'none';
+            
+            // 滚动到写文章区域
+            document.getElementById('createSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function showAbout() {
+            document.getElementById('articles').style.display = 'none';
+            document.getElementById('createSection').style.display = 'none';
+            document.getElementById('aboutSection').style.display = 'block';
+            
+            // 滚动到关于区域
+            document.getElementById('aboutSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function scrollToArticles() {
+            document.getElementById('articles').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // 6. 显示文章详情
+        function showArticle(articleId) {
+            // 获取所有文章
+            const userArticles = JSON.parse(localStorage.getItem('fuwakoArticles') || '[]');
+            const allArticles = [...sampleArticles, ...userArticles];
+            
+            // 查找指定文章
+            const article = allArticles.find(a => a.id == articleId);
+            
+            if (!article) {
+                showNotification('文章不存在！', 'error');
+                return;
+            }
+            
+            // 生成文章详情HTML
+            const articleDetail = document.getElementById('articleDetail');
+            articleDetail.innerHTML = `
+                <div class="article-header-detail">
+                    <h1 class="article-title-detail">${article.title}</h1>
+                    <div class="article-meta">
+                        <div>
+                            <span style="margin-right: 20px;"><i class="far fa-calendar"></i> ${article.date}</span>
+                            <span><i class="fas fa-folder"></i> ${article.category}</span>
+                        </div>
+                        <div class="article-category">${article.category}</div>
+                    </div>
+                </div>
+                <div class="article-content-detail">
+                    ${article.content}
+                </div>
+                ${article.tags && article.tags.length > 0 ? `
+                    <div style="margin-top: 30px; display: flex; flex-wrap: wrap; gap: 10px;">
+                        <strong style="margin-right: 10px;">标签：</strong>
+                        ${article.tags.map(tag => `<span style="background: rgba(255, 182, 193, 0.2); padding: 5px 10px; border-radius: 15px; font-size: 14px;">${tag}</span>`).join('')}
+                    </div>
+                ` : ''}
+                ${article.mood ? `
+                    <div style="margin-top: 20px; font-size: 16px; color: #888; display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-smile"></i> <span>写作时的心情：${article.mood}</span>
+                    </div>
+                ` : ''}
+            `;
+            
+            // 显示模态框
+            document.getElementById('articleModal').classList.add('active');
+            document.body.style.overflow = 'hidden'; // 防止背景滚动
+            
+            showNotification(`📖 正在阅读：${article.title}`, 'success');
+        }
+
+        // 7. 关闭文章模态框
+        function closeArticleModal() {
+            document.getElementById('articleModal').classList.remove('active');
+            document.body.style.overflow = 'auto'; // 恢复背景滚动
+        }
+
+        // 8. 文章发布功能
+        function submitArticle(e) {
             e.preventDefault();
             
             const title = document.getElementById('articleTitle').value;
@@ -908,17 +1296,17 @@
             
             // 创建文章对象
             const newArticle = {
-                id: Date.now(),
+                id: Date.now(), // 使用时间戳作为唯一ID
                 title,
                 category,
                 content,
+                excerpt: content.length > 150 ? content.substring(0, 150) + '...' : content,
                 tags: tags ? tags.split(',').map(tag => tag.trim()) : [],
                 mood,
                 date: new Date().toLocaleDateString('zh-CN', {
                     year: 'numeric',
                     month: 'long',
-                    day: 'numeric',
-                    weekday: 'long'
+                    day: 'numeric'
                 })
             };
             
@@ -941,32 +1329,71 @@
             showNotification(`${moodEmoji} 文章"${title}"已成功保存到你的家中！`, 'success');
             
             // 添加庆祝粒子效果
-            createParticles(articleForm, '✨', 25);
+            createParticles(document.getElementById('articleForm'), '✨', 25);
             
             // 重置表单
-            articleForm.reset();
+            document.getElementById('articleForm').reset();
             
-            // 3秒后自动滚动到文章区域
+            // 重新加载文章列表
+            loadArticles();
+            
+            // 切换到首页
             setTimeout(() => {
-                document.querySelector('.articles-grid').scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-            }, 1000);
-        });
-        
-        // 2. 加载保存的文章
-        function loadSavedArticles() {
-            const articles = JSON.parse(localStorage.getItem('fuwakoArticles') || '[]');
-            
-            if (articles.length > 0) {
-                console.log(`已加载 ${articles.length} 篇文章`);
-                // 这里可以实现在页面上显示保存的文章
-                // 例如：更新文章列表或显示文章数量
-            }
+                showHome();
+            }, 1500);
         }
-        
-        // 3. 提示消息
+
+        // 9. 按分类过滤文章
+        function filterArticlesByCategory(category) {
+            const allArticles = [...sampleArticles, ...JSON.parse(localStorage.getItem('fuwakoArticles') || '[]')];
+            const filteredArticles = allArticles.filter(article => article.category === category);
+            
+            const articlesGrid = document.getElementById('articlesGrid');
+            articlesGrid.innerHTML = '';
+            
+            if (filteredArticles.length === 0) {
+                articlesGrid.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 40px; background: white; border-radius: 15px;">
+                        <i class="fas fa-folder-open" style="font-size: 60px; color: var(--primary); margin-bottom: 20px;"></i>
+                        <h3 style="font-size: 24px; margin-bottom: 15px;">暂时没有"${category}"分类的文章</h3>
+                        <p style="color: #666; margin-bottom: 20px;">去写一篇新的文章吧！</p>
+                        <button class="btn" id="writeNewArticle">
+                            <i class="fas fa-pencil-alt"></i> 写新文章
+                        </button>
+                    </div>
+                `;
+                
+                document.getElementById('writeNewArticle').addEventListener('click', showCreate);
+                return;
+            }
+            
+            // 生成过滤后的文章卡片
+            filteredArticles.forEach(article => {
+                const articleCard = document.createElement('article');
+                articleCard.className = 'article-card';
+                articleCard.setAttribute('data-id', article.id);
+                
+                articleCard.innerHTML = `
+                    <div class="article-header">
+                        <div class="article-date">
+                            <i class="far fa-calendar"></i> ${article.date}
+                        </div>
+                        <div class="article-category">${article.category}</div>
+                    </div>
+                    <h3 class="article-title">${article.title}</h3>
+                    <p class="article-excerpt">${article.excerpt || article.content.substring(0, 150) + '...'}</p>
+                    <button class="read-more" data-id="${article.id}">
+                        阅读全文 <i class="fas fa-arrow-right"></i>
+                    </button>
+                `;
+                
+                articlesGrid.appendChild(articleCard);
+            });
+            
+            showNotification(`筛选到 ${filteredArticles.length} 篇"${category}"分类的文章`, 'success');
+        }
+
+        // 10. 提示消息
         function showNotification(message, type = 'success') {
             const notification = document.getElementById('notification');
             notification.textContent = message;
@@ -983,8 +1410,8 @@
                 notification.style.display = 'none';
             }, 4000);
         }
-        
-        // 4. 粒子效果
+
+        // 11. 粒子效果
         function createParticles(element, emoji, count = 20) {
             const rect = element.getBoundingClientRect();
             const x = rect.left + rect.width / 2;
@@ -1008,8 +1435,8 @@
                 }, 3000);
             }
         }
-        
-        // 5. 鼠标移动效果
+
+        // 12. 鼠标移动效果
         document.addEventListener('mousemove', function(e) {
             // 偶尔创建跟随粒子
             if (Math.random() > 0.98) {
@@ -1030,63 +1457,23 @@
                 }, 2000);
             }
         });
-        
-        // 6. 返回首页按钮
-        document.getElementById('homeBtn').addEventListener('click', function() {
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
-        });
-        
-        // 7. 探索按钮
-        document.getElementById('exploreBtn').addEventListener('click', function() {
-            document.getElementById('articles').scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-        });
-        
-        // 8. 页面加载完成后初始化
-        window.addEventListener('DOMContentLoaded', function() {
-            loadSavedArticles();
+
+        // 13. 返回顶部功能
+        function initScrollTop() {
+            const scrollTopBtn = document.getElementById('scrollTop');
             
-            // 显示欢迎消息
-            setTimeout(() => {
-                showNotification('🏠 欢迎来到Fuwako的家！在这里记录你的生活点滴吧～', 'success');
-            }, 1000);
-            
-            // 平滑滚动
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function(e) {
-                    const targetId = this.getAttribute('href');
-                    if (targetId !== '#' && targetId !== '#!') {
-                        const targetElement = document.querySelector(targetId);
-                        if (targetElement) {
-                            e.preventDefault();
-                            window.scrollTo({
-                                top: targetElement.offsetTop - 100,
-                                behavior: 'smooth'
-                            });
-                        }
-                    }
-                });
+            window.addEventListener('scroll', function() {
+                if (window.pageYOffset > 300) {
+                    scrollTopBtn.classList.add('show');
+                } else {
+                    scrollTopBtn.classList.remove('show');
+                }
             });
             
-            // 检查是否有保存的文章
-            const savedArticles = JSON.parse(localStorage.getItem('fuwakoArticles') || '[]');
-            if (savedArticles.length > 0) {
-                const articleCount = document.createElement('div');
-                articleCount.style.cssText = 'position:fixed;top:100px;right:20px;background:var(--primary);color:white;padding:10px 15px;border-radius:20px;font-size:14px;box-shadow:0 5px 15px rgba(0,0,0,0.1);z-index:99;font-family:华文中宋, STZhongsong, SimSun, Microsoft YaHei;letter-spacing:1px;';
-                articleCount.innerHTML = `<i class="fas fa-book"></i> ${savedArticles.length} 篇文章已保存`;
-                document.body.appendChild(articleCount);
-                
-                setTimeout(() => {
-                    articleCount.style.opacity = '0';
-                    setTimeout(() => articleCount.remove(), 500);
-                }, 3000);
-            }
-        });
+            scrollTopBtn.addEventListener('click', function() {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        }
     </script>
 </body>
 </html>
