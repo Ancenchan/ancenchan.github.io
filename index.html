@@ -224,47 +224,38 @@
         
     <head>部分的<style>标签中添加图片背景样式 -->
 <style>
-    /* 为hero部分添加图片背景 */
-    .hero {
-        background: 
-            /* 图片背景 */
-            url('https://th.bing.com/th/id/R.6e5e3405a6c544c3d2c0f615c37b0153?rik=pATb8vM2hNYqfA&riu=http%3a%2f%2fimg.mp.itc.cn%2fupload%2f20170316%2f28985d826c114d848ce7d2a34c6d6997_th.jpeg&ehk=teT1kYqNgb69M6%2fWCAw1%2f1V4cfKekzvsC%2bRUKNJM0po%3d&risl=&pid=ImgRaw&r=0') 
-            center center / cover no-repeat;
-        border-radius: 20px;
-        padding: 50px 40px;
-        margin: 30px 0;
-        text-align: center;
-        position: relative;
-        overflow: hidden;
-        border: 2px solid var(--primary);
-        /* 确保内容在背景之上 */
-        z-index: 1;
-    }
-    
-    /* 添加遮罩层控制透明度 */
-    .hero::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(255, 255, 255, 0.5); /* 50%透明度白色遮罩 */
-        backdrop-filter: blur(2px); /* 可选：轻微模糊效果 */
-        z-index: -1;
-        border-radius: 20px;
-    }
-    
-    /* 确保标题和文字在遮罩层之上 */
-    .hero-title, .hero-subtitle, .hero button {
-        position: relative;
-        z-index: 2;
-    }
-    
-    /* 如果你想让图片背景更加透明，可以调整上面的rgba值：
-       background: rgba(255, 255, 255, 0.3);  更透明
-       background: rgba(255, 255, 255, 0.7);  更不透明
-    */
+ .hero {
+    background: 
+        linear-gradient(135deg, rgba(255, 182, 193, 0.2), rgba(255, 107, 157, 0.2)),
+        url('https://th.bing.com/th/id/R.6e5e3405a6c544c3d2c0f615c37b0153?rik=pATb8vM2hNYqfA&riu=http%3a%2f%2fimg.mp.itc.cn%2fupload%2f20170316%2f28985d826c114d848ce7d2a34c6d6997_th.jpeg&ehk=teT1kYqNgb69M6%2fWCAw1%2f1V4cfKekzvsC%2bRUKNJM0po%3d&risl=&pid=ImgRaw&r=0') 
+        center center / cover no-repeat;
+    border-radius: 20px;
+    padding: 50px 40px;
+    margin: 30px 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    border: 2px solid var(--primary);
+    /* 移除z-index: 1; */
+}
+
+.hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.5); /* 50%透明度白色遮罩 */
+    backdrop-filter: blur(2px);
+    z-index: 1; /* 改为1，位于背景之上，内容之下 */
+    border-radius: 20px;
+}
+
+.hero-title, .hero-subtitle, .hero button {
+    position: relative;
+    z-index: 2; /* 确保内容在遮罩层之上 */
+}
 </style>
         /* 6. 博客文章区域 - 修复重叠问题 */
         .blog-section {
@@ -3233,6 +3224,7 @@ window.addEventListener('DOMContentLoaded', function() {
     </script>
 </body>
 </html>
+
 
 
 
