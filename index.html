@@ -6,6 +6,7 @@
     <title>🏠 Fuwako的家 | 温馨小窝，记录生活</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        
         /* 1. 导入华文中宋字体并优化渲染 */
         @font-face {
             font-family: '华文中宋';
@@ -1100,6 +1101,152 @@ a, button, .clickable, input, textarea, select {
             transform: translateY(-3px);
             box-shadow: 0 8px 20px rgba(255, 107, 157, 0.4);
         }
+        /* ========== GitHub同步相关样式 ========== */
+
+/* 同步按钮样式 */
+#syncBtn {
+    background: linear-gradient(135deg, #6e8efb, #a777e3);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(110, 142, 251, 0.3);
+}
+
+#syncBtn:hover {
+    background: linear-gradient(135deg, #5a7dfa, #9666d8);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(110, 142, 251, 0.4);
+}
+
+#syncBtn.syncing {
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
+}
+
+/* 配置按钮样式 */
+#configBtn {
+    background: linear-gradient(135deg, #333, #555);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+#configBtn:hover {
+    background: linear-gradient(135deg, #555, #333);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* 同步状态提示 */
+.sync-status {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    background: white;
+    padding: 15px 20px;
+    border-radius: 10px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: slideDown 0.3s ease;
+    font-family: var(--font-zh);
+    letter-spacing: 0.5px;
+}
+
+@keyframes slideDown {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.sync-status.success {
+    border-left: 5px solid #4CAF50;
+}
+
+.sync-status.error {
+    border-left: 5px solid #f44336;
+}
+
+.sync-status.info {
+    border-left: 5px solid #2196F3;
+}
+
+.sync-status.warning {
+    border-left: 5px solid #ff9800;
+}
+
+/* GitHub配置模态框样式 */
+.github-status-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    margin-left: 8px;
+}
+
+.github-status-indicator.connected {
+    color: #4CAF50;
+}
+
+.github-status-indicator.disconnected {
+    color: #f44336;
+}
+
+/* 云端图标样式（用于文章日期旁边） */
+.cloud-icon {
+    color: #6e8efb;
+    margin-left: 5px;
+    font-size: 12px;
+}
+
+/* 配置表单样式 */
+.github-config-form {
+    margin-top: 20px;
+}
+
+.github-config-form .form-group {
+    margin-bottom: 20px;
+}
+
+.github-config-form small {
+    color: #666;
+    display: block;
+    margin-top: 5px;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.github-config-form a {
+    color: #6e8efb;
+    text-decoration: none;
+}
+
+.github-config-form a:hover {
+    text-decoration: underline;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+    .sync-status {
+        top: 60px;
+        right: 10px;
+        left: 10px;
+        max-width: calc(100% - 20px);
+    }
+    
+    #syncBtn, #configBtn {
+        padding: 6px 12px;
+        font-size: 14px;
+    }
+}
     </style>
 </head>
 <body>
@@ -1234,6 +1381,75 @@ a, button, .clickable, input, textarea, select {
         </div>
     </div>
 
+<!-- GitHub配置模态框 -->
+<div id="githubConfigModal" class="article-modal">
+    <div class="modal-content" style="max-width: 600px;">
+        <button class="close-modal" onclick="closeGitHubConfig()">&times;</button>
+        <h2 style="color: var(--primary); margin-bottom: 20px;">
+            <i class="fab fa-github"></i> GitHub配置
+        </h2>
+        
+        <div id="githubStatus" style="margin-bottom: 20px; padding: 15px; border-radius: 10px; background: #f0f8ff; display: none;">
+            <!-- 状态信息会在这里显示 -->
+        </div>
+        
+        <div class="form-group">
+            <label for="githubToken"><i class="fas fa-key"></i> GitHub访问令牌</label>
+            <input type="password" id="githubToken" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" style="font-family: monospace;">
+            <small style="color: #666; display: block; margin-top: 5px;">
+                需要创建具有repo权限的token：<a href="https://github.com/settings/tokens" target="_blank">创建令牌</a>
+            </small>
+        </div>
+        
+        <div class="form-group">
+            <label for="repoOwner"><i class="fas fa-user"></i> 仓库所有者用户名</label>
+            <input type="text" id="repoOwner" placeholder="你的GitHub用户名">
+        </div>
+        
+        <div class="form-group">
+            <label for="repoName"><i class="fas fa-code-branch"></i> 仓库名称</label>
+            <input type="text" id="repoName" placeholder="你的仓库名（如：fuwako-diary）">
+        </div>
+        
+        <div class="form-group">
+            <label for="repoBranch"><i class="fas fa-code-branch"></i> 分支</label>
+            <input type="text" id="repoBranch" value="main" placeholder="main">
+        </div>
+        
+        <div class="button-group" style="margin-top: 30px;">
+            <button onclick="testGitHubConnection()" class="btn" style="background: #333; color: white;">
+                <i class="fas fa-plug"></i> 测试连接
+            </button>
+            <button onclick="saveGitHubConfig()" class="submit-btn">
+                <i class="fas fa-save"></i> 保存配置
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- 同步按钮（添加到导航栏） -->
+<script>
+// 在导航栏添加同步按钮
+window.addEventListener('DOMContentLoaded', function() {
+    const nav = document.querySelector('nav ul');
+    const syncLi = document.createElement('li');
+    syncLi.innerHTML = `
+        <a id="syncBtn" title="同步到GitHub">
+            <i class="fas fa-cloud-upload-alt"></i> 同步
+        </a>
+    `;
+    nav.appendChild(syncLi);
+    
+    // 添加配置按钮
+    const configLi = document.createElement('li');
+    configLi.innerHTML = `
+        <a onclick="openGitHubConfig()" title="GitHub设置">
+            <i class="fab fa-github"></i> 配置
+        </a>
+    `;
+    nav.appendChild(configLi);
+});
+</script>
     <!-- 底部 -->
     <footer>
         <div class="container">
@@ -1970,3 +2186,4 @@ a, button, .clickable, input, textarea, select {
     </script>
 </body>
 </html>
+
