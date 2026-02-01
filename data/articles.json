@@ -1,5 +1,16 @@
 [
   {
+    "id": 1769929637845,
+    "title": "SQL教程-1",
+    "category": "个人随笔",
+    "content": "OwO因为SQL的客户端比较多，加上网上的一些攻略七零八落的，在这里贴一下自己所用到的作为存档。\n长大以后才发现，实际上一般来说公司内部会有自己的平台去使用SQL语言，应该大部分不需要自己在电脑上写x\n在电脑下载只能说作为练习吧，或者直接在python里写感觉也不错，还能直接可视化。有空研究下这个好了。\n1.客户端的选择：MySQL Workbench\n下载地址：https://dev.mysql.com/downloads/workbench/\n2.安装过程\n其实没啥特殊的【。\n3.汉化菜单\nhttps://pan.baidu.com/s/1PLc-5LivnLvV0iusp2mo4g?pwd=m7kd#list/path=%2F\n过程是这样：https://blog.csdn.net/pk694046220/article/details/105208293\n4.安装My SQL数据库\nhttps://www.cnblogs.com/aishangJava/p/13335254.html",
+    "excerpt": "OwO因为SQL的客户端比较多，加上网上的一些攻略七零八落的，在这里贴一下自己所用到的作为存档。\n长大以后才发现，实际上一般来说公司内部会有自己的平台去使用SQL语言，应该大部分不需要自己在电脑上写x\n在电脑下载只能说作为练习吧，或者直接在python里写感觉也不错，还能直接可视化。有空研究下这个好...",
+    "tags": [
+      "SQL"
+    ],
+    "date": "2026年2月1日"
+  },
+  {
     "id": 1769881640020,
     "title": "如何打造属于自己的博客网页=w=",
     "category": "个人随笔",
