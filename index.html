@@ -249,7 +249,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(255, 255, 255, 0.5); /* 50%透明度白色遮罩 */
+            background: rgba(255, 255, 255, 0.5);
             backdrop-filter: blur(2px);
             z-index: 1;
             border-radius: 20px;
@@ -390,6 +390,7 @@
             white-space: pre-wrap;
             word-wrap: break-word;
             word-break: break-word;
+            text-indent: 0;
         }
         
         .read-more {
@@ -538,10 +539,13 @@
             transform: rotate(90deg) scale(1.1);
         }
         
+        /* 修复：文章详情页布局优化，避免标签和关闭按钮重叠 */
         .article-header-detail {
             margin-bottom: 30px;
             padding-bottom: 20px;
             border-bottom: 2px solid #f0f0f0;
+            position: relative;
+            padding-right: 50px;
         }
         
         .article-title-detail {
@@ -552,6 +556,7 @@
             font-family: var(--font-zh);
             letter-spacing: 1px;
             font-smooth: always;
+            word-wrap: break-word;
         }
         
         .article-meta {
@@ -560,18 +565,43 @@
             align-items: center;
             color: #888;
             font-size: 16px;
+            flex-wrap: wrap;
+            gap: 10px;
         }
         
+        .meta-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .article-category-detail {
+            background: rgba(255, 182, 193, 0.2);
+            color: var(--primary);
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 13px;
+            font-weight: normal;
+            font-family: var(--font-zh);
+            flex-shrink: 0;
+            max-width: 150px;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        
+        /* 修复：文章内容空格问题 */
         .article-content-detail {
             font-size: 18px;
             line-height: 1.9;
             color: #444;
             margin-top: 30px;
             font-smooth: always;
-            /* 修复：添加换行支持 */
             white-space: pre-wrap;
             word-wrap: break-word;
             word-break: break-word;
+            text-align: left;
         }
         
         .article-content-detail p {
@@ -579,9 +609,43 @@
             font-family: var(--font-smooth);
             letter-spacing: 0.5px;
             font-weight: 400;
+            text-indent: 0 !important;
+            text-align: left;
         }
         
-        /* 8. 写文章/编辑文章区域 */
+        /* 8. 文章图片样式 */
+        .article-image-container {
+            margin: 25px 0;
+            text-align: center;
+            max-width: 100%;
+            overflow: hidden;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .article-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 15px;
+            transition: transform 0.3s ease;
+            display: block;
+            margin: 0 auto;
+        }
+        
+        .article-image:hover {
+            transform: scale(1.02);
+        }
+        
+        .image-caption {
+            color: #888;
+            font-size: 14px;
+            margin-top: 10px;
+            font-style: italic;
+            text-align: center;
+            font-family: var(--font-smooth);
+        }
+        
+        /* 9. 写文章/编辑文章区域 */
         .create-section {
             background: white;
             border-radius: 20px;
@@ -658,7 +722,6 @@
             min-height: 250px;
             resize: vertical;
             line-height: 1.8;
-            /* 确保文本区域内的换行正常显示 */
             white-space: pre-wrap;
         }
         
@@ -716,7 +779,7 @@
             gap: 15px;
         }
         
-        /* 9. 侧边栏 */
+        /* 10. 侧边栏 */
         .sidebar {
             display: flex;
             flex-direction: column;
@@ -771,7 +834,7 @@
             border-color: var(--primary);
         }
         
-        /* 10. 底部 - 美化快速链接和联系我 */
+        /* 11. 底部 - 美化快速链接和联系我 */
         footer {
             background: linear-gradient(135deg, rgba(255, 250, 240, 0.9), rgba(255, 235, 240, 0.9));
             padding: 60px 0 30px;
@@ -933,7 +996,7 @@
             letter-spacing: 1px;
         }
         
-        /* 11. 响应式设计 */
+        /* 12. 响应式设计 */
         @media (max-width: 768px) {
             .nav-container {
                 flex-direction: column;
@@ -994,15 +1057,25 @@
             }
             
             .article-actions {
-                top: 60px; /* 在小屏幕上增加间距 */
+                top: 60px;
             }
             
             .article-title {
                 padding-right: 0;
             }
+            
+            /* 响应式图片 */
+            .article-image-container {
+                margin: 15px -10px;
+                border-radius: 10px;
+            }
+            
+            .article-image {
+                border-radius: 10px;
+            }
         }
         
-        /* 12. 粒子效果 - 爱心 */
+        /* 13. 粒子效果 - 爱心 */
         .particle {
             position: absolute;
             pointer-events: none;
@@ -1023,7 +1096,7 @@
             }
         }
         
-        /* 13. 提示消息 */
+        /* 14. 提示消息 */
         .notification {
             position: fixed;
             bottom: 20px;
@@ -1053,7 +1126,7 @@
             }
         }
         
-        /* 14. 装饰元素 */
+        /* 15. 装饰元素 */
         .home-icon {
             position: fixed;
             bottom: 30px;
@@ -1078,7 +1151,7 @@
             box-shadow: 0 12px 25px rgba(255, 182, 193, 0.6);
         }
         
-        /* 15. 按钮样式 */
+        /* 16. 按钮样式 */
         .btn {
             background: var(--primary);
             color: white;
@@ -1102,7 +1175,7 @@
             box-shadow: 0 10px 20px rgba(255, 182, 193, 0.4);
         }
         
-        /* 16. 返回顶部按钮 */
+        /* 17. 返回顶部按钮 */
         .scroll-top {
             position: fixed;
             bottom: 100px;
@@ -1134,7 +1207,7 @@
             transform: translateY(-5px);
         }
         
-        /* 17. 文章操作按钮 */
+        /* 18. 文章操作按钮 */
         .article-actions-detail {
             display: flex;
             gap: 15px;
@@ -1178,7 +1251,7 @@
             box-shadow: 0 8px 20px rgba(255, 107, 157, 0.4);
         }
         
-        /* 18. GitHub相关样式 */
+        /* 19. GitHub相关样式 */
         /* 同步状态提示 */
         .sync-status {
             position: fixed;
@@ -1242,6 +1315,30 @@
             font-size: 12px;
         }
         
+        /* 20. 图片上传区域样式 */
+        .image-preview-container {
+            margin-top: 10px;
+            display: none;
+        }
+        
+        .image-preview-container img {
+            max-width: 200px;
+            max-height: 150px;
+            border-radius: 10px;
+            border: 2px solid var(--primary);
+        }
+        
+        .image-upload-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        
+        .image-upload-row input {
+            flex: 1;
+        }
+        
         /* 响应式调整 */
         @media (max-width: 768px) {
             .sync-status {
@@ -1254,6 +1351,10 @@
             #syncBtn, #configBtn {
                 padding: 6px 12px;
                 font-size: 14px;
+            }
+            
+            .image-upload-row {
+                flex-direction: column;
             }
         }
     </style>
@@ -1275,7 +1376,7 @@
                     <li><a id="adminBtn"><i class="fas fa-user-secret"></i> 我是安尘</a></li>
                     <!-- 新增：GitHub相关按钮 -->
                     <li><a id="syncBtn"><i class="fas fa-cloud-upload-alt"></i> 同步</a></li>
-                    <li><a id="configBtn" onclick="openGitHubConfig()"><i class="fab fa-github"></i> 配置</a></li>
+                    <li><a id="configBtn"><i class="fab fa-github"></i> 配置</a></li>
                 </ul>
             </nav>
         </div>
@@ -1332,6 +1433,23 @@
                     <div class="form-group full-width">
                         <label for="articleContent"><i class="fas fa-edit"></i> 文章内容</label>
                         <textarea id="articleContent" placeholder="在这里写下你的想法、故事和感悟..." required></textarea>
+                    </div>
+                    
+                    <!-- 新增：图片上传区域 -->
+                    <div class="form-group">
+                        <label for="articleImage"><i class="fas fa-image"></i> 插入图片</label>
+                        <div class="image-upload-row">
+                            <input type="text" id="articleImage" placeholder="输入图片URL，例如：https://example.com/image.jpg">
+                            <button type="button" id="uploadImageBtn" class="btn" style="background: #6e8efb;">
+                                <i class="fas fa-upload"></i> 插入
+                            </button>
+                        </div>
+                        <div id="imagePreview" class="image-preview-container">
+                            <img src="" alt="图片预览">
+                        </div>
+                        <small style="color: #666; display: block; margin-top: 5px;">
+                            支持网络图片URL，或使用 <a href="https://imgbb.com/" target="_blank">图床服务</a> 上传图片
+                        </small>
                     </div>
                     
                     <div class="form-group">
@@ -1458,7 +1576,7 @@
                             <li><a id="footerHome"><i class="fas fa-home"></i> 首页</a></li>
                             <li><a id="footerCreate"><i class="fas fa-pencil-alt"></i> 写文章</a></li>
                             <li><a id="footerAbout"><i class="fas fa-heart"></i> 关于我</a></li>
-                            <li><a href="#articles"><i class="fas fa-book-open"></i> 所有文章</a></li>
+                            <li><a href="#articles" id="footerAllArticles"><i class="fas fa-book-open"></i> 所有文章</a></li>
                         </ul>
                     </div>
                 </div>
@@ -1513,13 +1631,46 @@
             // 首先确保文本是字符串
             let textStr = String(text);
             
+            // 移除每行开头的前导空格
+            textStr = textStr.replace(/^\s+/gm, '');
+            
+            // 移除每行结尾的尾随空格
+            textStr = textStr.replace(/\s+$/gm, '');
+            
             // 将连续多个换行符转换为段落分隔
             textStr = textStr.replace(/\n\s*\n\s*\n/g, '\n\n');
+            
+            // 渲染图片
+            textStr = renderImagesInContent(textStr);
             
             // 将单个换行符转换为<br>标签
             textStr = textStr.replace(/\n/g, '<br>');
             
             return textStr;
+        }
+        
+        // 渲染图片内容
+        function renderImagesInContent(content) {
+            if (!content) return content;
+            
+            // 将Markdown格式的图片 ![alt](url) 转换为HTML
+            let processedContent = content;
+            
+            // 匹配Markdown图片语法
+            const imageRegex = /!\[(.*?)\]\((.*?)\)/g;
+            
+            // 替换为HTML图片标签
+            processedContent = processedContent.replace(imageRegex, 
+                (match, alt, src) => {
+                    return `<div class="article-image-container">
+                        <img src="${src}" alt="${alt || '文章图片'}" class="article-image" 
+                             onerror="this.style.display='none'; this.parentElement.innerHTML='<span style=\\'color:#999; font-style:italic;\\'>❌ 图片加载失败</span>';">
+                        ${alt && alt !== '图片' ? `<div class="image-caption">${alt}</div>` : ''}
+                    </div>`;
+                }
+            );
+            
+            return processedContent;
         }
         
         // 修复日期格式
@@ -1914,6 +2065,63 @@
                     }
                 }
             }
+            
+            // 测试GitHub连接
+            async testConnection() {
+                if (!this.isConfigured()) {
+                    return { success: false, message: '请先配置GitHub信息' };
+                }
+                
+                try {
+                    const response = await fetch(
+                        `${this.apiBase}/repos/${this.repoOwner}/${this.repoName}`,
+                        {
+                            headers: {
+                                'Authorization': `token ${this.token}`,
+                                'Accept': 'application/vnd.github.v3+json'
+                            }
+                        }
+                    );
+                    
+                    if (response.ok) {
+                        return { 
+                            success: true, 
+                            message: '✓ GitHub连接成功！可以正常同步文章。' 
+                        };
+                    } else {
+                        const errorData = await response.json();
+                        return { 
+                            success: false, 
+                            message: `连接失败：${errorData.message || response.status}` 
+                        };
+                    }
+                } catch (error) {
+                    return { 
+                        success: false, 
+                        message: `连接失败：${error.message}` 
+                    };
+                }
+            }
+            
+            // 显示配置状态
+            showConfigStatus() {
+                const statusDiv = document.getElementById('githubStatus');
+                if (!this.isConfigured()) {
+                    statusDiv.innerHTML = '<div style="color: #f44336;"><i class="fas fa-exclamation-circle"></i> 未配置GitHub同步</div>';
+                    statusDiv.style.display = 'block';
+                    return;
+                }
+                
+                this.testConnection().then(result => {
+                    if (result.success) {
+                        statusDiv.innerHTML = `<div style="color: #4CAF50;"><i class="fas fa-check-circle"></i> ${result.message}</div>`;
+                        statusDiv.style.display = 'block';
+                    } else {
+                        statusDiv.innerHTML = `<div style="color: #f44336;"><i class="fas fa-exclamation-circle"></i> ${result.message}</div>`;
+                        statusDiv.style.display = 'block';
+                    }
+                });
+            }
         }
 
         // 全局GitHub管理器实例
@@ -2251,10 +2459,37 @@
         }
 
         function scrollToArticles() {
-            document.getElementById('articles').scrollIntoView({ behavior: 'smooth' });
+            console.log('滚动到文章区域');
+            
+            // 先显示首页
+            showHome();
+            
+            // 等待DOM更新后滚动
+            setTimeout(() => {
+                const articlesSection = document.getElementById('articles');
+                if (articlesSection) {
+                    const headerHeight = document.querySelector('header').offsetHeight;
+                    const scrollPosition = articlesSection.offsetTop - headerHeight - 20;
+                    
+                    window.scrollTo({
+                        top: scrollPosition,
+                        behavior: 'smooth'
+                    });
+                    
+                    // 高亮显示文章区域
+                    articlesSection.style.boxShadow = '0 0 0 3px var(--primary)';
+                    articlesSection.style.transition = 'box-shadow 0.5s';
+                    
+                    setTimeout(() => {
+                        articlesSection.style.boxShadow = 'none';
+                    }, 1500);
+                    
+                    showNotification('📚 浏览所有文章', 'success');
+                }
+            }, 100);
         }
 
-        // 8. 显示文章详情 - 修复换行显示
+        // 8. 显示文章详情 - 修复换行显示和布局重叠问题
         async function showArticle(articleId) {
             const articles = await gitHubManager.fetchArticles();
             const article = articles.find(a => a.id == articleId);
@@ -2285,18 +2520,18 @@
                 <div class="article-header-detail">
                     <h1 class="article-title-detail">${article.title || "未命名文章"}</h1>
                     <div class="article-meta">
-                        <div>
-                            <span style="margin-right: 20px;"><i class="far fa-calendar"></i> ${article.date} ${cloudIcon}</span>
-                            <span><i class="fas fa-folder"></i> ${article.category || "个人随笔"}</span>
+                        <div class="meta-left">
+                            <span><i class="far fa-calendar"></i> ${article.date}</span>
+                            ${cloudIcon}
                         </div>
-                        <div class="article-category">${article.category || "个人随笔"}</div>
+                        <div class="article-category-detail">${article.category || "个人随笔"}</div>
                     </div>
                 </div>
                 <div class="article-content-detail">
                     ${contentWithLineBreaks}
                 </div>
                 ${article.tags && article.tags.length > 0 ? `
-                    <div style="margin-top: 30px; display: flex; flex-wrap: wrap; gap: 10px;">
+                    <div style="margin-top: 30px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
                         <strong style="margin-right: 10px;">关键词：</strong>
                         ${article.tags.map(tag => `<span style="background: rgba(255, 182, 193, 0.2); padding: 5px 10px; border-radius: 15px; font-size: 14px;">${tag}</span>`).join('')}
                     </div>
@@ -2537,7 +2772,112 @@
             }
         }
 
-        // 16. 鼠标移动效果 - 爱心飘落
+        // 16. 图片上传功能
+        function initImageUpload() {
+            const uploadBtn = document.getElementById('uploadImageBtn');
+            const imageInput = document.getElementById('articleImage');
+            const imagePreview = document.getElementById('imagePreview');
+            const previewImg = imagePreview.querySelector('img');
+            
+            // 点击上传按钮
+            uploadBtn.addEventListener('click', function() {
+                const url = imageInput.value.trim();
+                if (url) {
+                    // 验证URL格式
+                    if (isValidImageUrl(url)) {
+                        previewImg.src = url;
+                        imagePreview.style.display = 'block';
+                        showNotification('✓ 图片URL已加载', 'success');
+                        
+                        // 自动在文章内容中插入图片标记
+                        insertImageToContent(url);
+                    } else {
+                        showNotification('❌ 请输入有效的图片URL', 'error');
+                    }
+                } else {
+                    // 如果没有URL，提示用户输入
+                    showNotification('💡 请先输入图片URL', 'info');
+                }
+            });
+            
+            // 图片URL输入变化时
+            imageInput.addEventListener('input', function() {
+                const url = this.value.trim();
+                if (url && isValidImageUrl(url)) {
+                    previewImg.src = url;
+                    imagePreview.style.display = 'block';
+                } else {
+                    imagePreview.style.display = 'none';
+                }
+            });
+            
+            // 支持直接粘贴图片URL
+            document.addEventListener('paste', function(e) {
+                if (e.target.id === 'articleContent' || e.target.id === 'articleImage') {
+                    const pastedText = e.clipboardData.getData('text');
+                    if (isValidImageUrl(pastedText)) {
+                        imageInput.value = pastedText;
+                        previewImg.src = pastedText;
+                        imagePreview.style.display = 'block';
+                        showNotification('📋 已粘贴图片URL', 'success');
+                        
+                        // 如果焦点在文章内容区，直接插入
+                        if (e.target.id === 'articleContent') {
+                            e.preventDefault();
+                            insertImageToContent(pastedText);
+                        }
+                    }
+                }
+            });
+        }
+
+        // 验证图片URL
+        function isValidImageUrl(url) {
+            if (!url) return false;
+            
+            // 检查常见图片扩展名
+            const imageExtensions = /\.(jpeg|jpg|gif|png|bmp|webp|svg)(\?.*)?$/i;
+            
+            // 检查是否是数据URL
+            const isDataUrl = url.startsWith('data:image/');
+            
+            // 检查是否是常见图床域名
+            const imageHosts = [
+                'imgbb.com',
+                'i.imgur.com',
+                'cdn.discordapp.com',
+                'pbs.twimg.com',
+                'images.unsplash.com'
+            ];
+            
+            return imageExtensions.test(url) || 
+                   isDataUrl || 
+                   imageHosts.some(host => url.includes(host));
+        }
+
+        // 插入图片到文章内容
+        function insertImageToContent(imageUrl) {
+            const contentTextarea = document.getElementById('articleContent');
+            const cursorPos = contentTextarea.selectionStart;
+            const textBefore = contentTextarea.value.substring(0, cursorPos);
+            const textAfter = contentTextarea.value.substring(cursorPos);
+            
+            // 提示用户输入图片描述
+            const altText = prompt('请输入图片描述（可选）：', '图片');
+            
+            const imageMarkdown = `\n\n![${altText || '图片'}](${imageUrl})\n\n`;
+            
+            contentTextarea.value = textBefore + imageMarkdown + textAfter;
+            contentTextarea.focus();
+            
+            // 移动光标到插入位置之后
+            const newCursorPos = cursorPos + imageMarkdown.length;
+            contentTextarea.setSelectionRange(newCursorPos, newCursorPos);
+            
+            showNotification('🖼️ 图片标记已插入到文章内容中', 'success');
+        }
+
+        // 17. 鼠标移动效果 - 爱心飘落
         document.addEventListener('mousemove', function(e) {
             if (Math.random() > 0.98) {
                 const emojis = ['❤️', '💕', '💖', '💗', '💓', '💞', '💘'];
@@ -2558,7 +2898,7 @@
             }
         });
 
-        // 17. 返回顶部功能
+        // 18. 返回顶部功能
         function initScrollTop() {
             const scrollTopBtn = document.getElementById('scrollTop');
             
@@ -2575,7 +2915,7 @@
             });
         }
 
-        // 18. 绑定所有事件
+        // 19. 绑定所有事件
         function bindEvents() {
             document.getElementById('navHome').addEventListener('click', showHome);
             document.getElementById('navCreate').addEventListener('click', showCreateForm);
@@ -2608,6 +2948,7 @@
                 }
             });
             
+            document.getElementById('configBtn').addEventListener('click', openGitHubConfig);
             document.getElementById('syncBtn').addEventListener('click', syncToGitHub);
             document.getElementById('testGitHubBtn').addEventListener('click', testGitHubConnection);
             document.getElementById('saveGitHubConfig').addEventListener('click', saveGitHubConfig);
@@ -2617,6 +2958,10 @@
             document.getElementById('footerCreate').addEventListener('click', showCreateForm);
             document.getElementById('footerAbout').addEventListener('click', showAbout);
             document.getElementById('footerLogo').addEventListener('click', showHome);
+            document.getElementById('footerAllArticles').addEventListener('click', function(e) {
+                e.preventDefault();
+                scrollToArticles();
+            });
             
             document.getElementById('homeBtn').addEventListener('click', showHome);
             
@@ -2669,9 +3014,12 @@
                     closeGitHubConfig();
                 }
             });
+            
+            // 初始化图片上传功能
+            initImageUpload();
         }
 
-        // 19. 页面初始化
+        // 20. 页面初始化
         window.addEventListener('DOMContentLoaded', function() {
             console.log('页面加载完成，开始初始化...');
             
