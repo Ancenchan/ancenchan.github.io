@@ -3,119 +3,168 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ancen的秘密基地w 🌸</title>
+    <title>Ancen's Secret Base 🌸</title>
     <link href="https://lib.baomitu.com/quill/1.3.6/quill.snow.css" rel="stylesheet">
     <script src="https://lib.baomitu.com/quill/1.3.6/quill.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;700&family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Kosugi+Maru&family=Noto+Sans+SC:wght@300;400&display=swap" rel="stylesheet">
     
     <style>
-        :root { --f-bg: #fff9fb; --f-pink: #ffb1c1; --f-soft-text: #8e7676; }
-        body { background-color: var(--f-bg); color: var(--f-soft-text); font-family: 'Noto Sans SC', sans-serif; margin: 0; overflow-x: hidden; }
-        
-        /* 布局样式 */
-        .header-banner { height: 300px; background: url('https://api.paugram.com/wallpaper?source=gh') center/cover no-repeat; border-radius: 0 0 50px 50px; }
-        .f-card { background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(15px); border-radius: 30px; border: 2px solid rgba(255, 255, 255, 0.8); transition: all 0.3s ease; }
-        .moe-btn { background: linear-gradient(135deg, #ffb1c1 0%, #ff8fa3 100%); color: white; padding: 12px 25px; border-radius: 18px; font-weight: bold; cursor: pointer; }
+        :root { 
+            --f-bg: #fdfdfd; 
+            --f-accent: #ffdee9; 
+            --f-glass: rgba(255, 255, 255, 0.6);
+            --f-text: #7a6e6e;
+        }
 
-        /* 标签样式 */
-        .tag-pill { display: flex; align-items: center; justify-content: space-between; padding: 10px 18px; margin-bottom: 8px; border-radius: 15px; background: white; font-size: 14px; cursor: pointer; }
-        .tag-pill:hover, .tag-pill.active { background: #fff1f3; color: var(--f-pink); transform: translateX(8px); }
+        body { 
+            background: linear-gradient(135deg, #fff5f7 0%, #fefefe 100%);
+            color: var(--f-text);
+            font-family: 'Noto Sans SC', 'Kosugi Maru', sans-serif;
+            margin: 0;
+            overflow-x: hidden;
+            letter-spacing: 0.05em;
+        }
+
+        /* 顶部 Banner：更清淡的渐变或轻量化背景 */
+        .header-banner { 
+            height: 260px; 
+            background: linear-gradient(to bottom, #ffdee988, #ffffff00), 
+                        url('https://api.paugram.com/wallpaper?source=gh') center/cover no-repeat;
+            filter: saturate(0.8) brightness(1.05);
+            border-radius: 0 0 80px 80px;
+        }
+
+        /* 清透磨砂卡片 */
+        .f-card {
+            background: var(--f-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 40px;
+            box-shadow: 0 10px 40px rgba(255, 177, 193, 0.08);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .f-card:hover { transform: translateY(-5px); box-shadow: 0 15px 50px rgba(255, 177, 193, 0.15); }
+
+        /* 按钮：更清透的柔光感 */
+        .moe-btn {
+            background: #ffffff;
+            color: #ffb1c1;
+            border: 1px solid #ffb1c188;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: 400;
+            transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(255, 177, 193, 0.1);
+        }
+        .moe-btn:hover { background: #ffb1c1; color: white; border-color: transparent; }
+
+        /* 标签 */
+        .tag-pill {
+            padding: 8px 16px; margin: 4px; border-radius: 12px;
+            background: rgba(255, 255, 255, 0.5); font-size: 13px;
+            border: 1px solid transparent; transition: 0.3s;
+        }
+        .tag-pill.active { border-color: #ffb1c1; color: #ffb1c1; background: #fffafa; }
 
         /* 编辑器遮罩 */
-        #editor-mask { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 245, 247, 0.9); backdrop-filter: blur(10px); z-index: 1000; display: none; align-items: center; justify-content: center; }
-        #editor-container { height: 250px; font-size: 16px; border: none !important; }
+        #editor-mask { 
+            position: fixed; inset: 0; background: rgba(255, 255, 255, 0.85); 
+            backdrop-filter: blur(10px); z-index: 1000; display: none; align-items: center; justify-content: center; 
+        }
 
-        /* --- 本地互动萌宠样式 --- */
-        #pet-container { position: fixed; bottom: 20px; left: 20px; z-index: 999; cursor: pointer; transition: all 0.3s; }
-        #pet-img { width: 120px; height: auto; filter: drop-shadow(0 5px 15px rgba(255,177,193,0.4)); animation: petFloat 3s ease-in-out infinite; }
-        @keyframes petFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        /* --- 萌宠：Fuwari 风格修复版 --- */
+        #pet-container { position: fixed; bottom: 30px; left: 30px; z-index: 999; cursor: pointer; }
+        #pet-img { 
+            width: 130px; 
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.05));
+            animation: softFloat 4s ease-in-out infinite;
+        }
+        @keyframes softFloat { 0%, 100% { transform: translate(0, 0) rotate(0deg); } 50% { transform: translate(5px, -15px) rotate(2deg); } }
         
         #pet-bubble { 
-            position: absolute; top: -60px; left: 50%; transform: translateX(-50%);
-            background: white; border: 2px solid var(--f-pink); padding: 8px 15px;
-            border-radius: 15px; font-size: 12px; white-space: nowrap;
-            opacity: 0; transition: opacity 0.5s; pointer-events: none;
+            position: absolute; bottom: 100%; left: 0; margin-bottom: 10px;
+            background: white; color: #a49696; padding: 10px 18px;
+            border-radius: 20px; font-size: 13px; min-width: 120px;
+            opacity: 0; transition: 0.4s; pointer-events: none;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.03);
+            border: 1px solid #fef0f3;
         }
-        #pet-bubble::after { content: ''; position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); border-width: 10px 10px 0; border-style: solid; border-color: var(--f-pink) transparent transparent; }
+        #pet-bubble.active { opacity: 1; transform: translateY(-5px); }
+
+        .hidden { display: none; }
     </style>
 </head>
 <body>
 
 <div id="page-list">
     <div class="header-banner"></div>
-    <div class="max-w-6xl mx-auto px-6 -mt-20 relative pb-20">
-        <div class="flex flex-col lg:flex-row gap-10">
+    <div class="max-w-6xl mx-auto px-8 -mt-24 relative pb-24">
+        <div class="flex flex-col lg:flex-row gap-12">
             <aside class="w-full lg:w-72">
-                <div class="f-card p-8 text-center sticky top-10">
-                    <img src="https://p.qlogo.cn/gh/666666/666666/100" class="w-24 h-24 rounded-3xl mx-auto mb-4 object-cover">
-                    <h2 class="text-2xl font-bold" style="font-family: 'ZCOOL KuaiLe'">Ancen</h2>
-                    <button onclick="openEditor()" class="moe-btn w-full my-4">🖋️ 记录新的羁绊</button>
-                    <div id="tagCloud" class="text-left mt-4 border-t pt-4"></div>
+                <div class="f-card p-10 text-center sticky top-12">
+                    <img src="https://api.dicebear.com/7.x/notionists/svg?seed=Ancen&backgroundColor=ffdee9" class="w-24 h-24 rounded-full mx-auto mb-6 bg-white shadow-inner">
+                    <h2 class="text-2xl font-bold text-gray-500 mb-6" style="font-family: 'ZCOOL KuaiLe'">Ancenchan</h2>
+                    <button onclick="openEditor()" class="moe-btn w-full mb-8">记录碎碎念</button>
+                    <div id="tagCloud" class="flex flex-wrap justify-center gap-2 pt-6 border-t border-pink-50"></div>
                 </div>
             </aside>
-            <main class="flex-1 lg:mt-12 space-y-8" id="diaryList"></main>
+            <main class="flex-1 space-y-10" id="diaryList"></main>
         </div>
     </div>
 </div>
 
-<div id="page-detail" class="hidden p-6">
-    <div class="max-w-3xl mx-auto pt-10">
-        <button onclick="goBack()" class="mb-8 text-pink-300 font-bold">⬅ 返回传送门</button>
-        <div id="detail-content" class="f-card p-10 bg-white"></div>
+<div id="page-detail" class="hidden p-8">
+    <div class="max-w-4xl mx-auto pt-12">
+        <button onclick="goBack()" class="mb-10 text-pink-200 hover:text-pink-400 transition-colors text-sm">/ 返回 Base</button>
+        <div id="detail-content" class="f-card p-16 bg-white/80"></div>
     </div>
 </div>
 
 <div id="editor-mask">
-    <div class="f-card p-8 w-full max-w-2xl mx-4">
-        <div class="flex justify-between items-center mb-4">
-            <h3 id="editor-title-label" class="font-bold text-pink-400">💌 捕获灵感...</h3>
-            <button onclick="closeEditor()" class="text-2xl text-gray-300">&times;</button>
+    <div class="f-card p-10 w-full max-w-2xl mx-4 bg-white">
+        <div class="flex justify-between items-center mb-6">
+            <span class="text-pink-200 text-sm tracking-widest uppercase">New Moment</span>
+            <button onclick="closeEditor()" class="text-gray-300 hover:text-gray-500">✕</button>
         </div>
-        <input id="diaryTitle" type="text" placeholder="标题..." class="w-full text-xl font-bold mb-2 outline-none">
-        <input id="diaryTags" type="text" placeholder="分类(逗号隔开)" class="w-full text-xs mb-4 outline-none text-pink-300">
-        <div id="editor-container"></div>
-        <div class="flex justify-end mt-4">
-            <button id="saveBtn" onclick="handleSave()" class="moe-btn">同步星海</button>
+        <input id="diaryTitle" type="text" placeholder="标题在这里..." class="w-full text-2xl font-light mb-4 outline-none placeholder:text-gray-200">
+        <input id="diaryTags" type="text" placeholder="分类 (空格隔开)" class="w-full text-xs mb-6 outline-none text-pink-300 placeholder:text-pink-100 uppercase">
+        <div id="editor-container" class="text-gray-500"></div>
+        <div class="flex justify-end mt-8">
+            <button id="saveBtn" onclick="handleSave()" class="moe-btn px-10">同步</button>
         </div>
     </div>
 </div>
 
 <div id="pet-container" onclick="petSpeak()">
-    <div id="pet-bubble">你好呀，指挥官！</div>
-    <img id="pet-img" src="https://raw.githubusercontent.com/ShidukiSayaka/ShidukiSayaka.github.io/master/img/avatar.png" alt="Pet">
+    <div id="pet-bubble"></div>
+    <img id="pet-img" src="https://api.dicebear.com/7.x/adventurer/svg?seed=Lucky&hairColor=634e34&eyesColor=e85d75" alt="Pet">
 </div>
 
 <script>
-    // --- 定义全局变量 (修复初始化顺序报错) ---
     const REPO = "Ancenchan/ancenchan.github.io"; 
     const PATH = "data/articles.json";
-    let diaryData = [];
-    let currentSha = "";
-    let filterTag = null;
-    let editIndex = null;
+    let diaryData = [], currentSha = "", filterTag = null, editIndex = null;
 
-    // --- 初始化编辑器 ---
     const quill = new Quill('#editor-container', {
         theme: 'snow',
-        modules: { toolbar: [['bold', 'italic'], ['image']] }
+        placeholder: '此刻的心情是...',
+        modules: { toolbar: [['bold', 'italic'], ['image', 'link']] }
     });
 
-    // --- 增删查改逻辑 ---
     function openEditor(index = null) {
         editIndex = index;
         document.getElementById('editor-mask').style.display = 'flex';
         if (index !== null) {
             const item = diaryData[index];
             document.getElementById('diaryTitle').value = item.title;
-            document.getElementById('diaryTags').value = (item.tags || []).join(', ');
+            document.getElementById('diaryTags').value = (item.tags || []).join(' ');
             quill.root.innerHTML = item.content;
-            document.getElementById('saveBtn').innerText = "重塑星海";
         } else {
             document.getElementById('diaryTitle').value = "";
             document.getElementById('diaryTags').value = "";
             quill.root.innerHTML = "";
-            document.getElementById('saveBtn').innerText = "同步星海";
         }
     }
 
@@ -124,7 +173,7 @@
     async function fetchCloudData() {
         const token = localStorage.getItem('gh_token');
         if(!token) {
-            const t = prompt("🗝️ 请输入Token:");
+            const t = prompt("🗝️ Token:");
             if(t) localStorage.setItem('gh_token', t); else return;
         }
         try {
@@ -137,7 +186,7 @@
                 diaryData = JSON.parse(decodeURIComponent(escape(atob(data.content.replace(/\s/g, '')))));
                 render();
             }
-        } catch (e) { console.error("读取失败", e); }
+        } catch (e) { petSpeak("数据走丢了..."); }
     }
 
     function render() {
@@ -146,17 +195,16 @@
         const tagMap = {};
         diaryData.forEach(d => { if(d.tags) d.tags.forEach(t => tagMap[t] = (tagMap[t] || 0) + 1); });
         
-        cloud.innerHTML = `<div class="tag-pill ${!filterTag?'active':''}" onclick="setFilter(null)"><span>✦ 全部</span><span>${diaryData.length}</span></div>` + 
-            Object.keys(tagMap).map(t => `<div class="tag-pill ${filterTag===t?'active':''}" onclick="setFilter('${t}')"><span>✦ ${t}</span><span>${tagMap[t]}</span></div>`).join('');
+        cloud.innerHTML = Object.keys(tagMap).map(t => `<div class="tag-pill ${filterTag===t?'active':''}" onclick="setFilter('${t}')">${t}</div>`).join('');
 
         const filtered = filterTag ? diaryData.filter(d => d.tags && d.tags.includes(filterTag)) : diaryData;
         list.innerHTML = filtered.slice().reverse().map((item) => {
             const realIndex = diaryData.findIndex(d => d.id === item.id);
-            const pureText = (item.content || "").replace(/<[^>]+>/g, '').substring(0, 100);
-            return `<div class="f-card p-8 group cursor-pointer mb-6" onclick="showDetail(${realIndex})">
-                <div class="text-[10px] text-pink-200 mb-2">${item.date}</div>
-                <h2 class="text-xl font-bold mb-4">${item.title || '无名之书'}</h2>
-                <p class="text-gray-400 text-sm overflow-hidden" style="display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;">${pureText}...</p>
+            const preview = (item.content || "").replace(/<[^>]+>/g, '').substring(0, 80);
+            return `<div class="f-card p-12 cursor-pointer group" onclick="showDetail(${realIndex})">
+                <span class="text-[10px] text-pink-200 tracking-widest">${item.date}</span>
+                <h2 class="text-xl font-light text-gray-600 my-4 group-hover:text-pink-300 transition-colors">${item.title || 'Untitled'}</h2>
+                <p class="text-gray-300 text-sm leading-relaxed">${preview}...</p>
             </div>`;
         }).join('');
     }
@@ -164,12 +212,12 @@
     function showDetail(index) {
         const item = diaryData[index];
         document.getElementById('detail-content').innerHTML = `
-            <div class="text-[10px] text-pink-200 mb-4">${item.date}</div>
-            <h1 class="text-3xl font-bold mb-8">${item.title}</h1>
-            <div class="ql-editor p-0">${item.content}</div>
-            <div class="mt-10 border-t pt-4 flex gap-4">
-                <button onclick="openEditor(${index}); goBack();" class="text-pink-400 text-sm">编辑</button>
-                <button onclick="deleteItem(${index})" class="text-red-200 text-sm">删除</button>
+            <div class="text-[10px] text-pink-200 tracking-widest mb-10">${item.date}</div>
+            <h1 class="text-4xl font-light text-gray-700 mb-12">${item.title}</h1>
+            <div class="ql-editor p-0 text-gray-500 leading-loose">${item.content}</div>
+            <div class="mt-20 border-t border-pink-50 pt-8 flex gap-6">
+                <button onclick="openEditor(${index}); goBack();" class="text-pink-200 hover:text-pink-400 text-xs uppercase tracking-widest">Edit</button>
+                <button onclick="deleteItem(${index})" class="text-gray-200 hover:text-red-200 text-xs uppercase tracking-widest">Delete</button>
             </div>`;
         document.getElementById('page-list').classList.add('hidden');
         document.getElementById('page-detail').classList.remove('hidden');
@@ -181,18 +229,17 @@
         document.getElementById('page-detail').classList.add('hidden');
     }
 
-    function setFilter(tag) { filterTag = tag; render(); }
+    function setFilter(tag) { filterTag = (filterTag === tag) ? null : tag; render(); }
 
     async function handleSave() {
-        const content = quill.root.innerHTML;
-        const title = document.getElementById('diaryTitle').value.trim();
-        const tags = document.getElementById('diaryTags').value.split(/[,，\s]+/).map(t => t.trim()).filter(t => t);
-        const dateStr = new Date().toLocaleDateString('zh-CN', {year:'numeric', month:'long', day:'numeric'});
+        const title = document.getElementById('diaryTitle').value.trim() || "无题";
+        const tags = document.getElementById('diaryTags').value.trim().split(/\s+/).filter(t => t);
+        const dateStr = new Date().toLocaleDateString('zh-CN', {year:'numeric', month:'2-digit', day:'2-digit'});
 
         if (editIndex !== null) {
-            diaryData[editIndex] = { ...diaryData[editIndex], title, content, tags };
+            diaryData[editIndex] = { ...diaryData[editIndex], title, content: quill.root.innerHTML, tags };
         } else {
-            diaryData.push({ id: Date.now(), title, content, tags, date: dateStr });
+            diaryData.push({ id: Date.now(), title, content: quill.root.innerHTML, tags, date: dateStr });
         }
 
         const b64 = btoa(unescape(encodeURIComponent(JSON.stringify(diaryData, null, 2))));
@@ -200,48 +247,38 @@
             const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${PATH}`, {
                 method: 'PUT',
                 headers: { 'Authorization': `Bearer ${localStorage.getItem('gh_token')}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: "Update", content: b64, sha: currentSha })
+                body: JSON.stringify({ message: "Cloud Update", content: b64, sha: currentSha })
             });
             if(res.ok) {
                 const d = await res.json();
                 currentSha = d.content.sha;
-                closeEditor();
-                render();
-                petSpeak("记录成功啦！真棒~");
+                closeEditor(); render(); petSpeak("星海已接收到你的记忆 ✨");
             }
-        } catch (e) { alert("同步失败"); }
+        } catch (e) { petSpeak("同步失败，检查下网络？"); }
     }
 
     async function deleteItem(index) {
-        if(!confirm("确定删除吗？")) return;
+        if(!confirm("要抹除这段记忆吗？")) return;
         diaryData.splice(index, 1);
         const b64 = btoa(unescape(encodeURIComponent(JSON.stringify(diaryData, null, 2))));
         const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${PATH}`, {
             method: 'PUT',
             headers: { 'Authorization': `Bearer ${localStorage.getItem('gh_token')}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: "Delete", content: b64, sha: currentSha })
+            body: JSON.stringify({ message: "Cloud Delete", content: b64, sha: currentSha })
         });
-        if(res.ok) { 
-            const d = await res.json();
-            currentSha = d.content.sha;
-            goBack(); 
-            render(); 
-        }
+        if(res.ok) { const d = await res.json(); currentSha = d.content.sha; goBack(); render(); }
     }
 
-    // --- 宠物互动逻辑 ---
-    const quotes = ["今天也要开心哦！", "记录点什么好呢？", "秘密基地永远欢迎你~", "棕发红眼是最高配置！", "摸摸头，变聪明！"];
+    // --- 宠物互动 ---
     function petSpeak(msg) {
         const bubble = document.getElementById('pet-bubble');
+        const quotes = ["Fuwa fuwa~", "在看哪一段记忆呢？", "世界依然明亮。", "棕发的你，今天也很棒！"];
         bubble.innerText = msg || quotes[Math.floor(Math.random() * quotes.length)];
-        bubble.style.opacity = 1;
-        setTimeout(() => bubble.style.opacity = 0, 3000);
+        bubble.classList.add('active');
+        setTimeout(() => bubble.classList.remove('active'), 3500);
     }
 
-    window.onload = () => {
-        fetchCloudData();
-        setTimeout(() => petSpeak("欢迎回来，Ancen！"), 1000);
-    };
+    window.onload = fetchCloudData;
 </script>
 </body>
 </html>
