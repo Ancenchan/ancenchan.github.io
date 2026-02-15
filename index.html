@@ -4,89 +4,78 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ancen's Magic Notebook ✨</title>
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Noto+Sans+SC:wght@300;500&display=swap" rel="stylesheet">
     <style>
         :root { --moe-bg: #fff5f7; --moe-pink: #ffb7c5; --moe-accent: #a5d8ff; --moe-text: #7d5a5a; }
         body { background: var(--moe-bg); font-family: 'Noto Sans SC', sans-serif; color: var(--moe-text); margin: 0; }
         
-        /* 自定义头图高度与样式 */
+        /* 自定义头图 */
         .header-banner {
-            height: 45vh;
-            background: url('https://api.dujin.org/bing/1920.php') center/cover no-repeat; /* 这里可以换成你喜欢的二次元图 */
+            height: 40vh;
+            background: url('https://api.dujin.org/bing/1920.php') center/cover no-repeat;
             position: relative;
             display: flex;
-            align-items: center;
-            justify-content: center;
+            align-items: center; justify-content: center;
             border-bottom: 5px solid white;
         }
-        .header-mask {
-            position: absolute;
-            bottom: 0; left: 0; right: 0;
-            height: 100px;
-            background: linear-gradient(transparent, var(--moe-bg));
-        }
-        .header-title {
-            font-family: 'ZCOOL KuaiLe', cursive;
-            text-shadow: 2px 2px 10px rgba(0,0,0,0.3);
-            color: white;
-            z-index: 10;
-        }
+        .header-mask { position: absolute; bottom: 0; left: 0; right: 0; height: 80px; background: linear-gradient(transparent, var(--moe-bg)); }
+        .header-title { font-family: 'ZCOOL KuaiLe', cursive; text-shadow: 2px 2px 10px rgba(0,0,0,0.3); color: white; z-index: 10; }
 
-        .moe-card { background: rgba(255, 255, 255, 0.9); border: 3px solid white; border-radius: 25px; box-shadow: 0 8px 0 rgba(255, 183, 197, 0.1); transition: 0.3s; }
-        .moe-card:hover { transform: translateY(-5px); }
-
-        /* 内容里的图片样式 */
-        .diary-content img {
-            max-width: 100%;
-            border-radius: 15px;
-            margin: 15px auto;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            display: block;
-        }
-        .diary-content p { margin-bottom: 1em; line-height: 1.8; }
+        .moe-card { background: rgba(255, 255, 255, 0.95); border: 3px solid white; border-radius: 25px; box-shadow: 0 10px 30px rgba(255, 183, 197, 0.15); transition: 0.3s; }
         
-        .moe-btn { background: var(--moe-pink); color: white; border-radius: 20px; padding: 10px 25px; font-weight: bold; border: none; cursor: pointer; border-bottom: 4px solid #f09cae; }
+        /* 编辑器美化 */
+        #editor-container { height: 300px; border: none !important; font-size: 16px; }
+        .ql-toolbar.ql-snow { border: none !important; border-bottom: 1px dashed var(--moe-pink) !important; padding: 8px 15px !important; }
+        .ql-container.ql-snow { border: none !important; }
+        
+        /* 展示区图片样式 */
+        .diary-content img { max-width: 100%; border-radius: 12px; margin: 10px 0; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .diary-content { line-height: 1.8; color: #555; }
+
+        .moe-btn { background: var(--moe-pink); color: white; border-radius: 20px; padding: 10px 30px; font-weight: bold; border: none; cursor: pointer; border-bottom: 4px solid #f09cae; transition: 0.2s; }
+        .moe-btn:hover { opacity: 0.9; transform: translateY(-1px); }
         .moe-btn:active { transform: translateY(2px); border-bottom: 0px solid transparent; }
 
         .tag-pill { background: var(--moe-accent); color: white; padding: 2px 12px; border-radius: 50px; font-size: 11px; margin-right: 5px; }
-        textarea { border: 2px dashed var(--moe-pink); border-radius: 15px; padding: 15px; outline: none; transition: 0.3s; width: 100%; resize: vertical; }
-        textarea:focus { border-style: solid; background: white; }
     </style>
 </head>
 <body>
 
     <div class="header-banner">
         <div class="header-title text-center">
-            <h1 class="text-5xl mb-2">Ancen's Notebook</h1>
-            <p class="text-lg opacity-90 tracking-widest">记录生活的呼吸感 ✨</p>
+            <h1 class="text-5xl mb-2">Ancen's Magic</h1>
+            <p class="text-lg opacity-90 tracking-widest">每一帧美好都值得被收藏 ✨</p>
         </div>
         <div class="header-mask"></div>
     </div>
 
-    <div class="max-w-3xl mx-auto px-4 -mt-10 relative z-20 pb-20">
+    <div class="max-w-3xl mx-auto px-4 -mt-12 relative z-20 pb-20">
         
         <div class="text-right mb-4">
-            <button onclick="configToken()" class="text-[10px] bg-white/80 backdrop-blur px-3 py-1 rounded-full text-pink-300 hover:text-pink-500 transition">🗝️ 设置钥匙 (Token)</button>
+            <button onclick="configToken()" class="text-[10px] bg-white/90 backdrop-blur px-4 py-1.5 rounded-full text-pink-300 hover:text-pink-500 shadow-sm transition">🗝️ 配置次元锁</button>
         </div>
 
-        <div class="moe-card p-8 mb-12">
-            <input id="diaryTitle" type="text" placeholder="给这篇日记取个名字喵..." class="w-full text-2xl font-bold text-gray-700 mb-4 bg-transparent border-none focus:ring-0 outline-none">
+        <div class="moe-card p-4 mb-12">
+            <input id="diaryTitle" type="text" placeholder="给这篇日记取个名字喵..." class="w-full text-2xl font-bold text-gray-700 p-4 bg-transparent border-none focus:ring-0 outline-none">
             
-            <textarea id="diaryInput" rows="6" class="text-gray-600 mb-4" placeholder="支持 Markdown！插入图片：![描述](图片网址)"></textarea>
+            <div id="editor-wrapper" class="border-2 border-dashed border-pink-100 rounded-2xl overflow-hidden mb-4">
+                <div id="editor-container"></div>
+            </div>
             
-            <div class="flex flex-wrap justify-between items-center gap-4">
-                <input id="diaryTags" type="text" placeholder="标签(逗号隔开)" class="text-sm text-blue-400 bg-transparent border-none outline-none">
-                <div class="flex gap-2">
-                    <button id="cancelBtn" onclick="resetEditor()" class="hidden text-gray-400 text-xs">取消</button>
-                    <button id="saveBtn" onclick="handleSave()" class="moe-btn">发布章节</button>
+            <div class="flex flex-wrap justify-between items-center gap-4 px-2">
+                <input id="diaryTags" type="text" placeholder="标签(逗号隔开)" class="text-sm text-blue-300 bg-transparent border-none outline-none">
+                <div class="flex gap-3">
+                    <button id="cancelBtn" onclick="resetEditor()" class="hidden text-gray-400 text-sm">取消</button>
+                    <button id="saveBtn" onclick="handleSave()" class="moe-btn">记录这一刻</button>
                 </div>
             </div>
         </div>
 
-        <div id="diaryList" class="space-y-12">
-            <div class="text-center py-20 text-pink-200">✨ 正在从星空搬运记忆...</div>
+        <div id="diaryList" class="space-y-12 text-gray-800">
+            <div class="text-center py-20 text-pink-200 animate-pulse">✨ 正在从云端读取记忆...</div>
         </div>
     </div>
 
@@ -97,8 +86,21 @@
         let currentSha = "";
         let editingId = null;
 
-        const getToken = () => localStorage.getItem('gh_token');
+        // 初始化 Quill
+        const quill = new Quill('#editor-container', {
+            theme: 'snow',
+            placeholder: '在这里写下你的故事，可以直接粘贴图片哦...',
+            modules: {
+                toolbar: [
+                    ['bold', 'italic', 'underline'],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    ['link', 'image'],
+                    ['clean']
+                ]
+            }
+        });
 
+        const getToken = () => localStorage.getItem('gh_token');
         function configToken() {
             const t = prompt("输入你的 GitHub Token：");
             if(t) { localStorage.setItem('gh_token', t.trim()); location.reload(); }
@@ -106,7 +108,7 @@
 
         async function fetchCloudData() {
             if(!getToken()) {
-                document.getElementById('diaryList').innerHTML = `<div class="text-center text-pink-300 bg-white p-10 rounded-3xl">配置 Token 后即可开启魔法喵~</div>`;
+                document.getElementById('diaryList').innerHTML = `<div class="text-center text-pink-300 bg-white p-10 rounded-3xl">请先配置 Token 喵~</div>`;
                 return;
             }
             try {
@@ -127,32 +129,31 @@
             const list = document.getElementById('diaryList');
             list.innerHTML = diaryData.slice().reverse().map((item, index) => {
                 const realIndex = diaryData.length - 1 - index;
-                // 使用 marked 解析 Markdown
-                const contentHtml = marked.parse(item.content || '');
                 const tagsHtml = (item.tags || []).map(t => `<span class="tag-pill"># ${t}</span>`).join('');
                 
                 return `
                 <div class="moe-card p-10">
-                    <div class="flex justify-between items-center text-[10px] text-pink-200 mb-6">
-                        <span class="tracking-widest italic font-medium">DATE: ${item.date}</span>
+                    <div class="flex justify-between items-center text-[11px] text-pink-300 mb-6 font-medium">
+                        <span>📅 ${item.date}</span>
                         <div class="flex gap-4">
-                            <button onclick="startEdit(${realIndex})" class="hover:text-blue-400 transition">EDIT</button>
-                            <button onclick="deleteItem(${realIndex})" class="hover:text-red-400 transition">DELETE</button>
+                            <button onclick="startEdit(${realIndex})" class="hover:text-blue-400 uppercase">Edit</button>
+                            <button onclick="deleteItem(${realIndex})" class="hover:text-red-400 uppercase">Delete</button>
                         </div>
                     </div>
                     <h2 class="text-3xl font-bold text-gray-800 mb-6">${item.title || '无标题随笔'}</h2>
-                    <div class="diary-content text-gray-600">${contentHtml}</div>
-                    <div class="mt-8 flex flex-wrap gap-2 border-t border-gray-50 pt-6">${tagsHtml}</div>
+                    <div class="diary-content ql-editor" style="padding:0">${item.content || ''}</div>
+                    <div class="mt-8 flex flex-wrap gap-2 pt-6 border-t border-pink-50">${tagsHtml}</div>
                 </div>`;
             }).join('');
         }
 
         async function handleSave() {
-            const content = document.getElementById('diaryInput').value.trim();
+            const content = quill.root.innerHTML; // 获取富文本 HTML
             const title = document.getElementById('diaryTitle').value.trim();
             const tags = document.getElementById('diaryTags').value ? document.getElementById('diaryTags').value.split(',').map(t => t.trim()) : [];
             
-            if(!content) return alert("内容不能为空喵！");
+            if(quill.getText().trim().length === 0 && !content.includes('img')) return alert("内容不能为空喵！");
+
             const btn = document.getElementById('saveBtn');
             btn.innerText = "咏唱中...";
             btn.disabled = true;
@@ -166,7 +167,7 @@
             }
 
             if(await syncToCloud()) { resetEditor(); render(); }
-            btn.innerText = "发布章节";
+            btn.innerText = "记录这一刻";
             btn.disabled = false;
         }
 
@@ -176,18 +177,18 @@
                 const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${PATH}`, {
                     method: 'PUT',
                     headers: { 'Authorization': `Bearer ${getToken()}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: "Update story", content: b64, sha: currentSha })
+                    body: JSON.stringify({ message: "Update rich diary", content: b64, sha: currentSha })
                 });
                 if(res.ok) {
                     const d = await res.json();
                     currentSha = d.content.sha;
                     return true;
                 }
-            } catch (e) { alert("魔法失败..."); return false; }
+            } catch (e) { alert("同步失败..."); return false; }
         }
 
         async function deleteItem(index) {
-            if(!confirm("确认碎掉这段回忆？")) return;
+            if(!confirm("真的要删除这段记忆吗？")) return;
             diaryData.splice(index, 1);
             if(await syncToCloud()) render();
         }
@@ -196,20 +197,20 @@
             editingId = index;
             const item = diaryData[index];
             document.getElementById('diaryTitle').value = item.title || '';
-            document.getElementById('diaryInput').value = item.content;
+            quill.root.innerHTML = item.content || '';
             document.getElementById('diaryTags').value = (item.tags || []).join(',');
             document.getElementById('cancelBtn').classList.remove('hidden');
-            document.getElementById('saveBtn').innerText = "确认修改";
+            document.getElementById('saveBtn').innerText = "保存修改";
             window.scrollTo({top: 400, behavior: 'smooth'});
         }
 
         function resetEditor() {
             editingId = null;
             document.getElementById('diaryTitle').value = '';
-            document.getElementById('diaryInput').value = '';
+            quill.root.innerHTML = '';
             document.getElementById('diaryTags').value = '';
             document.getElementById('cancelBtn').classList.add('hidden');
-            document.getElementById('saveBtn').innerText = "发布章节";
+            document.getElementById('saveBtn').innerText = "记录这一刻";
         }
 
         window.onload = fetchCloudData;
