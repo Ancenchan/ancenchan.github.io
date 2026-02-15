@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的私人日记本</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background: #fdfcf8; color: #4a4a4a; font-family: 'Noto Serif SC', serif; }
+        .glass { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); }
+    </style>
+</head>
+<body class="p-4 md:p-10">
+    <div class="max-w-2xl mx-auto">
+        <header class="mb-10 text-center">
+            <h1 class="text-3xl font-bold text-gray-800">🖋️ 岁月留痕</h1>
+            <p class="text-gray-500 mt-2">随时随地，记录此时此刻</p>
+        </header>
+
+        <div class="glass p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
+            <textarea id="diaryInput" rows="5" class="w-full bg-transparent border-none focus:outline-none text-lg resize-none" placeholder="今天发生了什么有趣的时刻..."></textarea>
+            <div class="flex justify-end mt-4">
+                <button onclick="saveDiary()" class="bg-gray-800 text-white px-6 py-2 rounded-full hover:bg-black transition shadow-md">保存到云端</button>
+            </div>
+        </div>
+
+        <div id="diaryList" class="space-y-6">
+            <p class="text-center text-gray-400">正在同步云端笔记...</p>
+        </div>
+    </div>
+
+    <script>
+        // 配置信息（请替换为你自己的信息）
+        const GITHUB_CONFIG = {
+            token: '你的_GITHUB_TOKEN', // ⚠️ 注意：前端暴露 token 有风险，建议设为私人仓库
+            repo: '你的用户名/仓库名',
+            path: 'articles.json'
+        };
+
+        let articles = [];
+
+        // 1. 初始化：从仓库读取 articles.json
+        async function fetchDiaries() {
+            try {
+                const res = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}`);
+                const data = await res.json();
+                const content = decodeURIComponent(escape(atob(data.content))); // 处理中文乱码
+                articles = JSON.parse(content);
+                renderDiaries();
+                return data.sha; // 保存文件的 SHA 供后续更新使用
+            } catch (e) {
+                console.error("加载失败", e);
+            }
+        }
+
+        // 2. 渲染列表
+        function renderDiaries() {
+            const list = document.getElementById('diaryList');
+            list.innerHTML = articles.map(item => `
+                <div class="border-l-2 border-gray-200 pl-4 py-2">
+                    <div class="text-xs text-gray-400 mb-1">${item.date}</div>
+                    <div class="text-gray-700 leading-relaxed">${item.content}</div>
+                </div>
+            `).reverse().join('');
+        }
+
+        // 3. 保存逻辑：推送到 GitHub
+        async function saveDiary() {
+            const content = document.getElementById('diaryInput').value;
+            if(!content) return alert("内容不能为空");
+
+            const newItem = {
+                date: new Date().toLocaleString(),
+                content: content
+            };
+
+            // 获取旧文件的 SHA
+            const getRes = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}`);
+            const getData = await getRes.json();
+            const sha = getData.sha;
+
+            articles.push(newItem);
+            const updatedContent = btoa(unescape(encodeURIComponent(JSON.stringify(articles, null, 2))));
+
+            const putRes = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `token ${GITHUB_CONFIG.token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    message: `Add diary: ${newItem.date}`,
+                    content: updatedContent,
+                    sha: sha
+                })
+            });
+
+            if(putRes.ok) {
+                document.getElementById('diaryInput').value = '';
+                renderDiaries();
+                alert("同步成功！");
+            }
+        }
+
+        window.onload = fetchDiaries;
+    </script>
+</body>
+</html>
