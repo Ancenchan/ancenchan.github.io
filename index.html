@@ -3,72 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Notebook | 岁月留痕</title>
+    <title>Ancen's Notebook | 喵~</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Noto+Sans+SC:wght@300;500&display=swap" rel="stylesheet">
     <style>
-        :root { --fuwari-bg: #f4f7f6; --fuwari-card: #ffffff; --fuwari-accent: #88abaf; --fuwari-delete: #e5a4a4; }
-        body { background-color: var(--fuwari-bg); font-family: 'Noto Sans SC', sans-serif; color: #444; scroll-behavior: smooth; }
-        .fuwari-card { 
-            background: var(--fuwari-card); 
-            border-radius: 20px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
-            transition: all 0.3s ease;
+        :root {
+            --moe-bg: #fff5f7;
+            --moe-pink: #ffb7c5;
+            --moe-accent: #a5d8ff;
+            --moe-text: #7d5a5a;
         }
-        .fuwari-card:hover { transform: translateY(-3px); box-shadow: 0 15px 35px rgba(0,0,0,0.06); }
-        .btn-primary { background: var(--fuwari-accent); color: white; }
-        .input-focus:focus { outline: none; box-shadow: 0 2px 10px rgba(136, 171, 175, 0.2); }
-        .action-btn { opacity: 0; transition: opacity 0.2s; }
-        .fuwari-card:hover .action-btn { opacity: 1; }
+        
+        body { 
+            background: var(--moe-bg);
+            background-image: radial-gradient(#ffdae0 1px, transparent 1px);
+            background-size: 20px 20px;
+            font-family: 'Noto Sans SC', sans-serif;
+            color: var(--moe-text);
+        }
+
+        h1 { font-family: 'ZCOOL KuaiLe', cursive; }
+
+        /* 果冻卡片 */
+        .moe-card {
+            background: rgba(255, 255, 255, 0.9);
+            border: 3px solid white;
+            border-radius: 30px;
+            box-shadow: 0 8px 0 rgba(255, 183, 197, 0.2);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .moe-card:hover {
+            transform: translateY(-5px) scale(1.01);
+            box-shadow: 0 12px 0 rgba(255, 183, 197, 0.3);
+        }
+
+        /* 萌系按钮 */
+        .moe-btn {
+            background: var(--moe-pink);
+            color: white;
+            border-radius: 20px;
+            padding: 8px 24px;
+            font-weight: bold;
+            border-bottom: 4px solid #f09cae;
+            transition: all 0.1s;
+        }
+        .moe-btn:active {
+            transform: translateY(2px);
+            border-bottom: 0px solid transparent;
+        }
+
+        /* 标签 */
+        .tag-pill {
+            background: var(--moe-accent);
+            color: white;
+            padding: 2px 10px;
+            border-radius: 50px;
+            font-size: 11px;
+        }
+
+        /* 输入框装饰 */
+        textarea {
+            background: rgba(255, 255, 255, 0.5) !important;
+            border: 2px dashed var(--moe-pink) !important;
+            border-radius: 20px !important;
+        }
     </style>
 </head>
-<body class="py-12 px-4">
+<body class="py-8 px-4">
     <div class="max-w-2xl mx-auto">
-        <header class="flex justify-between items-center mb-10">
-            <div>
-                <h1 class="text-3xl font-light tracking-tight text-gray-800">My Diary</h1>
-                <p id="statusInfo" class="text-xs text-gray-400 mt-1">云端同步已就绪</p>
+        <div class="text-center mb-10">
+            <h1 class="text-4xl text-pink-400 mb-2">✨ 魔法日记本 ✨</h1>
+            <p class="text-sm opacity-60">「把每一天的碎碎念都藏进云端~」</p>
+            <div class="mt-4">
+                <button onclick="configToken()" class="text-[10px] text-pink-300 hover:text-pink-500 uppercase tracking-widest">🗝️ 开启次元锁 (设置Token)</button>
             </div>
-            <button onclick="configToken()" class="text-xs bg-white px-3 py-1 rounded-full shadow-sm text-gray-400 hover:text-gray-600 transition">配置 Token</button>
-        </header>
+        </div>
 
-        <div class="fuwari-card p-6 mb-12 border border-white">
-            <h2 id="editorTitle" class="text-sm font-medium text-gray-400 mb-4 uppercase tracking-widest">撰写新章节</h2>
+        <div class="moe-card p-6 mb-12">
+            <div class="flex items-center gap-2 mb-4">
+                <span class="text-2xl">📝</span>
+                <input id="diaryTitle" type="text" placeholder="给这篇日记起个标题嘛..." 
+                    class="bg-transparent border-none focus:outline-none text-lg font-bold w-full text-pink-500 placeholder-pink-200">
+            </div>
             <textarea id="diaryInput" rows="5" 
-                class="w-full border-none focus:ring-0 text-gray-600 placeholder-gray-300 resize-none text-lg input-focus rounded-lg p-2" 
-                placeholder="记录此时此刻..."></textarea>
-            <div class="flex justify-end gap-3 mt-4 pt-4 border-t border-gray-50">
-                <button id="cancelEditBtn" onclick="resetEditor()" class="hidden text-gray-400 text-sm px-4">取消修改</button>
-                <button onclick="handleSave()" id="saveBtn" class="btn-primary px-8 py-2 rounded-xl text-sm font-medium shadow-md active:scale-95 transition">
-                    保存到云端
-                </button>
+                class="w-full focus:ring-0 p-4 text-gray-600 placeholder-pink-100 resize-none mb-4" 
+                placeholder="今天的心情是草莓味的吗？"></textarea>
+            <div class="flex justify-between items-center">
+                <input id="diaryTags" type="text" placeholder="标签(逗号隔开)" class="bg-transparent text-xs text-blue-300 focus:outline-none">
+                <div class="flex gap-2">
+                    <button id="cancelBtn" onclick="resetEditor()" class="hidden text-gray-400 text-xs">算了喵</button>
+                    <button id="saveBtn" onclick="handleSave()" class="moe-btn">同步魔法!</button>
+                </div>
             </div>
         </div>
 
         <div id="diaryList" class="space-y-8">
-            <div class="text-center py-20 text-gray-300">正在检索云端数据...</div>
+            <div class="text-center py-10 animate-pulse text-pink-200">✨ 正在召唤云端记忆...</div>
         </div>
     </div>
 
     <script>
-        // --- 请务必修改此处 ---
-        const REPO = "你的用户名/仓库名"; 
-        const PATH = "data/articles.json";
+        // --- 请根据实际情况确认 ---
+        const REPO = "Ancenchan/ancenchan.github.io"; 
+        const PATH = "data/articles.json"; // 既然在data文件夹下
         
         let diaryData = [];
         let currentSha = "";
-        let editingId = null; // 用于记录当前正在编辑哪一条
+        let editingId = null;
 
-        function getToken() { return localStorage.getItem('gh_token'); }
+        const getToken = () => localStorage.getItem('gh_token');
         function configToken() {
-            const t = prompt("请输入 GitHub Personal Access Token (需 repo 权限):");
+            const t = prompt("输入你的 GitHub Token 喵：");
             if(t) { localStorage.setItem('gh_token', t); location.reload(); }
         }
 
-        // 1. 查 (Read)
         async function fetchCloudData() {
             if(!getToken()) {
-                document.getElementById('diaryList').innerHTML = `<div class="text-center py-10 text-gray-400 font-light">请点击右上角配置 Token</div>`;
+                document.getElementById('diaryList').innerHTML = `<div class="text-center text-pink-300">还没有钥匙（Token）哦，点击上方文字设置~</div>`;
                 return;
             }
             try {
@@ -81,128 +132,104 @@
                     const content = decodeURIComponent(atob(data.content).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
                     diaryData = JSON.parse(content);
                     render();
-                } else {
-                    diaryData = [];
-                    render();
                 }
             } catch (e) {
-                console.error(e);
-                document.getElementById('diaryList').innerHTML = "加载失败，请检查配置。";
+                document.getElementById('diaryList').innerHTML = "召唤失败，检查下路径对不对喵？";
             }
         }
 
-        // 渲染方法
         function render() {
             const list = document.getElementById('diaryList');
-            if(diaryData.length === 0) {
-                list.innerHTML = `<div class="text-center py-20 text-gray-300 font-light italic">这里空空如也，开始写第一篇吧</div>`;
-                return;
-            }
             list.innerHTML = diaryData.slice().reverse().map((item, index) => {
                 const realIndex = diaryData.length - 1 - index;
+                const tags = item.tags ? item.tags.map(t => `<span class="tag-pill">#${t}</span>`).join('') : '';
                 return `
-                <div class="fuwari-card p-8 group">
-                    <div class="flex justify-between items-start mb-4">
-                        <span class="text-[10px] uppercase tracking-[0.2em] text-gray-300">${item.date}</span>
-                        <div class="action-btn flex gap-3">
-                            <button onclick="startEdit(${realIndex})" class="text-xs text-blue-300 hover:text-blue-500">编辑</button>
-                            <button onclick="deleteItem(${realIndex})" class="text-xs text-red-200 hover:text-red-400">删除</button>
+                <div class="moe-card p-6 relative overflow-hidden">
+                    <div class="flex justify-between text-[10px] text-pink-200 mb-2">
+                        <span>📅 ${item.date}</span>
+                        <div class="flex gap-2">
+                            <button onclick="startEdit(${realIndex})" class="hover:text-blue-400">✨ 改写</button>
+                            <button onclick="deleteItem(${realIndex})" class="hover:text-red-400">💢 碎掉</button>
                         </div>
                     </div>
-                    <div class="text-gray-600 leading-relaxed font-light text-lg whitespace-pre-wrap">${item.content}</div>
+                    <h3 class="text-lg font-bold text-gray-700 mb-2">${item.title || '无标题日记'}</h3>
+                    <p class="text-gray-500 leading-relaxed text-sm whitespace-pre-wrap">${item.content}</p>
+                    <div class="mt-4 flex gap-2">${tags}</div>
                 </div>
                 `;
             }).join('');
         }
 
-        // 2. 增 & 改 (Create & Update)
         async function handleSave() {
-            const input = document.getElementById('diaryInput');
-            const btn = document.getElementById('saveBtn');
-            if(!input.value.trim()) return;
+            const content = document.getElementById('diaryInput').value;
+            const title = document.getElementById('diaryTitle').value;
+            const tags = document.getElementById('diaryTags').value.split(',').filter(t => t);
+            
+            if(!content) return alert("内容还是空的喵！");
 
-            btn.disabled = true;
-            btn.innerText = "同步中...";
+            const btn = document.getElementById('saveBtn');
+            btn.innerText = "咏唱中...";
+
+            const now = new Date();
+            const dateStr = `${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日`;
 
             if (editingId !== null) {
-                // 修改逻辑
-                diaryData[editingId].content = input.value;
-                diaryData[editingId].date = new Date().toLocaleString() + " (已编辑)";
+                diaryData[editingId] = { ...diaryData[editingId], title, content, tags, date: dateStr + " (已重写)" };
             } else {
-                // 新增逻辑
-                diaryData.push({
-                    date: new Date().toLocaleString(),
-                    content: input.value
-                });
+                diaryData.push({ id: Date.now(), title, category: "个人随笔", content, tags, date: dateStr });
             }
 
             const success = await syncToCloud();
             if(success) {
-                input.value = '';
                 resetEditor();
                 render();
             }
-            btn.disabled = false;
-            btn.innerText = "保存到云端";
+            btn.innerText = "同步魔法!";
         }
 
-        // 3. 删 (Delete)
         async function deleteItem(index) {
-            if(!confirm("确定要删除这段记忆吗？")) return;
+            if(!confirm("真的要让这段记忆消失吗喵？")) return;
             diaryData.splice(index, 1);
             await syncToCloud();
             render();
         }
 
-        // 进入编辑模式
         function startEdit(index) {
             editingId = index;
-            document.getElementById('diaryInput').value = diaryData[index].content;
-            document.getElementById('editorTitle').innerText = "修改章节";
-            document.getElementById('saveBtn').innerText = "确认修改";
-            document.getElementById('cancelEditBtn').classList.remove('hidden');
-            window.scrollTo(0, 0);
+            const item = diaryData[index];
+            document.getElementById('diaryTitle').value = item.title || '';
+            document.getElementById('diaryInput').value = item.content;
+            document.getElementById('diaryTags').value = (item.tags || []).join(',');
+            document.getElementById('cancelBtn').classList.remove('hidden');
+            window.scrollTo(0,0);
         }
 
         function resetEditor() {
             editingId = null;
+            document.getElementById('diaryTitle').value = '';
             document.getElementById('diaryInput').value = '';
-            document.getElementById('editorTitle').innerText = "撰写新章节";
-            document.getElementById('saveBtn').innerText = "保存到云端";
-            document.getElementById('cancelEditBtn').classList.add('hidden');
+            document.getElementById('diaryTags').value = '';
+            document.getElementById('cancelBtn').classList.add('hidden');
         }
 
-        // 核心：同步到 GitHub
         async function syncToCloud() {
             const jsonString = JSON.stringify(diaryData, null, 2);
             const base64Content = btoa(unescape(encodeURIComponent(jsonString)));
-
             try {
                 const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${PATH}`, {
                     method: 'PUT',
                     headers: { 'Authorization': `token ${getToken()}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        message: "Diary auto-sync",
-                        content: base64Content,
-                        sha: currentSha
-                    })
+                    body: JSON.stringify({ message: "Update via moe-web", content: base64Content, sha: currentSha })
                 });
-                const resData = await res.json();
                 if(res.ok) {
-                    currentSha = resData.content.sha;
+                    const d = await res.json();
+                    currentSha = d.content.sha;
                     return true;
-                } else {
-                    alert("同步失败：" + resData.message);
-                    return false;
                 }
-            } catch (e) {
-                alert("网络错误");
-                return false;
-            }
+            } catch (e) { alert("魔法失效了...检查网络喵"); return false; }
         }
 
         window.onload = fetchCloudData;
     </script>
 </body>
 </html>
-
