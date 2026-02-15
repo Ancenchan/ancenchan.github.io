@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ancen的秘密基地 🌸</title>
+    <title>Ancen的秘密基地呀 🌸</title>
     <link href="https://lib.baomitu.com/quill/1.3.6/quill.snow.css" rel="stylesheet">
     <script src="https://lib.baomitu.com/quill/1.3.6/quill.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;700&family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
     
     <style>
         :root { --f-bg: #fff9fb; --f-pink: #ffb1c1; --f-soft-text: #8e7676; }
@@ -27,7 +28,6 @@
             box-shadow: 0 15px 40px rgba(255, 177, 193, 0.2);
         }
 
-        /* 统一卡片样式 */
         .f-card {
             background: rgba(255, 255, 255, 0.75);
             backdrop-filter: blur(15px); border-radius: 30px;
@@ -36,7 +36,6 @@
             transition: all 0.3s ease;
         }
 
-        /* 标签侧边栏 */
         .tag-pill {
             display: flex; align-items: center; justify-content: space-between;
             padding: 10px 18px; margin-bottom: 8px; border-radius: 15px;
@@ -44,7 +43,7 @@
         }
         .tag-pill:hover, .tag-pill.active { background: #fff1f3; color: var(--f-pink); transform: translateX(8px); }
 
-        /* 编辑器遮罩 */
+        /* 编辑器遮罩层 */
         #editor-mask {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(255, 245, 247, 0.9); backdrop-filter: blur(10px);
@@ -63,13 +62,19 @@
         }
         .moe-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        /* 页面显示控制 */
         #page-detail { display: none; position: relative; width: 100%; min-height: 100vh; background: var(--f-bg); z-index: 50; }
         .preview-text { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-        
-        /* 调整 Quill 工具栏圆角 */
-        .ql-toolbar.ql-snow { border: none !important; border-bottom: 1px solid #f0f0f0 !important; }
-        .ql-container.ql-snow { border: none !important; }
+
+        /* 看板宠位置微调 */
+        #live2d-widget { 
+            transform-origin: bottom left;
+            transform: scale(0.8); /* 缩小一点萌宠 */
+        }
+        #waifu-tips {
+            font-size: 12px !important;
+            background: rgba(255, 255, 255, 0.9) !important;
+            border: 1px solid var(--f-pink) !important;
+        }
     </style>
 </head>
 <body>
@@ -83,7 +88,7 @@
                     <div class="f-card p-8 text-center">
                         <img src="https://api.btstu.cn/sjtx/api.php?lx=a1&format=jpg" class="w-24 h-24 rounded-3xl mx-auto mb-4 object-cover shadow-lg">
                         <h2 class="text-2xl font-bold" style="font-family: 'ZCOOL KuaiLe'">Ancen</h2>
-                        <p class="text-xs text-gray-400 mt-2">记录每一刻的心动</p>
+                        <p class="text-xs text-gray-400 mt-2">在这里，藏着所有的秘密</p>
                         <button onclick="openEditor()" class="moe-btn w-full my-4">🖋️ 记录新的羁绊</button>
                         <div id="tagCloud" class="flex flex-col text-left mt-4 border-t pt-4"></div>
                     </div>
@@ -107,7 +112,7 @@
             <h3 id="editor-title-label" class="font-bold text-pink-400">💌 捕获灵感...</h3>
             <button onclick="closeEditor()" class="text-2xl text-gray-300 hover:text-gray-500">&times;</button>
         </div>
-        <input id="diaryTitle" type="text" placeholder="标题..." class="w-full text-xl font-bold mb-2 outline-none border-none">
+        <input id="diaryTitle" type="text" placeholder="给这段记忆起个名字..." class="w-full text-xl font-bold mb-2 outline-none border-none">
         <input id="diaryTags" type="text" placeholder="分类(用逗号或空格隔开)" class="w-full text-xs mb-4 outline-none border-none text-pink-300">
         <div id="editor-container"></div>
         <div class="flex justify-end mt-4">
@@ -124,46 +129,36 @@
     let diaryData = [];
     let currentSha = "";
     let filterTag = null;
-    let editIndex = null; // 用于标记当前是否正在编辑旧文章
+    let editIndex = null;
 
-    // 初始化 Quill 编辑器
     const quill = new Quill('#editor-container', {
         theme: 'snow',
-        placeholder: '写点什么好呢...',
-        modules: { toolbar: [['bold', 'italic', 'underline'], ['image', 'link'], [{ 'list': 'ordered'}, { 'list': 'bullet' }]] }
+        placeholder: '每一滴思绪都值得被珍藏...',
+        modules: { toolbar: [['bold', 'italic', 'underline'], ['image'], [{ 'list': 'bullet' }]] }
     });
 
-    // 打开编辑器：新增或修改
     function openEditor(index = null) {
         editIndex = index;
         const mask = document.getElementById('editor-mask');
-        const titleInput = document.getElementById('diaryTitle');
-        const tagsInput = document.getElementById('diaryTags');
-        const saveBtn = document.getElementById('saveBtn');
-        const label = document.getElementById('editor-title-label');
-
         if (index !== null) {
-            // 编辑模式
             const item = diaryData[index];
-            titleInput.value = item.title || "";
-            tagsInput.value = (item.tags || []).join(', ');
+            document.getElementById('diaryTitle').value = item.title || "";
+            document.getElementById('diaryTags').value = (item.tags || []).join(', ');
             quill.root.innerHTML = item.content || "";
-            saveBtn.innerText = "重塑星海";
-            label.innerText = "📖 修改这段记忆...";
+            document.getElementById('saveBtn').innerText = "重塑星海";
+            document.getElementById('editor-title-label').innerText = "📖 修改记忆...";
         } else {
-            // 新增模式
-            titleInput.value = "";
-            tagsInput.value = "";
+            document.getElementById('diaryTitle').value = "";
+            document.getElementById('diaryTags').value = "";
             quill.root.innerHTML = "";
-            saveBtn.innerText = "同步星海";
-            label.innerText = "💌 捕获灵感...";
+            document.getElementById('saveBtn').innerText = "同步星海";
+            document.getElementById('editor-title-label').innerText = "💌 捕获灵感...";
         }
         mask.style.display = 'flex';
     }
 
     function closeEditor() { document.getElementById('editor-mask').style.display = 'none'; }
 
-    // 从 GitHub 获取数据
     async function fetchCloudData() {
         const token = localStorage.getItem('gh_token');
         if(!token) {
@@ -182,29 +177,20 @@
                 diaryData = JSON.parse(content);
                 render();
             }
-        } catch (e) { 
-            console.error(e);
-            alert("读取失败，请检查 Token 权限或仓库路径。"); 
-        }
+        } catch (e) { alert("读取失败，请检查 Token 权限。"); }
     }
 
-    // 渲染列表和标签云
     function render() {
         const list = document.getElementById('diaryList');
         const cloud = document.getElementById('tagCloud');
         const tagMap = {};
+        diaryData.forEach(d => { if(d.tags) d.tags.forEach(t => tagMap[t] = (tagMap[t] || 0) + 1); });
         
-        diaryData.forEach(d => { 
-            if(d.tags) d.tags.forEach(t => tagMap[t] = (tagMap[t] || 0) + 1); 
-        });
-        
-        // 渲染标签云
         cloud.innerHTML = `<div class="tag-pill ${!filterTag?'active':''}" onclick="setFilter(null)"><span>✦ 全部</span><span>${diaryData.length}</span></div>` + 
             Object.keys(tagMap).map(t => `<div class="tag-pill ${filterTag===t?'active':''}" onclick="setFilter('${t}')"><span>✦ ${t}</span><span>${tagMap[t]}</span></div>`).join('');
 
         const filtered = filterTag ? diaryData.filter(d => d.tags && d.tags.includes(filterTag)) : diaryData;
         
-        // 渲染文章列表（倒序显示最新）
         list.innerHTML = filtered.slice().reverse().map((item) => {
             const realIndex = diaryData.findIndex(d => d.id === item.id);
             const pureText = (item.content || "").replace(/<[^>]+>/g, '').substring(0, 100);
@@ -213,12 +199,11 @@
                 <div class="text-[10px] text-pink-200 mb-2">${item.date}</div>
                 <h2 class="text-xl font-bold mb-4 group-hover:text-pink-400 transition-colors">${item.title || '无名之书'}</h2>
                 <p class="text-gray-400 text-sm preview-text leading-relaxed">${pureText}...</p>
-                <div class="mt-4 text-pink-300 text-xs font-bold">阅读全文 >></div>
+                <div class="mt-4 text-pink-300 text-xs font-bold">查看详情 >></div>
             </div>`;
         }).join('');
     }
 
-    // 显示文章详情
     function showDetail(index) {
         const item = diaryData[index];
         const detail = document.getElementById('detail-content');
@@ -229,8 +214,8 @@
             <div class="mt-10 border-t pt-6 flex flex-wrap gap-2 items-center">
                 ${(item.tags||[]).map(t => `<span class="bg-pink-50 px-3 py-1 rounded-full text-xs text-pink-300">#${t}</span>`).join('')}
                 <div class="ml-auto flex gap-4">
-                    <button onclick="openEditor(${index}); goBack();" class="text-pink-400 hover:text-pink-600 text-xs font-bold">重塑(编辑)</button>
-                    <button onclick="deleteItem(${index})" class="text-red-200 hover:text-red-400 text-xs">封印(删除)</button>
+                    <button onclick="openEditor(${index}); goBack();" class="text-pink-400 hover:text-pink-600 text-xs font-bold">编辑记忆</button>
+                    <button onclick="deleteItem(${index})" class="text-red-200 hover:text-red-400 text-xs">封印</button>
                 </div>
             </div>
         `;
@@ -246,13 +231,11 @@
 
     function setFilter(tag) { filterTag = tag; render(); }
 
-    // 保存逻辑（兼容新增和修改）
     async function handleSave() {
         const content = quill.root.innerHTML;
         const title = document.getElementById('diaryTitle').value.trim();
         const tags = document.getElementById('diaryTags').value.split(/[,，\s]+/).map(t => t.trim()).filter(t => t);
-        
-        if(!content || content === '<p><br></p>') return alert("内容不能为空哦~");
+        if(!content || content === '<p><br></p>') return;
 
         const btn = document.getElementById('saveBtn');
         btn.innerText = "吟唱中..."; btn.disabled = true;
@@ -260,57 +243,37 @@
         const dateStr = new Date().toLocaleDateString('zh-CN', {year:'numeric', month:'long', day:'numeric'});
 
         if (editIndex !== null) {
-            // 修改已有文章
             diaryData[editIndex] = { ...diaryData[editIndex], title, content, tags };
         } else {
-            // 新增文章
             diaryData.push({ id: Date.now(), title, content, tags, date: dateStr });
         }
 
-        // 推送到 GitHub
         const b64 = btoa(unescape(encodeURIComponent(JSON.stringify(diaryData, null, 2))));
         try {
             const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${PATH}`, {
                 method: 'PUT',
-                headers: { 
-                    'Authorization': `Bearer ${localStorage.getItem('gh_token')}`, 
-                    'Content-Type': 'application/json' 
-                },
-                body: JSON.stringify({ 
-                    message: editIndex !== null ? "Update post" : "Add post", 
-                    content: b64, 
-                    sha: currentSha 
-                })
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('gh_token')}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: "Update Secrets", content: b64, sha: currentSha })
             });
-
             if(res.ok) {
                 const d = await res.json();
                 currentSha = d.content.sha;
                 closeEditor();
                 render();
-            } else {
-                alert("同步失败，请检查网络或 Token。");
             }
-        } catch (e) {
-            alert("发生错误：" + e.message);
-        } finally {
-            btn.innerText = "同步星海"; btn.disabled = false;
-        }
+        } catch (e) { alert("同步失败！"); }
+        btn.innerText = "同步星海"; btn.disabled = false;
     }
 
-    // 删除文章
     async function deleteItem(index) {
-        if(!confirm("确定要将这段记忆从星海中抹除吗？（不可撤销）")) return;
-        
+        if(!confirm("确定要删除这段记忆吗？")) return;
         diaryData.splice(index, 1);
         const b64 = btoa(unescape(encodeURIComponent(JSON.stringify(diaryData, null, 2))));
-        
         const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${PATH}`, {
             method: 'PUT',
             headers: { 'Authorization': `Bearer ${localStorage.getItem('gh_token')}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: "Delete post", content: b64, sha: currentSha })
+            body: JSON.stringify({ message: "Delete Post", content: b64, sha: currentSha })
         });
-
         if(res.ok) {
             const d = await res.json();
             currentSha = d.content.sha;
