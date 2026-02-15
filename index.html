@@ -3,72 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ancen's Memory Palace ✨</title>
+    <title>Ancen's Dreamy Space ✨</title>
     <link href="https://lib.baomitu.com/quill/1.3.6/quill.snow.css" rel="stylesheet">
     <script src="https://lib.baomitu.com/quill/1.3.6/quill.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Noto+Sans+SC:wght@300;500;700&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;700&family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
+    <script src="https://cdn.jsdelivr.net/gh/stevenjoezhang/live2d-widget@latest/autoload.js"></script>
+
     <style>
-        :root { --f-bg: #f4f4f7; --f-pink: #ffb7c5; --f-main: #555555; }
-        body { background-color: var(--f-bg); color: var(--f-main); font-family: 'Noto Sans SC', sans-serif; transition: all 0.3s; }
+        :root { --f-bg: #fdf6f7; --f-pink: #ffc0cb; --f-soft-text: #6b5b5b; }
+        
+        /* 1. 解决文字尖利：平滑字体渲染 */
+        html {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
+        }
 
-        /* Fuwari 风格 Header */
+        body { 
+            background-color: var(--f-bg); 
+            color: var(--f-soft-text); 
+            font-family: 'Noto Sans SC', sans-serif;
+            /* 2. 可爱鼠标指针 */
+            cursor: url('https://cdn.jsdelivr.net/gh/moezx/cdn@3.1.9/img/Sakura/cursor/normal.cur'), auto;
+        }
+        
+        a, button, .tag-pill { cursor: url('https://cdn.jsdelivr.net/gh/moezx/cdn@3.1.9/img/Sakura/cursor/ayuda.cur'), pointer !important; }
+
         .header-banner { 
-            height: 300px; 
+            height: 320px; 
             background: url('https://api.paugram.com/wallpaper?source=gh') center/cover no-repeat;
-            position: relative;
-        }
-        .header-banner::after {
-            content: ""; position: absolute; bottom: 0; width: 100%; height: 100px;
-            background: linear-gradient(transparent, var(--f-bg));
+            border-radius: 0 0 40px 40px;
+            box-shadow: 0 10px 30px rgba(255, 192, 203, 0.2);
         }
 
-        /* 侧边栏卡片 Fuwari 化 */
+        /* 柔和化的卡片 */
         .f-card {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.04);
-            border: 1px solid rgba(255,255,255,0.5);
-            transition: transform 0.3s ease;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(15px);
+            border-radius: 28px;
+            border: 2px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 15px 35px rgba(255, 183, 197, 0.1);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .f-card:hover { transform: translateY(-5px); }
+        .f-card:hover { transform: scale(1.01); background: rgba(255, 255, 255, 0.9); }
 
-        /* 标签分类样式 */
+        /* 竖排整齐的标签 */
         .tag-pill {
-            display: inline-block; padding: 4px 12px; margin: 4px; border-radius: 8px;
-            background: #eeeef2; font-size: 12px; cursor: pointer; transition: 0.2s;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 8px 16px; margin-bottom: 8px; border-radius: 12px;
+            background: white; font-size: 13px; color: #888;
+            transition: 0.3s; border: 1px solid transparent;
         }
-        .tag-pill:hover, .tag-pill.active { background: var(--f-pink); color: white; }
+        .tag-pill:hover, .tag-pill.active { 
+            background: #fff0f3; color: var(--f-pink); border-color: var(--f-pink);
+            transform: translateX(5px);
+        }
 
-        /* 模仿 Fuwari 的编辑器 */
+        /* 编辑器遮罩 */
         #editor-mask {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(20px);
+            background: rgba(255, 245, 247, 0.8); backdrop-filter: blur(12px);
             z-index: 1000; display: none; padding: 40px 20px;
         }
+        
         .f-editor-container {
-            max-width: 800px; margin: 0 auto; background: white; border-radius: 24px;
-            padding: 30px; box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+            max-width: 700px; margin: 0 auto; background: white; border-radius: 35px;
+            padding: 40px; box-shadow: 0 30px 60px rgba(255, 183, 197, 0.2);
         }
-        #editor-container { height: 350px; border: none !important; font-size: 16px; }
-        .ql-toolbar.ql-snow { border: none !important; border-bottom: 1px solid #eee !important; }
 
         .moe-btn {
-            background: #333; color: white; padding: 10px 24px; border-radius: 12px;
-            font-weight: 500; cursor: pointer; transition: 0.3s; border: none;
+            background: linear-gradient(135deg, #ffc0cb 0%, #ff9a9e 100%);
+            color: white; padding: 12px 28px; border-radius: 18px;
+            font-weight: bold; border: none; box-shadow: 0 8px 15px rgba(255, 192, 203, 0.4);
+            transition: 0.3s;
         }
-        .moe-btn:hover { background: var(--f-pink); box-shadow: 0 4px 15px rgba(255, 183, 197, 0.4); }
+        .moe-btn:hover { transform: translateY(-3px); box-shadow: 0 12px 20px rgba(255, 192, 203, 0.6); }
 
-        .diary-card img { border-radius: 12px; margin: 15px 0; max-width: 100%; }
-        .sticky-aside { position: sticky; top: 20px; }
+        /* 内容文字柔和化 */
+        .diary-content { font-weight: 300; line-height: 1.8; letter-spacing: 0.5px; }
+        
+        /* 隐藏看板娘手机端显示以免挡路 */
+        @media screen and (max-width: 768px) { #live2d-widget { display: none !important; } }
     </style>
 </head>
 <body>
 
 <script>
-    // 逻辑前置，防止点击报错
     const REPO = "Ancenchan/ancenchan.github.io"; 
     const PATH = "data/articles.json";
     let diaryData = [];
@@ -76,8 +98,8 @@
     let filterTag = null;
 
     function configToken() {
-        const t = prompt("请输入您的 GitHub Token:");
-        if(t) { localStorage.setItem('gh_token', t.trim()); location.reload(); }
+        const t = prompt("🗝️ 这里的锁需要输入 Token 才能开启喵~");
+        if(t) { localStorage.setItem('gh_token', t.trim()); window.location.reload(); }
     }
     function openEditor() { document.getElementById('editor-mask').style.display = 'block'; }
     function closeEditor() { document.getElementById('editor-mask').style.display = 'none'; }
@@ -85,45 +107,43 @@
 
 <div class="header-banner"></div>
 
-<div class="max-w-6xl mx-auto px-6 -mt-12 relative pb-20">
-    <div class="flex flex-col lg:flex-row gap-8">
+<div class="max-w-6xl mx-auto px-6 -mt-16 relative pb-20">
+    <div class="flex flex-col lg:flex-row gap-10">
         
         <aside class="w-full lg:w-72 shrink-0">
-            <div class="sticky-aside space-y-6">
+            <div class="sticky top-10 space-y-6">
                 <div class="f-card p-8 text-center">
                     <img src="https://api.btstu.cn/sjtx/api.php?lx=a1&format=jpg" 
-                         class="w-24 h-24 rounded-2xl mx-auto mb-4 object-cover shadow-lg border-2 border-white">
-                    <h2 class="text-xl font-bold text-gray-800 tracking-tight">Ancen ✨</h2>
-                    <p class="text-xs text-gray-400 my-2">星河滚烫，你是人间理想。</p>
-                    <div class="flex justify-around py-4 border-t border-gray-50 mt-4">
-                        <div onclick="setFilter(null)" class="cursor-pointer">
-                            <span class="block font-bold text-lg" id="postCount">0</span>
-                            <span class="text-[10px] uppercase text-gray-400">Posts</span>
+                         class="w-28 h-28 rounded-[30px] mx-auto mb-4 object-cover shadow-inner rotate-3 hover:rotate-0 transition-transform duration-500">
+                    <h2 class="text-2xl font-bold text-gray-700" style="font-family: 'ZCOOL KuaiLe'">Ancen</h2>
+                    <p class="text-xs text-gray-400 mt-2 mb-6">被文字治愈的瞬间 ✨</p>
+                    
+                    <button onclick="openEditor()" class="moe-btn w-full mb-6">📖 开启新的一页</button>
+                    
+                    <div class="flex justify-around py-4 border-t border-gray-50 text-gray-500">
+                        <div onclick="setFilter(null)" class="cursor-pointer hover:text-pink-400">
+                            <span class="block font-bold text-xl" id="postCount">0</span>
+                            <span class="text-[10px] uppercase">记忆</span>
                         </div>
                         <div>
-                            <span class="block font-bold text-lg">∞</span>
-                            <span class="text-[10px] uppercase text-gray-400">Dreams</span>
+                            <span class="block font-bold text-xl">∞</span>
+                            <span class="text-[10px] uppercase">幻想</span>
                         </div>
                     </div>
-                    <button onclick="openEditor()" class="moe-btn w-full mt-4">New Post</button>
                 </div>
 
                 <div class="f-card p-6">
-                    <h3 class="text-xs font-bold text-gray-400 uppercase mb-4 tracking-widest">Tags 分类</h3>
-                    <div id="tagCloud" class="flex flex-wrap">
-                        <span class="text-gray-300 italic text-sm">暂无标签...</span>
+                    <h3 class="text-xs font-bold text-pink-300 uppercase mb-4 tracking-widest text-center">✿ 分类书架</h3>
+                    <div id="tagCloud" class="flex flex-col">
+                        <span class="text-gray-300 italic text-center text-sm">还没有分类喵...</span>
                     </div>
                 </div>
-
-                <button onclick="configToken()" class="text-[10px] text-gray-300 w-full text-center hover:text-pink-300">⚙️ Token Configuration</button>
             </div>
         </aside>
 
         <main class="flex-1 lg:mt-12">
-            <div id="diaryList" class="space-y-8">
-                <div class="f-card p-20 text-center text-gray-300 animate-pulse">
-                    正在翻开记忆之书...
-                </div>
+            <div id="diaryList" class="space-y-10">
+                <div class="f-card p-20 text-center text-gray-300 italic">正在努力加载回忆中...</div>
             </div>
         </main>
     </div>
@@ -131,17 +151,17 @@
 
 <div id="editor-mask">
     <div class="f-editor-container">
-        <div class="flex justify-between items-center mb-6">
-            <h3 class="text-xl font-bold text-gray-700">✍️ 记下一段回忆</h3>
-            <button onclick="closeEditor()" class="text-gray-300 hover:text-gray-600 text-2xl">&times;</button>
+        <div class="flex justify-between items-center mb-8">
+            <h3 class="text-2xl font-bold text-pink-300" style="font-family: 'ZCOOL KuaiLe'">🧸 捕捉到一颗灵感星...</h3>
+            <button onclick="closeEditor()" class="text-gray-300 hover:text-pink-300 text-3xl transition-colors">&times;</button>
         </div>
-        <input id="diaryTitle" type="text" placeholder="Title" class="w-full text-2xl font-bold mb-4 outline-none border-none placeholder-gray-200">
-        <input id="diaryTags" type="text" placeholder="分类标签 (例如: 生活, 代码)" class="w-full text-sm mb-4 outline-none border-none text-pink-300">
-        <div id="editor-wrapper" class="border-y border-gray-100 py-2">
+        <input id="diaryTitle" type="text" placeholder="给此时此刻起个名字" class="w-full text-2xl font-bold mb-4 outline-none border-none placeholder-gray-200 text-gray-600">
+        <input id="diaryTags" type="text" placeholder="贴上分类标签（用逗号隔开）" class="w-full text-sm mb-6 outline-none border-none text-pink-200">
+        <div id="editor-wrapper" class="border-t border-pink-50 pt-4">
             <div id="editor-container"></div>
         </div>
-        <div class="flex justify-end mt-6">
-            <button id="saveBtn" onclick="handleSave()" class="moe-btn">Publish Chapter</button>
+        <div class="flex justify-end mt-8">
+            <button id="saveBtn" onclick="handleSave()" class="moe-btn">收藏这段记忆</button>
         </div>
     </div>
 </div>
@@ -149,7 +169,7 @@
 <script>
     const quill = new Quill('#editor-container', {
         theme: 'snow',
-        placeholder: '写点什么喵...',
+        placeholder: '写下你想说的话...',
         modules: { toolbar: [['bold', 'italic'], ['image'], [{ 'list': 'bullet' }]] }
     });
 
@@ -172,34 +192,26 @@
     function render() {
         const list = document.getElementById('diaryList');
         const cloud = document.getElementById('tagCloud');
-        
-        // 统计标签
         const tagMap = {};
-        diaryData.forEach(d => {
-            if(d.tags) d.tags.forEach(t => tagMap[t] = (tagMap[t] || 0) + 1);
-        });
+        diaryData.forEach(d => { if(d.tags) d.tags.forEach(t => tagMap[t] = (tagMap[t] || 0) + 1); });
         
-        // 渲染标签云
-        cloud.innerHTML = `<span class="tag-pill ${!filterTag?'active':''}" onclick="setFilter(null)">全部</span>` + 
-            Object.keys(tagMap).map(t => `<span class="tag-pill ${filterTag===t?'active':''}" onclick="setFilter('${t}')">${t} (${tagMap[t]})</span>`).join('');
+        cloud.innerHTML = `<div class="tag-pill ${!filterTag?'active':''}" onclick="setFilter(null)"><span>全部显示</span><span>${diaryData.length}</span></div>` + 
+            Object.keys(tagMap).map(t => `<div class="tag-pill ${filterTag===t?'active':''}" onclick="setFilter('${t}')"><span>${t}</span><span class="opacity-40">${tagMap[t]}</span></div>`).join('');
 
-        // 过滤数据
         const filtered = filterTag ? diaryData.filter(d => d.tags && d.tags.includes(filterTag)) : diaryData;
-        
         document.getElementById('postCount').innerText = diaryData.length;
         
         list.innerHTML = filtered.slice().reverse().map((item, index) => {
             const realIndex = diaryData.length - 1 - index;
-            const tagHtml = (item.tags || []).map(t => `<span class="text-[10px] text-pink-300 mr-2">#${t}</span>`).join('');
             return `
-            <div class="f-card p-10 diary-card">
-                <div class="flex justify-between items-center text-[10px] text-gray-300 mb-4 tracking-widest uppercase font-bold">
+            <div class="f-card p-12 diary-card">
+                <div class="flex justify-between items-center text-[11px] text-pink-200 mb-6 font-bold tracking-widest uppercase">
                     <span>${item.date}</span>
-                    <button onclick="deleteItem(${realIndex})" class="hover:text-red-400">Delete</button>
+                    <button onclick="deleteItem(${realIndex})" class="hover:text-red-300 transition-colors">Forget</button>
                 </div>
-                <h2 class="text-2xl font-bold text-gray-800 mb-4">${item.title || '无标题'}</h2>
-                <div class="ql-editor p-0 text-gray-600 leading-relaxed">${item.content || ''}</div>
-                <div class="mt-6 pt-4 border-t border-gray-50">${tagHtml}</div>
+                <h2 class="text-3xl font-bold text-gray-700 mb-6" style="font-family: 'Noto Sans SC'">${item.title || '无标题的梦'}</h2>
+                <div class="ql-editor p-0 text-gray-500 diary-content">${item.content || ''}</div>
+                <div class="mt-8 flex gap-3">${(item.tags || []).map(t => `<span class="text-[10px] bg-white px-3 py-1 rounded-full text-pink-200 border border-pink-50"># ${t}</span>`).join('')}</div>
             </div>`;
         }).join('');
     }
@@ -210,11 +222,10 @@
         const content = quill.root.innerHTML;
         const title = document.getElementById('diaryTitle').value.trim();
         const tags = document.getElementById('diaryTags').value.split(/[,，]/).map(t => t.trim()).filter(t => t);
-        
-        if(!content || content === '<p><br></p>') return alert("不能写空白页哦~");
+        if(!content || content === '<p><br></p>') return;
 
         const btn = document.getElementById('saveBtn');
-        btn.innerText = "Syncing..."; btn.disabled = true;
+        btn.innerText = "正在封存记忆..."; btn.disabled = true;
 
         const dateStr = new Date().toLocaleDateString('zh-CN', {year:'numeric', month:'long', day:'numeric'});
         diaryData.push({ id: Date.now(), title, content, tags, date: dateStr });
@@ -231,12 +242,15 @@
             currentSha = d.content.sha;
             closeEditor();
             render();
+            document.getElementById('diaryTitle').value = "";
+            document.getElementById('diaryTags').value = "";
+            quill.root.innerHTML = "";
         }
-        btn.innerText = "Publish Chapter"; btn.disabled = false;
+        btn.innerText = "收藏这段记忆"; btn.disabled = false;
     }
 
     async function deleteItem(index) {
-        if(!confirm("确认要删除吗？")) return;
+        if(!confirm("真的要让这段记忆消失吗？")) return;
         diaryData.splice(index, 1);
         const b64 = btoa(unescape(encodeURIComponent(JSON.stringify(diaryData, null, 2))));
         const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${PATH}`, {
