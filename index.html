@@ -13,7 +13,6 @@
             --moe-accent: #a5d8ff;
             --moe-text: #7d5a5a;
         }
-        
         body { 
             background: var(--moe-bg);
             background-image: radial-gradient(#ffdae0 1px, transparent 1px);
@@ -21,9 +20,7 @@
             font-family: 'Noto Sans SC', sans-serif;
             color: var(--moe-text);
         }
-
         h1 { font-family: 'ZCOOL KuaiLe', cursive; }
-
         .moe-card {
             background: rgba(255, 255, 255, 0.9);
             border: 3px solid white;
@@ -31,11 +28,7 @@
             box-shadow: 0 8px 0 rgba(255, 183, 197, 0.2);
             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .moe-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 0 rgba(255, 183, 197, 0.3);
-        }
-
+        .moe-card:hover { transform: translateY(-5px); box-shadow: 0 12px 0 rgba(255, 183, 197, 0.3); }
         .moe-btn {
             background: var(--moe-pink);
             color: white;
@@ -45,11 +38,7 @@
             border-bottom: 4px solid #f09cae;
             transition: all 0.1s;
         }
-        .moe-btn:active {
-            transform: translateY(2px);
-            border-bottom: 0px solid transparent;
-        }
-
+        .moe-btn:active { transform: translateY(2px); border-bottom: 0px solid transparent; }
         .tag-pill {
             background: var(--moe-accent);
             color: white;
@@ -59,23 +48,13 @@
             display: inline-block;
             margin-right: 4px;
         }
-
         textarea, input[type="text"] {
             background: rgba(255, 255, 255, 0.5);
             border: 2px dashed var(--moe-pink);
             border-radius: 15px;
             padding: 10px;
-            transition: all 0.3s;
         }
-        textarea:focus, input[type="text"]:focus {
-            outline: none;
-            border-style: solid;
-            background: white;
-        }
-
-        /* 滚动条美化 */
         ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: var(--moe-bg); }
         ::-webkit-scrollbar-thumb { background: var(--moe-pink); border-radius: 10px; }
     </style>
 </head>
@@ -85,23 +64,20 @@
             <h1 class="text-4xl text-pink-400 mb-2">✨ 魔法日记本 ✨</h1>
             <p class="text-sm opacity-60">欢迎回来，Ancenchan！</p>
             <div class="mt-4">
-                <button onclick="configToken()" class="text-[10px] text-pink-300 hover:text-pink-500 uppercase tracking-widest border border-pink-200 px-3 py-1 rounded-full bg-white">🗝️ 开启次元锁 (设置Token)</button>
+                <button onclick="configToken()" class="text-[10px] text-pink-300 hover:text-pink-500 uppercase tracking-widest border border-pink-200 px-3 py-1 rounded-full bg-white shadow-sm">🗝️ 开启次元锁 (设置Token)</button>
             </div>
         </div>
 
         <div class="moe-card p-6 mb-12">
             <div class="flex items-center gap-2 mb-4">
                 <span class="text-2xl">📝</span>
-                <input id="diaryTitle" type="text" placeholder="起个亮眼的标题喵..." 
-                    class="w-full text-lg font-bold text-pink-500 placeholder-pink-200">
+                <input id="diaryTitle" type="text" placeholder="起个标题嘛..." class="w-full text-lg font-bold text-pink-500 placeholder-pink-200 border-none focus:ring-0">
             </div>
-            <textarea id="diaryInput" rows="5" 
-                class="w-full text-gray-600 placeholder-pink-100 resize-none mb-4" 
-                placeholder="今天有什么想记录的吗？"></textarea>
+            <textarea id="diaryInput" rows="5" class="w-full text-gray-600 placeholder-pink-100 resize-none mb-4 border-none focus:ring-0" placeholder="今天的心情如何喵？"></textarea>
             <div class="flex flex-wrap justify-between items-center gap-4">
-                <input id="diaryTags" type="text" placeholder="标签(用逗号隔开)" class="text-xs text-blue-400 w-full sm:w-auto">
+                <input id="diaryTags" type="text" placeholder="标签(逗号隔开)" class="text-xs text-blue-400 border-none focus:ring-0">
                 <div class="flex gap-2">
-                    <button id="cancelBtn" onclick="resetEditor()" class="hidden text-gray-400 text-xs">取消编辑喵</button>
+                    <button id="cancelBtn" onclick="resetEditor()" class="hidden text-gray-400 text-xs">取消编辑</button>
                     <button id="saveBtn" onclick="handleSave()" class="moe-btn">同步魔法!</button>
                 </div>
             </div>
@@ -113,10 +89,8 @@
     </div>
 
     <script>
-        // --- 核心配置 (已根据你的信息填写) ---
         const REPO = "Ancenchan/ancenchan.github.io"; 
         const PATH = "data/articles.json";
-        
         let diaryData = [];
         let currentSha = "";
         let editingId = null;
@@ -124,151 +98,110 @@
         const getToken = () => localStorage.getItem('gh_token');
 
         function configToken() {
-            const t = prompt("输入你的 GitHub Token (ghp_开头的那个) 喵：");
-            if(t) { 
-                localStorage.setItem('gh_token', t); 
-                location.reload(); 
-            }
+            const t = prompt("输入你的 GitHub Token 喵：");
+            if(t) { localStorage.setItem('gh_token', t); location.reload(); }
         }
 
-        // 1. 加载 (Read)
+        // --- 核心修正点：不再发送 Cache-Control Header ---
         async function fetchCloudData() {
-            if(!getToken()) {
-                document.getElementById('diaryList').innerHTML = `<div class="text-center text-pink-300 bg-white p-10 rounded-3xl shadow-sm">还没有钥匙（Token）哦！<br>请点击上方“开启次元锁”设置后才能看到内容喵~</div>`;
+            const token = getToken();
+            if(!token) {
+                document.getElementById('diaryList').innerHTML = `<div class="text-center text-pink-300">请点击上方“开启次元锁”设置 Token 喵~</div>`;
                 return;
             }
             try {
-                // 使用时间戳 ?t= 规避缓存，且不触发 CORS 限制
-                const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${PATH}?t=${Date.now()}`, {
-                    headers: { 'Authorization': `token ${getToken()}` }
+                // 使用查询参数 t 避免缓存，这样不会触发 CORS
+                const url = `https://api.github.com/repos/${REPO}/contents/${PATH}?t=${Date.now()}`;
+                const res = await fetch(url, {
+                    method: 'GET',
+                    headers: { 'Authorization': `token ${token}` }
                 });
                 
                 if (res.ok) {
                     const data = await res.json();
                     currentSha = data.sha;
-                    // 安全解码 Base64 中文
-                    const content = decodeURIComponent(atob(data.content).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+                    const b64 = data.content.replace(/\s/g, '');
+                    const content = decodeURIComponent(atob(b64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
                     diaryData = JSON.parse(content);
                     render();
-                } else if (res.status === 401) {
-                    alert("Token 失效了喵，请重新设置！");
+                } else {
+                    const err = await res.json();
+                    document.getElementById('diaryList').innerHTML = `<div class="text-center text-red-300">加载失败: ${err.message}</div>`;
                 }
             } catch (e) {
-                document.getElementById('diaryList').innerHTML = `<div class="text-center text-red-300">召唤失败了...请确认仓库和文件路径是否正确。</div>`;
+                document.getElementById('diaryList').innerHTML = `<div class="text-center text-red-300">网络连接异常喵~</div>`;
             }
         }
 
-        // 渲染列表
         function render() {
             const list = document.getElementById('diaryList');
-            if(diaryData.length === 0) {
-                list.innerHTML = `<div class="text-center py-20 text-gray-300 italic">笔记本空空如也喵...</div>`;
+            if(!diaryData.length) {
+                list.innerHTML = `<div class="text-center py-20 text-gray-300 italic">空空如也喵...</div>`;
                 return;
             }
             list.innerHTML = diaryData.slice().reverse().map((item, index) => {
                 const realIndex = diaryData.length - 1 - index;
-                const tagsHtml = item.tags ? item.tags.map(t => `<span class="tag-pill">#${t}</span>`).join('') : '';
+                const tagsHtml = (item.tags || []).map(t => `<span class="tag-pill">#${t}</span>`).join('');
                 return `
                 <div class="moe-card p-8 relative">
-                    <div class="flex justify-between items-center text-[10px] text-pink-200 mb-3 font-medium">
-                        <span>📅 ${item.date} ${item.category ? '· ' + item.category : ''}</span>
+                    <div class="flex justify-between items-center text-[10px] text-pink-200 mb-3">
+                        <span>📅 ${item.date}</span>
                         <div class="flex gap-3">
-                            <button onclick="startEdit(${realIndex})" class="hover:text-blue-400 transition">✨ 改写</button>
-                            <button onclick="deleteItem(${realIndex})" class="hover:text-red-400 transition">💢 碎掉</button>
+                            <button onclick="startEdit(${realIndex})" class="hover:text-blue-400">✨ 改写</button>
+                            <button onclick="deleteItem(${realIndex})" class="hover:text-red-400">💢 碎掉</button>
                         </div>
                     </div>
-                    <h3 class="text-xl font-bold text-gray-700 mb-4">${item.title || '无标题日记'}</h3>
+                    <h3 class="text-xl font-bold text-gray-700 mb-4">${item.title || '无标题'}</h3>
                     <div class="text-gray-600 leading-relaxed text-md whitespace-pre-wrap">${item.content}</div>
-                    <div class="mt-6 flex flex-wrap gap-1">${tagsHtml}</div>
-                </div>
-                `;
+                    <div class="mt-6">${tagsHtml}</div>
+                </div>`;
             }).join('');
         }
 
-        // 2. 保存/更新 (Create/Update)
         async function handleSave() {
             const content = document.getElementById('diaryInput').value.trim();
             const title = document.getElementById('diaryTitle').value.trim();
-            const tagsInput = document.getElementById('diaryTags').value;
-            const tags = tagsInput ? tagsInput.split(',').map(t => t.trim()) : [];
-            
-            if(!content) return alert("写点什么再施法喵！");
+            const tags = document.getElementById('diaryTags').value ? document.getElementById('diaryTags').value.split(',').map(t => t.trim()) : [];
+            if(!content) return alert("写点什么喵！");
 
             const btn = document.getElementById('saveBtn');
-            const originalText = btn.innerText;
             btn.innerText = "咏唱中...";
             btn.disabled = true;
 
-            const now = new Date();
-            const dateStr = `${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日`;
+            const dateStr = new Date().toLocaleDateString('zh-CN', {year:'numeric', month:'long', day:'numeric'});
 
             if (editingId !== null) {
-                diaryData[editingId] = { 
-                    ...diaryData[editingId], 
-                    title, 
-                    content, 
-                    tags, 
-                    date: dateStr + " (已重写)" 
-                };
+                diaryData[editingId] = { ...diaryData[editingId], title, content, tags, date: dateStr + " (已重写)" };
             } else {
-                diaryData.push({ 
-                    id: Date.now(), 
-                    title: title || "新随笔", 
-                    category: "个人随笔", 
-                    content, 
-                    tags, 
-                    date: dateStr 
-                });
+                diaryData.push({ id: Date.now(), title: title || "新日记", content, tags, date: dateStr });
             }
 
             const success = await syncToCloud();
-            if(success) {
-                resetEditor();
-                render();
-            }
-            btn.innerText = originalText;
+            if(success) { resetEditor(); render(); }
+            btn.innerText = "同步魔法!";
             btn.disabled = false;
         }
 
-        // 3. 删除 (Delete)
-        async function deleteItem(index) {
-            if(!confirm("真的要让这段记忆消失吗喵？不可逆哦！")) return;
-            diaryData.splice(index, 1);
-            const success = await syncToCloud();
-            if(success) render();
-        }
-
-        // 核心：上传同步
         async function syncToCloud() {
-            const jsonString = JSON.stringify(diaryData, null, 2);
-            // 解决 Base64 中文问题的标准方案
-            const base64Content = btoa(unescape(encodeURIComponent(jsonString)));
+            const b64 = btoa(unescape(encodeURIComponent(JSON.stringify(diaryData, null, 2))));
             try {
                 const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${PATH}`, {
                     method: 'PUT',
-                    headers: { 
-                        'Authorization': `token ${getToken()}`, 
-                        'Content-Type': 'application/json' 
-                    },
-                    body: JSON.stringify({ 
-                        message: "Magic auto-sync", 
-                        content: base64Content, 
-                        sha: currentSha 
-                    })
+                    headers: { 'Authorization': `token ${getToken()}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: "Update diary", content: b64, sha: currentSha })
                 });
                 if(res.ok) {
                     const d = await res.json();
-                    currentSha = d.content.sha; // 必须更新 SHA，否则下次操作会失败
+                    currentSha = d.content.sha;
                     return true;
-                } else {
-                    const err = await res.json();
-                    alert("魔法失败: " + err.message);
-                    return false;
                 }
-            } catch (e) { 
-                alert("网络断开了喵...请检查网络！"); 
-                return false; 
-            }
+            } catch (e) { alert("魔法失败..."); return false; }
+        }
+
+        async function deleteItem(index) {
+            if(!confirm("真的要碎掉这段记忆吗喵？")) return;
+            diaryData.splice(index, 1);
+            if(await syncToCloud()) render();
         }
 
         function startEdit(index) {
@@ -278,8 +211,7 @@
             document.getElementById('diaryInput').value = item.content;
             document.getElementById('diaryTags').value = (item.tags || []).join(',');
             document.getElementById('cancelBtn').classList.remove('hidden');
-            document.getElementById('saveBtn').innerText = "重写记忆!";
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            window.scrollTo({top: 0, behavior: 'smooth'});
         }
 
         function resetEditor() {
@@ -288,10 +220,8 @@
             document.getElementById('diaryInput').value = '';
             document.getElementById('diaryTags').value = '';
             document.getElementById('cancelBtn').classList.add('hidden');
-            document.getElementById('saveBtn').innerText = "同步魔法!";
         }
 
-        // 初始化
         window.onload = fetchCloudData;
     </script>
 </body>
