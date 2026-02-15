@@ -3,56 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ancen的秘密基地 🌸</title>
+    <title>Ancen的秘密基地w 🌸</title>
     <link href="https://lib.baomitu.com/quill/1.3.6/quill.snow.css" rel="stylesheet">
     <script src="https://lib.baomitu.com/quill/1.3.6/quill.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;700&family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/live2d-widget-handle@1.0.1/waifu.css">
     
     <style>
         :root { --f-bg: #fff9fb; --f-pink: #ffb1c1; --f-soft-text: #8e7676; }
-        body { 
-            background-color: var(--f-bg); color: var(--f-soft-text); 
-            font-family: 'Noto Sans SC', sans-serif;
-            margin: 0; overflow-x: hidden;
-        }
-        .header-banner { 
-            height: 300px; 
-            background: url('https://api.paugram.com/wallpaper?source=gh') center/cover no-repeat;
-            border-radius: 0 0 50px 50px;
-            box-shadow: 0 15px 40px rgba(255, 177, 193, 0.2);
-        }
-        .f-card {
-            background: rgba(255, 255, 255, 0.75);
-            backdrop-filter: blur(15px); border-radius: 30px;
-            border: 2px solid rgba(255, 255, 255, 0.8);
-            box-shadow: 0 10px 30px rgba(255, 183, 197, 0.1);
-        }
-        .tag-pill {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 10px 18px; margin-bottom: 8px; border-radius: 15px;
-            background: white; font-size: 14px; cursor: pointer; transition: 0.3s;
-        }
+        body { background-color: var(--f-bg); color: var(--f-soft-text); font-family: 'Noto Sans SC', sans-serif; margin: 0; overflow-x: hidden; }
+        
+        /* 布局样式 */
+        .header-banner { height: 300px; background: url('https://api.paugram.com/wallpaper?source=gh') center/cover no-repeat; border-radius: 0 0 50px 50px; }
+        .f-card { background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(15px); border-radius: 30px; border: 2px solid rgba(255, 255, 255, 0.8); transition: all 0.3s ease; }
+        .moe-btn { background: linear-gradient(135deg, #ffb1c1 0%, #ff8fa3 100%); color: white; padding: 12px 25px; border-radius: 18px; font-weight: bold; cursor: pointer; }
+
+        /* 标签样式 */
+        .tag-pill { display: flex; align-items: center; justify-content: space-between; padding: 10px 18px; margin-bottom: 8px; border-radius: 15px; background: white; font-size: 14px; cursor: pointer; }
         .tag-pill:hover, .tag-pill.active { background: #fff1f3; color: var(--f-pink); transform: translateX(8px); }
-        #editor-mask {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255, 245, 247, 0.9); backdrop-filter: blur(10px);
-            z-index: 1000; display: none; align-items: center; justify-content: center;
-        }
-        .f-editor-container {
-            width: 90%; max-width: 650px; background: white; border-radius: 35px;
-            padding: 30px; box-shadow: 0 20px 50px rgba(0,0,0,0.1);
-        }
+
+        /* 编辑器遮罩 */
+        #editor-mask { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 245, 247, 0.9); backdrop-filter: blur(10px); z-index: 1000; display: none; align-items: center; justify-content: center; }
         #editor-container { height: 250px; font-size: 16px; border: none !important; }
-        .moe-btn {
-            background: linear-gradient(135deg, #ffb1c1 0%, #ff8fa3 100%);
-            color: white; padding: 12px 25px; border-radius: 18px; font-weight: bold;
+
+        /* --- 本地互动萌宠样式 --- */
+        #pet-container { position: fixed; bottom: 20px; left: 20px; z-index: 999; cursor: pointer; transition: all 0.3s; }
+        #pet-img { width: 120px; height: auto; filter: drop-shadow(0 5px 15px rgba(255,177,193,0.4)); animation: petFloat 3s ease-in-out infinite; }
+        @keyframes petFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        
+        #pet-bubble { 
+            position: absolute; top: -60px; left: 50%; transform: translateX(-50%);
+            background: white; border: 2px solid var(--f-pink); padding: 8px 15px;
+            border-radius: 15px; font-size: 12px; white-space: nowrap;
+            opacity: 0; transition: opacity 0.5s; pointer-events: none;
         }
-        #page-detail { display: none; min-height: 100vh; background: var(--f-bg); }
-        .preview-text { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-        /* 宠物位置调整 */
-        .waifu { left: 10px !important; bottom: -10px !important; line-height: 0; }
+        #pet-bubble::after { content: ''; position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); border-width: 10px 10px 0; border-style: solid; border-color: var(--f-pink) transparent transparent; }
     </style>
 </head>
 <body>
@@ -61,14 +46,12 @@
     <div class="header-banner"></div>
     <div class="max-w-6xl mx-auto px-6 -mt-20 relative pb-20">
         <div class="flex flex-col lg:flex-row gap-10">
-            <aside class="w-full lg:w-72 shrink-0">
-                <div class="sticky top-10 space-y-6">
-                    <div class="f-card p-8 text-center">
-                        <img src="https://p.qlogo.cn/gh/666666/666666/100" class="w-24 h-24 rounded-3xl mx-auto mb-4 object-cover shadow-lg">
-                        <h2 class="text-2xl font-bold" style="font-family: 'ZCOOL KuaiLe'">Ancen</h2>
-                        <button onclick="openEditor()" class="moe-btn w-full my-4">🖋️ 记录新的羁绊</button>
-                        <div id="tagCloud" class="flex flex-col text-left mt-4 border-t pt-4"></div>
-                    </div>
+            <aside class="w-full lg:w-72">
+                <div class="f-card p-8 text-center sticky top-10">
+                    <img src="https://p.qlogo.cn/gh/666666/666666/100" class="w-24 h-24 rounded-3xl mx-auto mb-4 object-cover">
+                    <h2 class="text-2xl font-bold" style="font-family: 'ZCOOL KuaiLe'">Ancen</h2>
+                    <button onclick="openEditor()" class="moe-btn w-full my-4">🖋️ 记录新的羁绊</button>
+                    <div id="tagCloud" class="text-left mt-4 border-t pt-4"></div>
                 </div>
             </aside>
             <main class="flex-1 lg:mt-12 space-y-8" id="diaryList"></main>
@@ -76,7 +59,7 @@
     </div>
 </div>
 
-<div id="page-detail" class="p-6">
+<div id="page-detail" class="hidden p-6">
     <div class="max-w-3xl mx-auto pt-10">
         <button onclick="goBack()" class="mb-8 text-pink-300 font-bold">⬅ 返回传送门</button>
         <div id="detail-content" class="f-card p-10 bg-white"></div>
@@ -84,7 +67,7 @@
 </div>
 
 <div id="editor-mask">
-    <div class="f-editor-container">
+    <div class="f-card p-8 w-full max-w-2xl mx-4">
         <div class="flex justify-between items-center mb-4">
             <h3 id="editor-title-label" class="font-bold text-pink-400">💌 捕获灵感...</h3>
             <button onclick="closeEditor()" class="text-2xl text-gray-300">&times;</button>
@@ -98,35 +81,27 @@
     </div>
 </div>
 
-<div class="waifu">
-    <div class="waifu-tips"></div>
-    <canvas id="live2d" width="280" height="250" class="live2d"></canvas>
-    <div class="waifu-tool">
-        <span class="fui-chat"></span>
-        <span class="fui-eye"></span>
-        <span class="fui-cross"></span>
-    </div>
+<div id="pet-container" onclick="petSpeak()">
+    <div id="pet-bubble">你好呀，指挥官！</div>
+    <img id="pet-img" src="https://raw.githubusercontent.com/ShidukiSayaka/ShidukiSayaka.github.io/master/img/avatar.png" alt="Pet">
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/live2d-widget-handle@1.0.1/live2d.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/live2d-widget-handle@1.0.1/waifu-tips.js"></script>
-
 <script>
-    // --- 优先定义所有变量 ---
+    // --- 定义全局变量 (修复初始化顺序报错) ---
     const REPO = "Ancenchan/ancenchan.github.io"; 
     const PATH = "data/articles.json";
     let diaryData = [];
     let currentSha = "";
     let filterTag = null;
-    let editIndex = null; // 确保在函数调用前定义
+    let editIndex = null;
 
-    // 初始化编辑器
+    // --- 初始化编辑器 ---
     const quill = new Quill('#editor-container', {
         theme: 'snow',
         modules: { toolbar: [['bold', 'italic'], ['image']] }
     });
 
-    // --- 业务逻辑函数 ---
+    // --- 增删查改逻辑 ---
     function openEditor(index = null) {
         editIndex = index;
         document.getElementById('editor-mask').style.display = 'flex';
@@ -150,8 +125,7 @@
         const token = localStorage.getItem('gh_token');
         if(!token) {
             const t = prompt("🗝️ 请输入Token:");
-            if(t) localStorage.setItem('gh_token', t);
-            else return;
+            if(t) localStorage.setItem('gh_token', t); else return;
         }
         try {
             const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${PATH}?v=${Date.now()}`, {
@@ -160,8 +134,7 @@
             if (res.ok) {
                 const data = await res.json();
                 currentSha = data.sha;
-                const content = decodeURIComponent(escape(atob(data.content.replace(/\s/g, ''))));
-                diaryData = JSON.parse(content);
+                diaryData = JSON.parse(decodeURIComponent(escape(atob(data.content.replace(/\s/g, '')))));
                 render();
             }
         } catch (e) { console.error("读取失败", e); }
@@ -183,7 +156,7 @@
             return `<div class="f-card p-8 group cursor-pointer mb-6" onclick="showDetail(${realIndex})">
                 <div class="text-[10px] text-pink-200 mb-2">${item.date}</div>
                 <h2 class="text-xl font-bold mb-4">${item.title || '无名之书'}</h2>
-                <p class="text-gray-400 text-sm preview-text">${pureText}...</p>
+                <p class="text-gray-400 text-sm overflow-hidden" style="display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;">${pureText}...</p>
             </div>`;
         }).join('');
     }
@@ -198,14 +171,14 @@
                 <button onclick="openEditor(${index}); goBack();" class="text-pink-400 text-sm">编辑</button>
                 <button onclick="deleteItem(${index})" class="text-red-200 text-sm">删除</button>
             </div>`;
-        document.getElementById('page-list').style.display = 'none';
-        document.getElementById('page-detail').style.display = 'block';
+        document.getElementById('page-list').classList.add('hidden');
+        document.getElementById('page-detail').classList.remove('hidden');
         window.scrollTo(0, 0);
     }
 
     function goBack() {
-        document.getElementById('page-list').style.display = 'block';
-        document.getElementById('page-detail').style.display = 'none';
+        document.getElementById('page-list').classList.remove('hidden');
+        document.getElementById('page-detail').classList.add('hidden');
     }
 
     function setFilter(tag) { filterTag = tag; render(); }
@@ -223,17 +196,20 @@
         }
 
         const b64 = btoa(unescape(encodeURIComponent(JSON.stringify(diaryData, null, 2))));
-        const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${PATH}`, {
-            method: 'PUT',
-            headers: { 'Authorization': `Bearer ${localStorage.getItem('gh_token')}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: "Update", content: b64, sha: currentSha })
-        });
-        if(res.ok) {
-            const d = await res.json();
-            currentSha = d.content.sha;
-            closeEditor();
-            render();
-        }
+        try {
+            const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${PATH}`, {
+                method: 'PUT',
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('gh_token')}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: "Update", content: b64, sha: currentSha })
+            });
+            if(res.ok) {
+                const d = await res.json();
+                currentSha = d.content.sha;
+                closeEditor();
+                render();
+                petSpeak("记录成功啦！真棒~");
+            }
+        } catch (e) { alert("同步失败"); }
     }
 
     async function deleteItem(index) {
@@ -245,16 +221,26 @@
             headers: { 'Authorization': `Bearer ${localStorage.getItem('gh_token')}`, 'Content-Type': 'application/json' },
             body: JSON.stringify({ message: "Delete", content: b64, sha: currentSha })
         });
-        if(res.ok) { goBack(); render(); }
+        if(res.ok) { 
+            const d = await res.json();
+            currentSha = d.content.sha;
+            goBack(); 
+            render(); 
+        }
     }
 
-    // --- 初始化入口 ---
+    // --- 宠物互动逻辑 ---
+    const quotes = ["今天也要开心哦！", "记录点什么好呢？", "秘密基地永远欢迎你~", "棕发红眼是最高配置！", "摸摸头，变聪明！"];
+    function petSpeak(msg) {
+        const bubble = document.getElementById('pet-bubble');
+        bubble.innerText = msg || quotes[Math.floor(Math.random() * quotes.length)];
+        bubble.style.opacity = 1;
+        setTimeout(() => bubble.style.opacity = 0, 3000);
+    }
+
     window.onload = () => {
         fetchCloudData();
-        // 确保 initModel 在库加载完成后执行
-        if(typeof initModel === 'function') {
-            initModel("https://cdn.jsdelivr.net/gh/stevenjoezhang/live2d-widget@latest/waifu-tips.json");
-        }
+        setTimeout(() => petSpeak("欢迎回来，Ancen！"), 1000);
     };
 </script>
 </body>
