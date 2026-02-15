@@ -7,23 +7,24 @@
     <link href="https://lib.baomitu.com/quill/1.3.6/quill.snow.css" rel="stylesheet">
     <script src="https://lib.baomitu.com/quill/1.3.6/quill.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Kosugi+Maru&family=Noto+Sans+SC:wght@400;500&display=swap" rel="stylesheet">
     
     <style>
         :root { 
             --f-bg: #fdfdfd; 
             --f-accent: #ffb1c1; 
             --f-glass: rgba(255, 255, 255, 0.75);
-            --f-text-main: #4a4a4a;
-            --f-text-muted: #8c8c8c;
+            --f-text-main: #333333; /* 进一步加深，确保清晰 */
+            --f-text-muted: #666666;
         }
 
+        /* 统一使用更现代、清爽的系统字体 */
         body { 
             background: linear-gradient(135deg, #fff5f7 0%, #fefefe 100%);
             color: var(--f-text-main);
-            font-family: 'Noto Sans SC', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans SC", sans-serif;
             margin: 0;
             overflow-x: hidden;
+            line-height: 1.6;
         }
 
         .header-banner { 
@@ -38,7 +39,7 @@
             background: var(--f-glass);
             backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.9);
-            border-radius: 35px;
+            border-radius: 30px;
             box-shadow: 0 8px 30px rgba(255, 177, 193, 0.06);
             transition: all 0.4s ease;
         }
@@ -46,41 +47,41 @@
         /* 侧边栏样式 */
         .tag-sidebar { display: flex; flex-direction: column; gap: 8px; width: 100%; }
         .tag-pill {
-            padding: 14px 22px;
-            border-radius: 20px;
+            padding: 12px 18px;
+            border-radius: 15px;
             background: rgba(255, 255, 255, 0.3);
             font-size: 14px;
             color: var(--f-text-muted);
-            border: 1px solid transparent;
             transition: all 0.3s;
             text-align: left;
             display: flex;
             align-items: center;
         }
         .tag-pill:hover { background: white; transform: translateX(8px); color: var(--f-accent); }
-        .tag-pill.active { border-color: var(--f-accent); color: var(--f-accent); background: white; font-weight: 500; box-shadow: 0 5px 15px rgba(255, 177, 193, 0.1); }
-        .tag-pill::before { content: '🌸'; margin-right: 10px; font-size: 12px; opacity: 0.6; }
+        .tag-pill.active { border-color: var(--f-accent); color: var(--f-accent); background: white; font-weight: 600; }
+        .tag-pill::before { content: '🌸'; margin-right: 10px; font-size: 12px; }
 
         .moe-btn {
             background: white; color: var(--f-accent); border: 1px solid #ffb1c1aa;
-            padding: 12px; border-radius: 20px; transition: 0.3s;
-            box-shadow: 0 4px 10px rgba(255, 177, 193, 0.05);
+            padding: 10px; border-radius: 15px; transition: 0.3s;
+            font-size: 14px;
         }
         .moe-btn:hover { background: var(--f-accent); color: white; transform: scale(1.02); }
 
-        #editor-mask { position: fixed; inset: 0; background: rgba(255,255,255,0.8); backdrop-filter: blur(10px); z-index: 1000; display: none; align-items: center; justify-content: center; }
+        /* 编辑器遮罩 */
+        #editor-mask { position: fixed; inset: 0; background: rgba(255,255,255,0.85); backdrop-filter: blur(15px); z-index: 1000; display: none; align-items: center; justify-content: center; }
 
         /* 宠物动效 */
         #pet-container { position: fixed; bottom: 30px; left: 30px; z-index: 999; cursor: pointer; }
-        #pet-img { width: 120px; animation: softFloat 4s ease-in-out infinite; }
-        @keyframes softFloat { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-12px) rotate(2deg); } }
+        #pet-img { width: 100px; animation: softFloat 4s ease-in-out infinite; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.05)); }
+        @keyframes softFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
         
         #pet-bubble { 
             position: absolute; bottom: 105%; left: 0; margin-bottom: 12px;
-            background: white; padding: 12px 20px; border-radius: 22px; font-size: 13px;
+            background: white; padding: 10px 18px; border-radius: 18px; font-size: 12px;
             opacity: 0; transition: 0.4s; pointer-events: none; border: 1px solid #fef0f3;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.03);
-            color: #666;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.03);
+            white-space: nowrap;
         }
         #pet-bubble.active { opacity: 1; transform: translateY(-5px); }
     </style>
@@ -93,37 +94,39 @@
         <div class="flex flex-col lg:flex-row gap-12">
             <aside class="w-full lg:w-64">
                 <div class="f-card p-8 text-center sticky top-12">
-                    <img src="https://img.moegirl.org.cn/common/thumb/4/4b/Konata_Izumi_new.png/250px-Konata_Izumi_new.png" class="w-28 h-28 rounded-full mx-auto mb-6 bg-white object-contain shadow-sm p-1 border border-pink-50">
-                    <h2 class="text-xl font-bold text-gray-700 mb-6" style="font-family: 'ZCOOL KuaiLe'">Ancenchan</h2>
-                    <button onclick="openEditor()" class="moe-btn w-full mb-8 text-sm tracking-widest font-medium">新的记忆 ✨</button>
+                    <img id="myAvatar" src="https://github.com/Ancenchan.png" onerror="this.src='https://api.dicebear.com/7.x/adventurer/svg?seed=Lucky'" class="w-24 h-24 rounded-full mx-auto mb-4 bg-white shadow-sm border border-pink-50">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-6 tracking-tight">Ancenchan</h2>
+                    <button onclick="openEditor()" class="moe-btn w-full mb-8 font-medium">🖋️ 记录瞬间</button>
                     
-                    <div class="text-left text-[10px] text-pink-200 uppercase tracking-[0.2em] mb-4 ml-2">Collection</div>
+                    <div class="text-left text-[10px] text-pink-300 uppercase tracking-widest mb-4 ml-2 font-bold">Collections</div>
                     <nav id="tagCloud" class="tag-sidebar"></nav>
                 </div>
             </aside>
-            <main class="flex-1 space-y-8" id="diaryList"></main>
+            <main class="flex-1 space-y-8" id="diaryList">
+                <div class="text-center py-20 text-gray-300">正在连接星海...</div>
+            </main>
         </div>
     </div>
 </div>
 
 <div id="page-detail" class="hidden p-8">
     <div class="max-w-4xl mx-auto pt-12">
-        <button onclick="goBack()" class="mb-10 text-pink-300 hover:text-pink-500 transition-colors text-sm tracking-widest">/ BACK TO BASE</button>
-        <div id="detail-content" class="f-card p-16 bg-white/95"></div>
+        <button onclick="goBack()" class="mb-10 text-pink-300 hover:text-pink-500 transition-colors text-sm font-bold tracking-widest">/ BACK</button>
+        <div id="detail-content" class="f-card p-12 md:p-16 bg-white/95"></div>
     </div>
 </div>
 
 <div id="editor-mask">
-    <div class="f-card p-10 w-full max-w-2xl mx-4 bg-white shadow-2xl border-none">
+    <div class="f-card p-10 w-full max-w-2xl mx-4 bg-white border-none shadow-2xl">
         <div class="flex justify-between items-center mb-6">
-            <span class="text-pink-200 text-xs tracking-[0.2em]">MOMENT EDITOR</span>
-            <button onclick="closeEditor()" class="text-gray-300 hover:text-gray-500 transition-colors text-xl">✕</button>
+            <span class="text-pink-200 text-xs font-bold tracking-widest">EDITOR</span>
+            <button onclick="closeEditor()" class="text-gray-300 hover:text-gray-500 text-xl">✕</button>
         </div>
-        <input id="diaryTitle" type="text" placeholder="标题..." class="w-full text-2xl font-normal mb-4 outline-none text-gray-700 placeholder:text-gray-200">
-        <input id="diaryTags" type="text" placeholder="标签 (用空格分开)" class="w-full text-xs mb-6 outline-none text-pink-300 uppercase tracking-widest">
+        <input id="diaryTitle" type="text" placeholder="标题..." class="w-full text-2xl font-semibold mb-4 outline-none text-gray-800">
+        <input id="diaryTags" type="text" placeholder="分类 (用空格分开)" class="w-full text-xs mb-6 outline-none text-pink-300 font-bold">
         <div id="editor-container" style="height: 300px;"></div>
         <div class="flex justify-end mt-8">
-            <button id="saveBtn" onclick="handleSave()" class="moe-btn px-12 border-pink-100 hover:border-transparent">同步至星海</button>
+            <button id="saveBtn" onclick="handleSave()" class="moe-btn px-12 border-pink-100">保存记忆</button>
         </div>
     </div>
 </div>
@@ -140,8 +143,18 @@
 
     const quill = new Quill('#editor-container', {
         theme: 'snow',
-        modules: { toolbar: [['bold', 'italic'], ['image', 'link']] }
+        modules: { toolbar: [['bold', 'italic'], ['image']] }
     });
+
+    // 检查 Token
+    function getToken() {
+        let token = localStorage.getItem('gh_token');
+        if(!token) {
+            token = prompt("🔒 此操作需要权限，请输入你的 GitHub Token:");
+            if(token) localStorage.setItem('gh_token', token);
+        }
+        return token;
+    }
 
     function openEditor(index = null) {
         editIndex = index;
@@ -160,23 +173,30 @@
 
     function closeEditor() { document.getElementById('editor-mask').style.display = 'none'; }
 
+    // 【重要：游客可见】初始化加载不需要 Token
     async function fetchCloudData() {
-        const token = localStorage.getItem('gh_token');
-        if(!token) {
-            const t = prompt("🗝️ Token:");
-            if(t) localStorage.setItem('gh_token', t); else return;
-        }
         try {
-            const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${PATH}?v=${Date.now()}`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            // 使用没有 Auth 头的请求尝试获取公开内容
+            const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${PATH}?v=${Date.now()}`);
             if (res.ok) {
                 const data = await res.json();
                 currentSha = data.sha;
                 diaryData = JSON.parse(decodeURIComponent(escape(atob(data.content.replace(/\s/g, '')))));
                 render();
+            } else {
+                // 如果公开仓库没读到，可能是私有的，则尝试用 Token
+                const token = localStorage.getItem('gh_token');
+                if (token) {
+                    const resWithAuth = await fetch(`https://api.github.com/repos/${REPO}/contents/${PATH}`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    const data = await resWithAuth.json();
+                    currentSha = data.sha;
+                    diaryData = JSON.parse(decodeURIComponent(escape(atob(data.content.replace(/\s/g, '')))));
+                    render();
+                }
             }
-        } catch (e) { petSpeak("加载中..."); }
+        } catch (e) { document.getElementById('diaryList').innerHTML = '<div class="text-center py-20">还没有数据哦~</div>'; }
     }
 
     function render() {
@@ -185,7 +205,6 @@
         const tagMap = {};
         diaryData.forEach(d => { if(d.tags) d.tags.forEach(t => tagMap[t] = (tagMap[t] || 0) + 1); });
         
-        // 渲染侧边栏，不再包含“全部分类”
         cloud.innerHTML = Object.keys(tagMap).map(t => `
             <button class="tag-pill ${filterTag===t?'active':''}" onclick="setFilter('${t}')">
                 <span class="flex-1">${t}</span>
@@ -194,15 +213,19 @@
         `).join('');
 
         const filtered = filterTag ? diaryData.filter(d => d.tags && d.tags.includes(filterTag)) : diaryData;
+        if(filtered.length === 0) {
+            list.innerHTML = '<div class="text-center py-20 text-gray-200">这里空空的...</div>';
+            return;
+        }
         list.innerHTML = filtered.slice().reverse().map((item) => {
             const realIndex = diaryData.findIndex(d => d.id === item.id);
             const preview = (item.content || "").replace(/<[^>]+>/g, '').substring(0, 100);
-            return `<div class="f-card p-10 cursor-pointer group hover:bg-white/80" onclick="showDetail(${realIndex})">
+            return `<div class="f-card p-10 cursor-pointer group hover:bg-white" onclick="showDetail(${realIndex})">
                 <div class="flex justify-between items-center mb-5">
-                    <span class="text-[10px] text-pink-200 tracking-[0.2em] font-medium">${item.date}</span>
-                    <div class="flex gap-2">${(item.tags||[]).map(t => `<span class="text-[9px] border border-pink-50 px-2 py-0.5 rounded-lg text-pink-300 bg-white/50">${t}</span>`).join('')}</div>
+                    <span class="text-[10px] text-pink-200 tracking-widest font-bold">${item.date}</span>
+                    <div class="flex gap-2">${(item.tags||[]).map(t => `<span class="text-[9px] border border-pink-50 px-2 py-0.5 rounded text-pink-300 font-bold uppercase">${t}</span>`).join('')}</div>
                 </div>
-                <h2 class="text-xl font-medium text-gray-700 mb-4 group-hover:text-pink-400 transition-colors">${item.title || 'Untitled'}</h2>
+                <h2 class="text-xl font-bold text-gray-800 mb-4 group-hover:text-pink-400 transition-colors">${item.title || '无题'}</h2>
                 <p class="text-gray-500 leading-relaxed text-sm">${preview}...</p>
             </div>`;
         }).join('');
@@ -211,12 +234,12 @@
     function showDetail(index) {
         const item = diaryData[index];
         document.getElementById('detail-content').innerHTML = `
-            <div class="text-[10px] text-pink-200 tracking-[0.3em] mb-10 font-bold uppercase">${item.date}</div>
+            <div class="text-[10px] text-pink-300 tracking-[0.3em] mb-10 font-bold uppercase">${item.date}</div>
             <h1 class="text-3xl font-bold text-gray-800 mb-10 tracking-tight">${item.title}</h1>
-            <div class="ql-editor p-0 text-gray-700 leading-8 text-base font-light">${item.content}</div>
+            <div class="ql-editor p-0 text-gray-700 leading-8 text-base font-normal">${item.content}</div>
             <div class="mt-20 border-t border-pink-50 pt-10 flex gap-8">
-                <button onclick="openEditor(${index}); goBack();" class="text-pink-300 hover:text-pink-500 text-xs uppercase font-bold tracking-widest transition-colors">Edit</button>
-                <button onclick="deleteItem(${index})" class="text-gray-200 hover:text-red-300 text-xs uppercase font-bold tracking-widest transition-colors">Delete</button>
+                <button onclick="openEditor(${index}); goBack();" class="text-pink-300 hover:text-pink-500 text-xs font-bold tracking-widest transition-colors uppercase">Edit</button>
+                <button onclick="deleteItem(${index})" class="text-gray-300 hover:text-red-400 text-xs font-bold tracking-widest transition-colors uppercase">Delete</button>
             </div>`;
         document.getElementById('page-list').classList.add('hidden');
         document.getElementById('page-detail').classList.remove('hidden');
@@ -228,11 +251,13 @@
         document.getElementById('page-detail').classList.add('hidden');
     }
 
-    // 改进的滤镜逻辑：点击已选标签则重置内容
     function setFilter(tag) { filterTag = (filterTag === tag) ? null : tag; render(); }
 
     async function handleSave() {
-        const title = document.getElementById('diaryTitle').value.trim() || "新的瞬间";
+        const token = getToken();
+        if(!token) return;
+
+        const title = document.getElementById('diaryTitle').value.trim() || "新的记忆";
         const tags = document.getElementById('diaryTags').value.trim().split(/\s+/).filter(t => t);
         const dateStr = new Date().toLocaleDateString('zh-CN', {year:'numeric', month:'2-digit', day:'2-digit'});
 
@@ -246,24 +271,28 @@
         try {
             const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${PATH}`, {
                 method: 'PUT',
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('gh_token')}`, 'Content-Type': 'application/json' },
+                headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message: "Update Moment", content: b64, sha: currentSha })
             });
             if(res.ok) {
                 const d = await res.json();
                 currentSha = d.content.sha;
-                closeEditor(); render(); petSpeak("记忆已保存 ✨");
+                closeEditor(); render(); petSpeak("已同步至云端。");
+            } else {
+                alert("保存失败，可能是 Token 错误或权限不足。");
             }
-        } catch (e) { alert("同步失败..."); }
+        } catch (e) { alert("网络错误。"); }
     }
 
     async function deleteItem(index) {
-        if(!confirm("确定抹除这段记忆吗？")) return;
+        const token = getToken();
+        if(!token || !confirm("确认删除？")) return;
+
         diaryData.splice(index, 1);
         const b64 = btoa(unescape(encodeURIComponent(JSON.stringify(diaryData, null, 2))));
         const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${PATH}`, {
             method: 'PUT',
-            headers: { 'Authorization': `Bearer ${localStorage.getItem('gh_token')}`, 'Content-Type': 'application/json' },
+            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
             body: JSON.stringify({ message: "Delete Moment", content: b64, sha: currentSha })
         });
         if(res.ok) { const d = await res.json(); currentSha = d.content.sha; goBack(); render(); }
