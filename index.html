@@ -14,7 +14,7 @@
             --f-bg: #fdfdfd; 
             --f-accent: #ffb1c1; 
             --f-glass: rgba(255, 255, 255, 0.75);
-            --f-text-main: #4a4a4a; /* 加深文字颜色，提高可读性 */
+            --f-text-main: #4a4a4a;
             --f-text-muted: #8c8c8c;
         }
 
@@ -43,48 +43,46 @@
             transition: all 0.4s ease;
         }
 
-        /* 侧边栏标签竖排 */
-        .tag-sidebar { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+        /* 侧边栏样式 */
+        .tag-sidebar { display: flex; flex-direction: column; gap: 8px; width: 100%; }
         .tag-pill {
-            padding: 12px 20px;
-            border-radius: 18px;
-            background: rgba(255, 255, 255, 0.4);
+            padding: 14px 22px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.3);
             font-size: 14px;
             color: var(--f-text-muted);
             border: 1px solid transparent;
-            transition: 0.3s;
+            transition: all 0.3s;
             text-align: left;
             display: flex;
             align-items: center;
         }
-        .tag-pill:hover { background: white; transform: translateX(5px); color: var(--f-accent); }
-        .tag-pill.active { border-color: var(--f-accent); color: var(--f-accent); background: white; font-weight: 500; }
-        .tag-pill::before { content: '✦'; margin-right: 8px; font-size: 10px; opacity: 0.5; }
+        .tag-pill:hover { background: white; transform: translateX(8px); color: var(--f-accent); }
+        .tag-pill.active { border-color: var(--f-accent); color: var(--f-accent); background: white; font-weight: 500; box-shadow: 0 5px 15px rgba(255, 177, 193, 0.1); }
+        .tag-pill::before { content: '🌸'; margin-right: 10px; font-size: 12px; opacity: 0.6; }
 
         .moe-btn {
             background: white; color: var(--f-accent); border: 1px solid #ffb1c1aa;
-            padding: 12px; border-radius: 18px; transition: 0.3s;
+            padding: 12px; border-radius: 20px; transition: 0.3s;
+            box-shadow: 0 4px 10px rgba(255, 177, 193, 0.05);
         }
-        .moe-btn:hover { background: var(--f-accent); color: white; }
-
-        /* 日记列表文字加深 */
-        .diary-preview { color: #5a5a5a; line-height: 1.8; }
-        .diary-title { color: #333; }
+        .moe-btn:hover { background: var(--f-accent); color: white; transform: scale(1.02); }
 
         #editor-mask { position: fixed; inset: 0; background: rgba(255,255,255,0.8); backdrop-filter: blur(10px); z-index: 1000; display: none; align-items: center; justify-content: center; }
 
-        /* 宠物 */
+        /* 宠物动效 */
         #pet-container { position: fixed; bottom: 30px; left: 30px; z-index: 999; cursor: pointer; }
         #pet-img { width: 120px; animation: softFloat 4s ease-in-out infinite; }
-        @keyframes softFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+        @keyframes softFloat { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-12px) rotate(2deg); } }
         
         #pet-bubble { 
-            position: absolute; bottom: 100%; left: 0; margin-bottom: 10px;
-            background: white; padding: 10px 18px; border-radius: 20px; font-size: 13px;
+            position: absolute; bottom: 105%; left: 0; margin-bottom: 12px;
+            background: white; padding: 12px 20px; border-radius: 22px; font-size: 13px;
             opacity: 0; transition: 0.4s; pointer-events: none; border: 1px solid #fef0f3;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.03);
+            color: #666;
         }
         #pet-bubble.active { opacity: 1; transform: translateY(-5px); }
-        .hidden { display: none; }
     </style>
 </head>
 <body>
@@ -95,11 +93,11 @@
         <div class="flex flex-col lg:flex-row gap-12">
             <aside class="w-full lg:w-64">
                 <div class="f-card p-8 text-center sticky top-12">
-                    <img src="https://img.moegirl.org.cn/common/thumb/4/4b/Konata_Izumi_new.png/250px-Konata_Izumi_new.png" class="w-24 h-24 rounded-full mx-auto mb-6 bg-white object-contain shadow-sm p-1 border border-pink-50">
+                    <img src="https://img.moegirl.org.cn/common/thumb/4/4b/Konata_Izumi_new.png/250px-Konata_Izumi_new.png" class="w-28 h-28 rounded-full mx-auto mb-6 bg-white object-contain shadow-sm p-1 border border-pink-50">
                     <h2 class="text-xl font-bold text-gray-700 mb-6" style="font-family: 'ZCOOL KuaiLe'">Ancenchan</h2>
-                    <button onclick="openEditor()" class="moe-btn w-full mb-8 text-sm tracking-widest">🖋️ 新的记忆</button>
+                    <button onclick="openEditor()" class="moe-btn w-full mb-8 text-sm tracking-widest font-medium">新的记忆 ✨</button>
                     
-                    <div class="text-left text-[10px] text-pink-200 uppercase tracking-widest mb-4 ml-2">Categories</div>
+                    <div class="text-left text-[10px] text-pink-200 uppercase tracking-[0.2em] mb-4 ml-2">Collection</div>
                     <nav id="tagCloud" class="tag-sidebar"></nav>
                 </div>
             </aside>
@@ -111,21 +109,21 @@
 <div id="page-detail" class="hidden p-8">
     <div class="max-w-4xl mx-auto pt-12">
         <button onclick="goBack()" class="mb-10 text-pink-300 hover:text-pink-500 transition-colors text-sm tracking-widest">/ BACK TO BASE</button>
-        <div id="detail-content" class="f-card p-16 bg-white/90 shadow-xl"></div>
+        <div id="detail-content" class="f-card p-16 bg-white/95"></div>
     </div>
 </div>
 
 <div id="editor-mask">
-    <div class="f-card p-10 w-full max-w-2xl mx-4 bg-white shadow-2xl">
+    <div class="f-card p-10 w-full max-w-2xl mx-4 bg-white shadow-2xl border-none">
         <div class="flex justify-between items-center mb-6">
-            <span class="text-pink-200 text-xs tracking-tighter">MOMENT EDITOR</span>
-            <button onclick="closeEditor()" class="text-gray-300">✕</button>
+            <span class="text-pink-200 text-xs tracking-[0.2em]">MOMENT EDITOR</span>
+            <button onclick="closeEditor()" class="text-gray-300 hover:text-gray-500 transition-colors text-xl">✕</button>
         </div>
-        <input id="diaryTitle" type="text" placeholder="给记忆起个标题..." class="w-full text-2xl font-normal mb-4 outline-none text-gray-700">
-        <input id="diaryTags" type="text" placeholder="标签 (用空格分开)" class="w-full text-xs mb-6 outline-none text-pink-300 uppercase">
+        <input id="diaryTitle" type="text" placeholder="标题..." class="w-full text-2xl font-normal mb-4 outline-none text-gray-700 placeholder:text-gray-200">
+        <input id="diaryTags" type="text" placeholder="标签 (用空格分开)" class="w-full text-xs mb-6 outline-none text-pink-300 uppercase tracking-widest">
         <div id="editor-container" style="height: 300px;"></div>
         <div class="flex justify-end mt-8">
-            <button id="saveBtn" onclick="handleSave()" class="moe-btn px-12">同步</button>
+            <button id="saveBtn" onclick="handleSave()" class="moe-btn px-12 border-pink-100 hover:border-transparent">同步至星海</button>
         </div>
     </div>
 </div>
@@ -165,7 +163,7 @@
     async function fetchCloudData() {
         const token = localStorage.getItem('gh_token');
         if(!token) {
-            const t = prompt("🗝️ 请输入 GitHub Token：");
+            const t = prompt("🗝️ Token:");
             if(t) localStorage.setItem('gh_token', t); else return;
         }
         try {
@@ -178,7 +176,7 @@
                 diaryData = JSON.parse(decodeURIComponent(escape(atob(data.content.replace(/\s/g, '')))));
                 render();
             }
-        } catch (e) { petSpeak("加载有点慢呢..."); }
+        } catch (e) { petSpeak("加载中..."); }
     }
 
     function render() {
@@ -187,11 +185,11 @@
         const tagMap = {};
         diaryData.forEach(d => { if(d.tags) d.tags.forEach(t => tagMap[t] = (tagMap[t] || 0) + 1); });
         
-        // 竖排标签渲染
+        // 渲染侧边栏，不再包含“全部分类”
         cloud.innerHTML = Object.keys(tagMap).map(t => `
             <button class="tag-pill ${filterTag===t?'active':''}" onclick="setFilter('${t}')">
                 <span class="flex-1">${t}</span>
-                <span class="text-[10px] opacity-30">${tagMap[t]}</span>
+                <span class="text-[10px] opacity-40 font-mono">${tagMap[t]}</span>
             </button>
         `).join('');
 
@@ -199,13 +197,13 @@
         list.innerHTML = filtered.slice().reverse().map((item) => {
             const realIndex = diaryData.findIndex(d => d.id === item.id);
             const preview = (item.content || "").replace(/<[^>]+>/g, '').substring(0, 100);
-            return `<div class="f-card p-10 cursor-pointer group hover:bg-white" onclick="showDetail(${realIndex})">
-                <div class="flex justify-between items-center mb-4">
-                    <span class="text-[10px] text-pink-200 tracking-widest">${item.date}</span>
-                    <div class="flex gap-2">${(item.tags||[]).map(t => `<span class="text-[9px] border border-pink-50 px-2 py-0.5 rounded text-pink-200">${t}</span>`).join('')}</div>
+            return `<div class="f-card p-10 cursor-pointer group hover:bg-white/80" onclick="showDetail(${realIndex})">
+                <div class="flex justify-between items-center mb-5">
+                    <span class="text-[10px] text-pink-200 tracking-[0.2em] font-medium">${item.date}</span>
+                    <div class="flex gap-2">${(item.tags||[]).map(t => `<span class="text-[9px] border border-pink-50 px-2 py-0.5 rounded-lg text-pink-300 bg-white/50">${t}</span>`).join('')}</div>
                 </div>
                 <h2 class="text-xl font-medium text-gray-700 mb-4 group-hover:text-pink-400 transition-colors">${item.title || 'Untitled'}</h2>
-                <p class="diary-preview text-sm">${preview}...</p>
+                <p class="text-gray-500 leading-relaxed text-sm">${preview}...</p>
             </div>`;
         }).join('');
     }
@@ -213,12 +211,12 @@
     function showDetail(index) {
         const item = diaryData[index];
         document.getElementById('detail-content').innerHTML = `
-            <div class="text-[10px] text-pink-200 tracking-widest mb-10 font-medium">${item.date}</div>
-            <h1 class="text-3xl font-bold text-gray-800 mb-10">${item.title}</h1>
-            <div class="ql-editor p-0 text-gray-700 leading-8 text-base">${item.content}</div>
-            <div class="mt-16 border-t border-pink-50 pt-8 flex gap-6">
-                <button onclick="openEditor(${index}); goBack();" class="text-pink-300 hover:text-pink-500 text-xs uppercase font-bold tracking-widest">Edit</button>
-                <button onclick="deleteItem(${index})" class="text-gray-300 hover:text-red-300 text-xs uppercase font-bold tracking-widest">Delete</button>
+            <div class="text-[10px] text-pink-200 tracking-[0.3em] mb-10 font-bold uppercase">${item.date}</div>
+            <h1 class="text-3xl font-bold text-gray-800 mb-10 tracking-tight">${item.title}</h1>
+            <div class="ql-editor p-0 text-gray-700 leading-8 text-base font-light">${item.content}</div>
+            <div class="mt-20 border-t border-pink-50 pt-10 flex gap-8">
+                <button onclick="openEditor(${index}); goBack();" class="text-pink-300 hover:text-pink-500 text-xs uppercase font-bold tracking-widest transition-colors">Edit</button>
+                <button onclick="deleteItem(${index})" class="text-gray-200 hover:text-red-300 text-xs uppercase font-bold tracking-widest transition-colors">Delete</button>
             </div>`;
         document.getElementById('page-list').classList.add('hidden');
         document.getElementById('page-detail').classList.remove('hidden');
@@ -230,10 +228,11 @@
         document.getElementById('page-detail').classList.add('hidden');
     }
 
+    // 改进的滤镜逻辑：点击已选标签则重置内容
     function setFilter(tag) { filterTag = (filterTag === tag) ? null : tag; render(); }
 
     async function handleSave() {
-        const title = document.getElementById('diaryTitle').value.trim() || "新记忆";
+        const title = document.getElementById('diaryTitle').value.trim() || "新的瞬间";
         const tags = document.getElementById('diaryTags').value.trim().split(/\s+/).filter(t => t);
         const dateStr = new Date().toLocaleDateString('zh-CN', {year:'numeric', month:'2-digit', day:'2-digit'});
 
@@ -253,13 +252,13 @@
             if(res.ok) {
                 const d = await res.json();
                 currentSha = d.content.sha;
-                closeEditor(); render(); petSpeak("记忆已上传至星海 ✨");
+                closeEditor(); render(); petSpeak("记忆已保存 ✨");
             }
-        } catch (e) { alert("同步失败了..."); }
+        } catch (e) { alert("同步失败..."); }
     }
 
     async function deleteItem(index) {
-        if(!confirm("确定要删除吗？")) return;
+        if(!confirm("确定抹除这段记忆吗？")) return;
         diaryData.splice(index, 1);
         const b64 = btoa(unescape(encodeURIComponent(JSON.stringify(diaryData, null, 2))));
         const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${PATH}`, {
@@ -272,7 +271,7 @@
 
     function petSpeak(msg) {
         const bubble = document.getElementById('pet-bubble');
-        const quotes = ["チョココロネ~", "今天心情如何？", "我会一直在这里哦。", "发现了一段闪光的记忆！"];
+        const quotes = ["チョココロネ~", "今天也很清爽呢。", "秘密藏在标签里哦。", "要喝点红茶吗？"];
         bubble.innerText = msg || quotes[Math.floor(Math.random() * quotes.length)];
         bubble.classList.add('active');
         setTimeout(() => bubble.classList.remove('active'), 3000);
