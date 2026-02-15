@@ -4,87 +4,89 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ancen's Magic Notebook ✨</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Noto+Sans+SC:wght@300;500&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --moe-bg: #fff5f7;
-            --moe-pink: #ffb7c5;
-            --moe-accent: #a5d8ff;
-            --moe-text: #7d5a5a;
+        :root { --moe-bg: #fff5f7; --moe-pink: #ffb7c5; --moe-accent: #a5d8ff; --moe-text: #7d5a5a; }
+        body { background: var(--moe-bg); font-family: 'Noto Sans SC', sans-serif; color: var(--moe-text); margin: 0; }
+        
+        /* 自定义头图高度与样式 */
+        .header-banner {
+            height: 45vh;
+            background: url('https://api.dujin.org/bing/1920.php') center/cover no-repeat; /* 这里可以换成你喜欢的二次元图 */
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 5px solid white;
         }
-        body { 
-            background: var(--moe-bg);
-            background-image: radial-gradient(#ffdae0 1px, transparent 1px);
-            background-size: 20px 20px;
-            font-family: 'Noto Sans SC', sans-serif;
-            color: var(--moe-text);
+        .header-mask {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 100px;
+            background: linear-gradient(transparent, var(--moe-bg));
         }
-        h1 { font-family: 'ZCOOL KuaiLe', cursive; }
-        .moe-card {
-            background: rgba(255, 255, 255, 0.9);
-            border: 3px solid white;
-            border-radius: 30px;
-            box-shadow: 0 8px 0 rgba(255, 183, 197, 0.2);
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .moe-card:hover { transform: translateY(-5px); box-shadow: 0 12px 0 rgba(255, 183, 197, 0.3); }
-        .moe-btn {
-            background: var(--moe-pink);
+        .header-title {
+            font-family: 'ZCOOL KuaiLe', cursive;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.3);
             color: white;
-            border-radius: 20px;
-            padding: 8px 24px;
-            font-weight: bold;
-            border-bottom: 4px solid #f09cae;
-            transition: all 0.1s;
+            z-index: 10;
         }
-        .moe-btn:active { transform: translateY(2px); border-bottom: 0px solid transparent; }
-        .tag-pill {
-            background: var(--moe-accent);
-            color: white;
-            padding: 2px 10px;
-            border-radius: 50px;
-            font-size: 11px;
-            display: inline-block;
-            margin-right: 4px;
-        }
-        textarea, input[type="text"] {
-            background: rgba(255, 255, 255, 0.5);
-            border: 2px dashed var(--moe-pink);
+
+        .moe-card { background: rgba(255, 255, 255, 0.9); border: 3px solid white; border-radius: 25px; box-shadow: 0 8px 0 rgba(255, 183, 197, 0.1); transition: 0.3s; }
+        .moe-card:hover { transform: translateY(-5px); }
+
+        /* 内容里的图片样式 */
+        .diary-content img {
+            max-width: 100%;
             border-radius: 15px;
-            padding: 10px;
+            margin: 15px auto;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            display: block;
         }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-thumb { background: var(--moe-pink); border-radius: 10px; }
+        .diary-content p { margin-bottom: 1em; line-height: 1.8; }
+        
+        .moe-btn { background: var(--moe-pink); color: white; border-radius: 20px; padding: 10px 25px; font-weight: bold; border: none; cursor: pointer; border-bottom: 4px solid #f09cae; }
+        .moe-btn:active { transform: translateY(2px); border-bottom: 0px solid transparent; }
+
+        .tag-pill { background: var(--moe-accent); color: white; padding: 2px 12px; border-radius: 50px; font-size: 11px; margin-right: 5px; }
+        textarea { border: 2px dashed var(--moe-pink); border-radius: 15px; padding: 15px; outline: none; transition: 0.3s; width: 100%; resize: vertical; }
+        textarea:focus { border-style: solid; background: white; }
     </style>
 </head>
-<body class="py-8 px-4">
-    <div class="max-w-2xl mx-auto">
-        <div class="text-center mb-10">
-            <h1 class="text-4xl text-pink-400 mb-2">✨ 魔法日记本 ✨</h1>
-            <p class="text-sm opacity-60">欢迎回来，Ancenchan！</p>
-            <div class="mt-4">
-                <button onclick="configToken()" class="text-[10px] text-pink-300 hover:text-pink-500 uppercase tracking-widest border border-pink-200 px-3 py-1 rounded-full bg-white shadow-sm">🗝️ 开启次元锁 (设置Token)</button>
-            </div>
+<body>
+
+    <div class="header-banner">
+        <div class="header-title text-center">
+            <h1 class="text-5xl mb-2">Ancen's Notebook</h1>
+            <p class="text-lg opacity-90 tracking-widest">记录生活的呼吸感 ✨</p>
+        </div>
+        <div class="header-mask"></div>
+    </div>
+
+    <div class="max-w-3xl mx-auto px-4 -mt-10 relative z-20 pb-20">
+        
+        <div class="text-right mb-4">
+            <button onclick="configToken()" class="text-[10px] bg-white/80 backdrop-blur px-3 py-1 rounded-full text-pink-300 hover:text-pink-500 transition">🗝️ 设置钥匙 (Token)</button>
         </div>
 
-        <div class="moe-card p-6 mb-12">
-            <div class="flex items-center gap-2 mb-4">
-                <span class="text-2xl">📝</span>
-                <input id="diaryTitle" type="text" placeholder="起个标题嘛..." class="w-full text-lg font-bold text-pink-500 placeholder-pink-200 border-none focus:ring-0">
-            </div>
-            <textarea id="diaryInput" rows="5" class="w-full text-gray-600 placeholder-pink-100 resize-none mb-4 border-none focus:ring-0" placeholder="今天的心情如何喵？"></textarea>
+        <div class="moe-card p-8 mb-12">
+            <input id="diaryTitle" type="text" placeholder="给这篇日记取个名字喵..." class="w-full text-2xl font-bold text-gray-700 mb-4 bg-transparent border-none focus:ring-0 outline-none">
+            
+            <textarea id="diaryInput" rows="6" class="text-gray-600 mb-4" placeholder="支持 Markdown！插入图片：![描述](图片网址)"></textarea>
+            
             <div class="flex flex-wrap justify-between items-center gap-4">
-                <input id="diaryTags" type="text" placeholder="标签(逗号隔开)" class="text-xs text-blue-400 border-none focus:ring-0">
+                <input id="diaryTags" type="text" placeholder="标签(逗号隔开)" class="text-sm text-blue-400 bg-transparent border-none outline-none">
                 <div class="flex gap-2">
-                    <button id="cancelBtn" onclick="resetEditor()" class="hidden text-gray-400 text-xs">取消编辑</button>
-                    <button id="saveBtn" onclick="handleSave()" class="moe-btn">同步魔法!</button>
+                    <button id="cancelBtn" onclick="resetEditor()" class="hidden text-gray-400 text-xs">取消</button>
+                    <button id="saveBtn" onclick="handleSave()" class="moe-btn">发布章节</button>
                 </div>
             </div>
         </div>
 
-        <div id="diaryList" class="space-y-8">
-            <div class="text-center py-10 animate-pulse text-pink-200">✨ 正在召唤云端记忆...</div>
+        <div id="diaryList" class="space-y-12">
+            <div class="text-center py-20 text-pink-200">✨ 正在从星空搬运记忆...</div>
         </div>
     </div>
 
@@ -98,62 +100,49 @@
         const getToken = () => localStorage.getItem('gh_token');
 
         function configToken() {
-            const t = prompt("输入你的 GitHub Token 喵：");
-            if(t) { localStorage.setItem('gh_token', t); location.reload(); }
+            const t = prompt("输入你的 GitHub Token：");
+            if(t) { localStorage.setItem('gh_token', t.trim()); location.reload(); }
         }
 
-        // --- 核心修正点：不再发送 Cache-Control Header ---
         async function fetchCloudData() {
-            const token = getToken();
-            if(!token) {
-                document.getElementById('diaryList').innerHTML = `<div class="text-center text-pink-300">请点击上方“开启次元锁”设置 Token 喵~</div>`;
+            if(!getToken()) {
+                document.getElementById('diaryList').innerHTML = `<div class="text-center text-pink-300 bg-white p-10 rounded-3xl">配置 Token 后即可开启魔法喵~</div>`;
                 return;
             }
             try {
-                // 使用查询参数 t 避免缓存，这样不会触发 CORS
-                const url = `https://api.github.com/repos/${REPO}/contents/${PATH}?t=${Date.now()}`;
-                const res = await fetch(url, {
-                    method: 'GET',
-                    headers: { 'Authorization': `token ${token}` }
+                const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${PATH}?v=${Date.now()}`, {
+                    headers: { 'Authorization': `Bearer ${getToken()}` }
                 });
-                
                 if (res.ok) {
                     const data = await res.json();
                     currentSha = data.sha;
-                    const b64 = data.content.replace(/\s/g, '');
-                    const content = decodeURIComponent(atob(b64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+                    const content = decodeURIComponent(escape(atob(data.content.replace(/\s/g, ''))));
                     diaryData = JSON.parse(content);
                     render();
-                } else {
-                    const err = await res.json();
-                    document.getElementById('diaryList').innerHTML = `<div class="text-center text-red-300">加载失败: ${err.message}</div>`;
                 }
-            } catch (e) {
-                document.getElementById('diaryList').innerHTML = `<div class="text-center text-red-300">网络连接异常喵~</div>`;
-            }
+            } catch (e) { console.error(e); }
         }
 
         function render() {
             const list = document.getElementById('diaryList');
-            if(!diaryData.length) {
-                list.innerHTML = `<div class="text-center py-20 text-gray-300 italic">空空如也喵...</div>`;
-                return;
-            }
             list.innerHTML = diaryData.slice().reverse().map((item, index) => {
                 const realIndex = diaryData.length - 1 - index;
-                const tagsHtml = (item.tags || []).map(t => `<span class="tag-pill">#${t}</span>`).join('');
+                // 使用 marked 解析 Markdown
+                const contentHtml = marked.parse(item.content || '');
+                const tagsHtml = (item.tags || []).map(t => `<span class="tag-pill"># ${t}</span>`).join('');
+                
                 return `
-                <div class="moe-card p-8 relative">
-                    <div class="flex justify-between items-center text-[10px] text-pink-200 mb-3">
-                        <span>📅 ${item.date}</span>
-                        <div class="flex gap-3">
-                            <button onclick="startEdit(${realIndex})" class="hover:text-blue-400">✨ 改写</button>
-                            <button onclick="deleteItem(${realIndex})" class="hover:text-red-400">💢 碎掉</button>
+                <div class="moe-card p-10">
+                    <div class="flex justify-between items-center text-[10px] text-pink-200 mb-6">
+                        <span class="tracking-widest italic font-medium">DATE: ${item.date}</span>
+                        <div class="flex gap-4">
+                            <button onclick="startEdit(${realIndex})" class="hover:text-blue-400 transition">EDIT</button>
+                            <button onclick="deleteItem(${realIndex})" class="hover:text-red-400 transition">DELETE</button>
                         </div>
                     </div>
-                    <h3 class="text-xl font-bold text-gray-700 mb-4">${item.title || '无标题'}</h3>
-                    <div class="text-gray-600 leading-relaxed text-md whitespace-pre-wrap">${item.content}</div>
-                    <div class="mt-6">${tagsHtml}</div>
+                    <h2 class="text-3xl font-bold text-gray-800 mb-6">${item.title || '无标题随笔'}</h2>
+                    <div class="diary-content text-gray-600">${contentHtml}</div>
+                    <div class="mt-8 flex flex-wrap gap-2 border-t border-gray-50 pt-6">${tagsHtml}</div>
                 </div>`;
             }).join('');
         }
@@ -162,8 +151,8 @@
             const content = document.getElementById('diaryInput').value.trim();
             const title = document.getElementById('diaryTitle').value.trim();
             const tags = document.getElementById('diaryTags').value ? document.getElementById('diaryTags').value.split(',').map(t => t.trim()) : [];
-            if(!content) return alert("写点什么喵！");
-
+            
+            if(!content) return alert("内容不能为空喵！");
             const btn = document.getElementById('saveBtn');
             btn.innerText = "咏唱中...";
             btn.disabled = true;
@@ -171,14 +160,13 @@
             const dateStr = new Date().toLocaleDateString('zh-CN', {year:'numeric', month:'long', day:'numeric'});
 
             if (editingId !== null) {
-                diaryData[editingId] = { ...diaryData[editingId], title, content, tags, date: dateStr + " (已重写)" };
+                diaryData[editingId] = { ...diaryData[editingId], title, content, tags, date: dateStr + " (UPDATE)" };
             } else {
-                diaryData.push({ id: Date.now(), title: title || "新日记", content, tags, date: dateStr });
+                diaryData.push({ id: Date.now(), title, content, tags, date: dateStr });
             }
 
-            const success = await syncToCloud();
-            if(success) { resetEditor(); render(); }
-            btn.innerText = "同步魔法!";
+            if(await syncToCloud()) { resetEditor(); render(); }
+            btn.innerText = "发布章节";
             btn.disabled = false;
         }
 
@@ -187,8 +175,8 @@
             try {
                 const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${PATH}`, {
                     method: 'PUT',
-                    headers: { 'Authorization': `token ${getToken()}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: "Update diary", content: b64, sha: currentSha })
+                    headers: { 'Authorization': `Bearer ${getToken()}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: "Update story", content: b64, sha: currentSha })
                 });
                 if(res.ok) {
                     const d = await res.json();
@@ -199,7 +187,7 @@
         }
 
         async function deleteItem(index) {
-            if(!confirm("真的要碎掉这段记忆吗喵？")) return;
+            if(!confirm("确认碎掉这段回忆？")) return;
             diaryData.splice(index, 1);
             if(await syncToCloud()) render();
         }
@@ -211,7 +199,8 @@
             document.getElementById('diaryInput').value = item.content;
             document.getElementById('diaryTags').value = (item.tags || []).join(',');
             document.getElementById('cancelBtn').classList.remove('hidden');
-            window.scrollTo({top: 0, behavior: 'smooth'});
+            document.getElementById('saveBtn').innerText = "确认修改";
+            window.scrollTo({top: 400, behavior: 'smooth'});
         }
 
         function resetEditor() {
@@ -220,6 +209,7 @@
             document.getElementById('diaryInput').value = '';
             document.getElementById('diaryTags').value = '';
             document.getElementById('cancelBtn').classList.add('hidden');
+            document.getElementById('saveBtn').innerText = "发布章节";
         }
 
         window.onload = fetchCloudData;
