@@ -35,6 +35,17 @@
             background: var(--f-glass); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
             border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 30px;
             box-shadow: 0 8px 30px rgba(255, 177, 193, 0.08); transition: all 0.4s ease;
+            /* 修复 2: 解决长链接溢出 */
+            word-break: break-all;
+        }
+
+        /* 修复 1: 首页摘要保留换行 */
+        .preview-text {
+            white-space: pre-line;
+            display: -webkit-box;
+            -webkit-line-clamp: 4; /* 最多显示4行，超过省略 */
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
 
         #pet-container { position: fixed; bottom: 20px; right: 20px; z-index: 999; cursor: pointer; opacity: 0.8; transition: 0.3s; }
@@ -49,6 +60,8 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.05); white-space: nowrap;
         }
         #pet-bubble.active { opacity: 1; transform: translateY(-5px); }
+
+        .ql-editor { word-break: break-all; } /* 详情页也要防链接溢出 */
 
         @media (max-width: 640px) {
             .header-banner { height: 160px; }
@@ -117,7 +130,6 @@
         modules: { toolbar: [['bold', 'italic'], ['image', 'link']] }
     });
 
-    // 鉴权逻辑：只有需要写操作时才检查 Token
     function getToken(forcePrompt = false) {
         let t = localStorage.getItem('gh_token');
         if (!t || forcePrompt) {
@@ -127,17 +139,14 @@
         return t;
     }
 
-    function checkAdminThenOpen() {
-        if(getToken()) openEditor();
-    }
+    function checkAdminThenOpen() { if(getToken()) openEditor(); }
 
     function openEditor(index = null) {
         editIndex = index;
         document.getElementById('editor-mask').style.display = 'flex';
         document.body.style.overflow = 'hidden';
         const saveBtn = document.getElementById('saveBtn');
-        saveBtn.innerText = "同步至星海";
-        saveBtn.disabled = false;
+        saveBtn.innerText = "同步至星海"; saveBtn.disabled = false;
         if (index !== null) {
             const item = diaryData[index];
             document.getElementById('diaryTitle').value = item.title;
@@ -150,10 +159,7 @@
         }
     }
 
-    function closeEditor() { 
-        document.getElementById('editor-mask').style.display = 'none'; 
-        document.body.style.overflow = 'auto';
-    }
+    function closeEditor() { document.getElementById('editor-mask').style.display = 'none'; document.body.style.overflow = 'auto'; }
 
     async function fetchCloudData() {
         const token = localStorage.getItem('gh_token');
@@ -166,7 +172,7 @@
                 diaryData = JSON.parse(decodeURIComponent(escape(atob(data.content.replace(/\s/g, '')))));
                 render();
             }
-        } catch (e) { petSpeak("星海连接中..."); }
+        } catch (e) { petSpeak("也要继续努力才行..."); }
     }
 
     function render() {
@@ -185,14 +191,18 @@
         const filtered = filterTag ? diaryData.filter(d => d.tags && d.tags.includes(filterTag)) : diaryData;
         list.innerHTML = filtered.slice().reverse().map((item) => {
             const realIndex = diaryData.findIndex(d => d.id === item.id);
-            const preview = (item.content || "").replace(/<[^>]+>/g, '').substring(0, 100);
+            // 修复 1: 提取内容并保留换行，但不提取HTML标签
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = item.content || "";
+            const previewText = tempDiv.innerText.substring(0, 300); 
+
             return `<div class="f-card p-6 sm:p-10 cursor-pointer group hover:bg-white/90" onclick="showDetail(${realIndex})">
                 <div class="flex justify-between items-start mb-4">
                     <span class="text-[10px] text-pink-200 tracking-widest font-medium">${item.date}</span>
                     <div class="flex flex-wrap justify-end gap-1">${(item.tags||[]).map(t => `<span class="text-[9px] border border-pink-100 px-2 py-0.5 rounded-lg text-pink-300">${t}</span>`).join('')}</div>
                 </div>
                 <h2 class="text-lg sm:text-xl font-medium text-gray-700 mb-3 group-hover:text-pink-400 transition-colors">${item.title || 'Untitled'}</h2>
-                <p class="text-gray-500 leading-relaxed text-sm">${preview}...</p>
+                <div class="text-gray-500 leading-relaxed text-sm preview-text">${previewText}</div>
             </div>`;
         }).join('');
     }
@@ -216,21 +226,15 @@
     function setFilter(tag) { filterTag = (filterTag === tag) ? null : tag; render(); }
 
     async function handleSave() {
-        const token = getToken();
-        if(!token) return;
+        const token = getToken(); if(!token) return;
         const saveBtn = document.getElementById('saveBtn');
         const title = document.getElementById('diaryTitle').value.trim() || "新的瞬间";
         const tags = document.getElementById('diaryTags').value.trim().split(/\s+/).filter(t => t);
         const dateStr = new Date().toLocaleDateString('zh-CN', {year:'numeric', month:'2-digit', day:'2-digit'});
 
-        saveBtn.disabled = true;
-        saveBtn.innerText = "正在同步...";
-
-        if (editIndex !== null) {
-            diaryData[editIndex] = { ...diaryData[editIndex], title, content: quill.root.innerHTML, tags };
-        } else {
-            diaryData.push({ id: Date.now(), title, content: quill.root.innerHTML, tags, date: dateStr });
-        }
+        saveBtn.disabled = true; saveBtn.innerText = "正在同步...";
+        if (editIndex !== null) { diaryData[editIndex] = { ...diaryData[editIndex], title, content: quill.root.innerHTML, tags }; }
+        else { diaryData.push({ id: Date.now(), title, content: quill.root.innerHTML, tags, date: dateStr }); }
 
         const b64 = btoa(unescape(encodeURIComponent(JSON.stringify(diaryData, null, 2))));
         try {
@@ -241,7 +245,7 @@
             });
             if (res.status === 401) { alert("Token 错误"); localStorage.removeItem('gh_token'); window.location.reload(); }
             if (res.ok) {
-                const d = await res.json(); currentSha = d.content.sha; render(); petSpeak("记忆已保存 ✨");
+                const d = await res.json(); currentSha = d.content.sha; render(); petSpeak("唱出来了……我，唱出来了！✨");
                 let count = 5;
                 const timer = setInterval(() => {
                     count--;
@@ -253,8 +257,7 @@
     }
 
     async function deleteItem(index) {
-        const token = getToken();
-        if(!token || !confirm("确定要删除吗？")) return;
+        const token = getToken(); if(!token || !confirm("确定要删除吗？")) return;
         diaryData.splice(index, 1);
         const b64 = btoa(unescape(encodeURIComponent(JSON.stringify(diaryData, null, 2))));
         const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${PATH}`, {
@@ -265,10 +268,19 @@
         if(res.ok) { const d = await res.json(); currentSha = d.content.sha; goBack(); render(); }
     }
 
+    // 修复 3: 心羽台词替换
     function petSpeak(msg) {
         const bubble = document.getElementById('pet-bubble');
-        const quotes = ["チョココロネ~", "欢迎来到我的秘密基地！", "访客模式已开启 🍃", "这里的记忆都是彩色的。"];
-        bubble.innerText = msg || quotes[Math.floor(Math.random() * quotes.length)];
+        const kohaneQuotes = [
+            "那个……我也能变得像大家一样帅气吗？",
+            "我也想……唱出能让大家露出笑容的歌！",
+            "只要和大家在一起，我感觉哪里都能去……！",
+            "Humming……♪ 嗯，今天的状态很不错！",
+            "Vivid BAD SQUAD，出击……！啊，有点害羞……",
+            "虽然还会紧张，但我不会再逃避了！",
+            "多亏了白石同学，我才能站在这里……"
+        ];
+        bubble.innerText = msg || kohaneQuotes[Math.floor(Math.random() * kohaneQuotes.length)];
         bubble.classList.add('active');
         setTimeout(() => bubble.classList.remove('active'), 3000);
     }
