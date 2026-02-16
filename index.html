@@ -21,7 +21,7 @@
             cursor: url('https://cur.cursors-4u.net/anime/ani-11/ani1085.cur'), auto;
         }
 
-        /* 🎵 音乐按钮 */
+        /* 音乐按钮 */
         #music-ctrl {
             position: fixed; top: 30px; right: 30px; z-index: 1001;
             width: 44px; height: 44px; background: white; border-radius: 50%;
@@ -29,11 +29,25 @@
             box-shadow: 0 4px 15px rgba(255,177,193,0.3); border: 1px solid #fff0f3;
             transition: transform 0.1s, background-color 0.3s; font-size: 20px;
         }
-        #music-ctrl:active { transform: scale(0.9); background-color: #fff0f3; }
         .music-playing { animation: rotate 3s linear infinite; color: #ffb1c1; }
         @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-        /* 🌸 宠物：心羽 */
+        /* 首页预览容器：关键修复换行 */
+        .preview-container {
+            max-height: 100px; /* 限制预览高度 */
+            overflow: hidden;
+            position: relative;
+            line-height: 1.6;
+            font-size: 13px;
+            color: #888;
+        }
+        /* 预览处的底部渐变遮罩，让截断更自然 */
+        .preview-fade {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 40px;
+            background: linear-gradient(transparent, rgba(255,255,255,0.9));
+        }
+
+        /* 宠物系统 */
         #pet-container { position: fixed; bottom: 20px; right: 20px; z-index: 999; cursor: pointer; }
         #pet-img { width: 90px; animation: softFloat 4s ease-in-out infinite; }
         @keyframes softFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
@@ -42,23 +56,13 @@
             position: absolute; bottom: 100%; right: 0; margin-bottom: 10px;
             background: white; padding: 10px 15px; border-radius: 18px; font-size: 12px;
             opacity: 0; transition: 0.4s; pointer-events: none; border: 1px solid #fef0f3;
-            box-shadow: 0 5px 15px rgba(255,177,193,0.2); white-space: nowrap;
-            color: #666;
+            box-shadow: 0 5px 15px rgba(255,177,193,0.2); white-space: nowrap; color: #666;
         }
 
         .f-card {
             background: var(--f-glass); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
             border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 30px;
             box-shadow: 0 8px 30px rgba(255, 177, 193, 0.06); word-break: break-word;
-        }
-
-        /* 修复首页预览换行限制 */
-        .preview-text {
-            display: -webkit-box;
-            -webkit-box-orient: vertical;
-            -webkit-line-clamp: 3; /* 限制显示3行 */
-            overflow: hidden;
-            line-height: 1.6;
         }
 
         .page-btn { padding: 8px 16px; border-radius: 15px; font-size: 12px; transition: 0.3s; border: 1px solid #ffdee9; color: #ffb1c1; }
@@ -121,7 +125,7 @@
         <input id="diaryTitle" type="text" placeholder="标题..." class="w-full text-xl mb-4 outline-none">
         <div id="editor-container" style="height: 300px;"></div>
         <button id="saveBtn" onclick="handleSave()" class="mt-8 w-full py-4 bg-pink-400 text-white rounded-2xl font-bold shadow-lg">同步至星海</button>
-        <button onclick="document.getElementById('editor-mask').style.display='none'" class="mt-2 w-full text-gray-300 text-xs">取消</button>
+        <button onclick="document.getElementById('editor-mask').style.display='none'" class="mt-4 w-full text-gray-400 text-xs">返回</button>
     </div>
 </div>
 
@@ -136,7 +140,6 @@
     let currentPage = 1;
     const pageSize = 6;
 
-    // 心羽台词库
     const kohaneQuotes = [
         "我会努力唱好的！",
         "这就是……街头音乐吗？好期待！",
@@ -147,8 +150,7 @@
         "感觉……蛇、蛇皮果好像也挺可爱的？(并不)",
         "这就是属于我们的『RAD WEEKEND』！",
         "谢谢你一直陪着我 ✨",
-        "今天的心情，也记录在日记里了吗？",
-        "听到了吗？星海里的歌声……"
+        "记录在这里的心情，我会好好珍藏的。"
     ];
 
     const quill = new Quill('#editor-container', { theme: 'snow', modules: { toolbar: [['bold', 'italic'], ['image', 'link']] } });
@@ -160,10 +162,7 @@
             bgm.play().then(() => {
                 ctrl.classList.add('music-playing');
                 petSpeak("音乐响起来了，真好听……♪");
-            }).catch(e => {
-                ctrl.style.backgroundColor = "#fee2e2";
-                setTimeout(() => ctrl.style.backgroundColor = "white", 500);
-            });
+            }).catch(e => console.error(e));
         } else {
             bgm.pause();
             ctrl.classList.remove('music-playing');
@@ -198,22 +197,25 @@
 
         const totalPages = Math.ceil(filtered.length / pageSize) || 1;
         if (currentPage > totalPages) currentPage = totalPages;
-        
         const start = (currentPage - 1) * pageSize;
         const pagedData = filtered.slice(start, start + pageSize);
 
         list.innerHTML = pagedData.map((item) => {
             const realIndex = diaryData.findIndex(d => d.id === item.id);
-            // 优化预览：移除HTML标签，保留合理的间距
-            const previewText = item.content.replace(/<\/?[^>]+(>|$)/g, " ").substring(0, 150);
             
+            // 关键：保留基本的换行标签 <p> 和 <br>，但剔除图片标签防止布局崩溃
+            let previewContent = item.content.replace(/<img[^>]*>/g, '[图片]');
+
             return `<div class="f-card p-6 sm:p-8 cursor-pointer group hover:bg-white/90 transition-all" onclick="showDetail(${realIndex})">
                 <div class="flex justify-between items-center mb-4">
                     <span class="text-[10px] text-pink-200 font-bold">${item.pinned?'置顶 · ':''}${item.date}</span>
                     <div class="flex gap-1">${(item.tags||[]).map(t => `<span class="text-[8px] bg-pink-50 text-pink-300 px-2 py-0.5 rounded-lg">${t}</span>`).join('')}</div>
                 </div>
                 <h2 class="text-lg font-medium text-gray-700 mb-3 group-hover:text-pink-400">${item.title}</h2>
-                <div class="preview-text text-gray-400 text-sm">${previewText}...</div>
+                <div class="preview-container">
+                    <div class="preview-body">${previewContent}</div>
+                    <div class="preview-fade"></div>
+                </div>
             </div>`;
         }).join('');
 
@@ -256,7 +258,6 @@
         }
     }
 
-    // 随机台词函数
     function petSpeak(msg) {
         const b = document.getElementById('pet-bubble');
         const text = msg || kohaneQuotes[Math.floor(Math.random() * kohaneQuotes.length)];
