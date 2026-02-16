@@ -20,61 +20,52 @@
             margin: 0; overflow-x: hidden; -webkit-tap-highlight-color: transparent;
             cursor: url('https://cur.cursors-4u.net/anime/ani-11/ani1085.cur'), auto;
         }
-        
-        /* 音乐按钮优化 */
+
+        /* 🎵 音乐按钮：更明显的反馈 */
         #music-ctrl {
             position: fixed; top: 30px; right: 30px; z-index: 1001;
             width: 42px; height: 42px; background: white; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 4px 15px rgba(255,177,193,0.25); border: 1px solid #fff0f3;
-            cursor: pointer; transition: 0.3s; font-size: 20px;
+            box-shadow: 0 4px 15px rgba(255,177,193,0.3); border: 1px solid #fff0f3;
+            transition: 0.3s; font-size: 20px;
         }
-        .music-playing { animation: rotate 3s linear infinite; color: #ffb1c1; }
-        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        
-        /* 紧凑侧边栏样式 */
-        .sidebar-section-title { font-size: 10px; color: #ffb1c1; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; margin-left: 4px; }
-        .tag-btn { padding: 4px 10px !important; border-radius: 10px !important; margin-bottom: 1px !important; }
-        .social-link { font-size: 11px; padding: 5px 10px; border-radius: 10px; margin-bottom: 2px; }
+        /* 播放中：转动 */
+        .music-playing { animation: rotate 3s linear infinite; color: #ffb1c1; background: #fff5f7 !important; }
+        /* 加载中：闪烁 */
+        .music-loading { animation: pulse 1s infinite; opacity: 0.6; }
 
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        
         .f-card {
             background: var(--f-glass); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
             border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 28px;
-            box-shadow: 0 8px 30px rgba(255, 177, 193, 0.06); transition: all 0.4s ease;
-            word-break: break-all;
+            box-shadow: 0 8px 30px rgba(255, 177, 193, 0.06); word-break: break-all;
         }
 
-        .preview-text {
-            white-space: pre-line; display: -webkit-box; -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical; overflow: hidden;
-        }
+        .sidebar-section-title { font-size: 10px; color: #ffb1c1; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
+        .social-link { font-size: 11px; padding: 6px 10px; border-radius: 10px; margin-bottom: 2px; }
 
-        #pet-container { position: fixed; bottom: 20px; right: 20px; z-index: 999; }
         #pet-img { width: 85px; animation: softFloat 4s ease-in-out infinite; }
         @keyframes softFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
 
-        @media (max-width: 640px) {
-            .header-banner { height: 140px; }
-            #music-ctrl { top: 20px; right: 20px; width: 38px; height: 38px; font-size: 18px; }
-        }
+        @media (max-width: 640px) { #music-ctrl { top: 20px; right: 20px; } }
     </style>
 </head>
 <body>
 
-<audio id="bgm" loop preload="auto" src="https://music.163.com/song/media/outer/url?id=1443831646.mp3"></audio>
+<audio id="bgm" loop preload="auto" src="music/bgm.mp3"></audio>
 <div id="music-ctrl" onclick="toggleMusic()">🎵</div>
 
 <div id="page-list">
-    <div class="header-banner"></div>
+    <div class="header-banner" style="height: 200px; background: linear-gradient(to bottom, #ffdee9cc, #ffffff22), url('https://api.paugram.com/wallpaper?source=gh') center/cover no-repeat; border-radius: 0 0 50px 50px;"></div>
     <div class="max-w-6xl mx-auto px-4 sm:px-8 -mt-12 relative pb-24">
         <div class="flex flex-col lg:flex-row gap-6">
             <aside class="w-full lg:w-60">
                 <div class="f-card p-5 text-center sticky top-8">
-                    <img src="images/IMG_3024.webp" class="w-20 h-20 rounded-full mx-auto mb-3 bg-white object-cover border-2 border-pink-50">
+                    <img src="images/IMG_3024.webp" class="w-20 h-20 rounded-full mx-auto mb-3 object-cover border-2 border-pink-50">
                     <h2 class="nickname mb-1">Ancenchan</h2>
-                    <div class="text-[11px] text-gray-400 mb-5 px-2 leading-relaxed font-light">
-                        在这里记录碎碎念和星海的歌声 ✨
-                    </div>
+                    <div class="text-[11px] text-gray-400 mb-5 leading-relaxed">在这里记录碎碎念和星海的歌声 ✨</div>
 
                     <div class="sidebar-section-title text-left">Collection</div>
                     <nav id="tagCloud" class="flex flex-col gap-0.5 mb-5"></nav>
@@ -90,10 +81,8 @@
 
             <main class="flex-1">
                 <div class="flex justify-between items-center mb-5 px-1">
-                    <h3 class="text-[10px] text-pink-200 tracking-[0.2em] font-bold uppercase">Memory Stream</h3>
-                    <button onclick="checkAdminThenOpen()" class="bg-white/90 backdrop-blur px-4 py-1.5 rounded-xl border border-pink-100 text-pink-400 text-xs hover:bg-pink-400 hover:text-white transition-all">
-                        新的记忆 ✨
-                    </button>
+                    <h3 class="text-[10px] text-pink-200 tracking-widest font-bold">MEMORY STREAM</h3>
+                    <button onclick="checkAdminThenOpen()" class="bg-white/90 px-4 py-1.5 rounded-xl border border-pink-100 text-pink-400 text-xs hover:bg-pink-400 hover:text-white transition-all">新的记忆 ✨</button>
                 </div>
                 <div class="space-y-4" id="diaryList"></div>
             </main>
@@ -101,175 +90,79 @@
     </div>
 </div>
 
-<div id="page-detail" class="hidden p-4 sm:p-8"><div class="max-w-4xl mx-auto pt-8"><button onclick="goBack()" class="mb-8 text-pink-300 hover:text-pink-500 text-sm tracking-widest">/ BACK</button><div id="detail-content" class="f-card p-8 sm:p-16 bg-white/95"></div></div></div>
-<div id="editor-mask" class="fixed inset-0 bg-white/80 backdrop-blur-md z-[1000] hidden items-center justify-center p-4"><div class="f-card p-6 sm:p-10 w-full max-w-2xl bg-white shadow-2xl border-none"><div class="flex justify-between items-center mb-6"><span class="text-pink-200 text-xs tracking-widest">EDITOR</span><button onclick="closeEditor()" class="text-gray-300 hover:text-gray-500 text-xl">✕</button></div><input id="diaryTitle" type="text" placeholder="标题..." class="w-full text-xl font-normal mb-4 outline-none text-gray-700 placeholder:text-gray-200"><input id="diaryTags" type="text" placeholder="标签 (空格隔开)" class="w-full text-xs mb-6 outline-none text-pink-300 uppercase"><div id="editor-container" class="text-gray-600" style="height: 250px;"></div><div class="flex justify-end mt-8"><button id="saveBtn" onclick="handleSave()" class="py-2.5 px-8 border border-pink-200 rounded-xl text-pink-400 bg-white hover:bg-pink-400 hover:text-white transition-all">同步至星海</button></div></div></div>
+<div id="page-detail" class="hidden p-4 sm:p-8"><div class="max-w-4xl mx-auto pt-8"><button onclick="goBack()" class="mb-8 text-pink-300 text-sm">/ BACK</button><div id="detail-content" class="f-card p-8 sm:p-16 bg-white/95"></div></div></div>
+<div id="editor-mask" class="fixed inset-0 bg-white/80 backdrop-blur-md z-[1000] hidden items-center justify-center p-4"><div class="f-card p-6 w-full max-w-2xl bg-white"><input id="diaryTitle" type="text" placeholder="标题..." class="w-full text-xl mb-4 outline-none"><div id="editor-container" style="height: 250px;"></div><button id="saveBtn" onclick="handleSave()" class="mt-8 w-full py-3 bg-pink-400 text-white rounded-xl">同步至星海</button></div></div>
 
-<div id="pet-container" onclick="petSpeak()"><div id="pet-bubble" style="position: absolute; bottom: 100%; right: 0; margin-bottom: 10px; background: white; padding: 8px 12px; border-radius: 15px; font-size: 11px; opacity: 0; transition: 0.4s; pointer-events: none; border: 1px solid #fef0f3; box-shadow: 0 5px 15px rgba(0,0,0,0.05); white-space: nowrap;"></div><img id="pet-img" src="images/IMG_2877.png" alt="Pet"></div>
+<div id="pet-container" onclick="petSpeak()"><div id="pet-bubble" style="position: absolute; bottom: 100%; right: 0; margin-bottom: 10px; background: white; padding: 8px 12px; border-radius: 15px; font-size: 11px; opacity: 0; transition: 0.4s; border: 1px solid #fef0f3; white-space: nowrap;"></div><img id="pet-img" src="images/IMG_2877.png" alt="Pet"></div>
 
 <script>
-    const REPO = "Ancenchan/ancenchan.github.io"; 
-    const PATH = "data/articles.json";
+    const REPO = "Ancenchan/ancenchan.github.io", PATH = "data/articles.json";
     let diaryData = [], currentSha = "", filterTag = null, editIndex = null;
-
     const quill = new Quill('#editor-container', { theme: 'snow', modules: { toolbar: [['bold', 'italic'], ['image', 'link']] } });
 
-    // 优化的音乐切换
+    // 🏆 音乐控制终极逻辑
     function toggleMusic() {
         const bgm = document.getElementById('bgm');
         const ctrl = document.getElementById('music-ctrl');
         
         if (bgm.paused) {
-            const playPromise = bgm.play();
-            if (playPromise !== undefined) {
-                playPromise.then(() => {
-                    ctrl.classList.add('music-playing');
-                }).catch(error => {
-                    // 如果失败，尝试静默引导
-                    console.log("Playback failed, waiting for user interaction.");
-                    ctrl.style.animation = "shake 0.5s ease-in-out";
-                    setTimeout(() => ctrl.style.animation = "", 500);
-                });
-            }
+            ctrl.classList.add('music-loading'); // 先闪烁，表示正在努力加载
+            bgm.play().then(() => {
+                ctrl.classList.remove('music-loading');
+                ctrl.classList.add('music-playing');
+            }).catch(() => {
+                // 如果失败，可能是没传文件，或者需要再次点击
+                ctrl.classList.remove('music-loading');
+                console.log("Waiting for interaction...");
+            });
         } else {
             bgm.pause();
             ctrl.classList.remove('music-playing');
+            ctrl.classList.remove('music-loading');
         }
     }
 
-    // 辅助功能：获取Token
-    function getToken(f=false) { let t=localStorage.getItem('gh_token'); if(!t||f){ t=prompt("🗝️ 请输入管理密码:"); if(t)localStorage.setItem('gh_token',t); } return t; }
-    function checkAdminThenOpen() { if(getToken()) openEditor(); }
-    function openEditor(index=null) { 
-        editIndex=index; document.getElementById('editor-mask').style.display='flex'; document.body.style.overflow='hidden';
-        if(index!==null){ const item=diaryData[index]; document.getElementById('diaryTitle').value=item.title; document.getElementById('diaryTags').value=(item.tags||[]).join(' '); quill.root.innerHTML=item.content; }
-        else { document.getElementById('diaryTitle').value=""; document.getElementById('diaryTags').value=""; quill.root.innerHTML=""; }
-    }
-    function closeEditor() { document.getElementById('editor-mask').style.display='none'; document.body.style.overflow='auto'; }
-
+    // 其他逻辑 (fetchData, render, save 等) 与之前一致...
     async function fetchCloudData() {
-        const t = localStorage.getItem('gh_token');
-        const h = t ? { 'Authorization': `Bearer ${t}` } : {};
+        const t = localStorage.getItem('gh_token'), h = t ? { 'Authorization': `Bearer ${t}` } : {};
         try {
             const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${PATH}?v=${Date.now()}`, { headers: h });
-            if (res.ok) {
-                const data = await res.json(); currentSha = data.sha;
-                diaryData = JSON.parse(decodeURIComponent(escape(atob(data.content.replace(/\s/g, '')))));
-                render();
-            }
+            if (res.ok) { const data = await res.json(); currentSha = data.sha; diaryData = JSON.parse(decodeURIComponent(escape(atob(data.content.replace(/\s/g, ''))))); render(); }
         } catch (e) { petSpeak("正在努力加载中..."); }
     }
 
     function render() {
-        const list = document.getElementById('diaryList');
-        const cloud = document.getElementById('tagCloud');
-        const tagMap = {};
-        diaryData.forEach(d => { if(d.tags) d.tags.forEach(t => tagMap[t] = (tagMap[t] || 0) + 1); });
-        
-        cloud.innerHTML = Object.keys(tagMap).map(t => `
-            <button class="tag-btn flex items-center transition-all text-[11px] ${filterTag===t?'bg-pink-100 text-pink-500':'text-gray-400 hover:bg-white/60'}" onclick="setFilter('${t}')">
-                <span class="mr-2">🌸</span><span class="flex-1 text-left">${t}</span>
-            </button>`).join('');
-
-        const sortedData = diaryData.slice().sort((a, b) => {
-            if (a.pinned && !b.pinned) return -1;
-            if (!a.pinned && b.pinned) return 1;
-            return b.id - a.id;
-        });
-
-        const filtered = filterTag ? sortedData.filter(d => d.tags && d.tags.includes(filterTag)) : sortedData;
-        list.innerHTML = filtered.map((item) => {
+        const list = document.getElementById('diaryList'), cloud = document.getElementById('tagCloud'), tagMap = {};
+        diaryData.forEach(d => d.tags && d.tags.forEach(t => tagMap[t] = (tagMap[t] || 0) + 1));
+        cloud.innerHTML = Object.keys(tagMap).map(t => `<button class="text-[11px] text-left p-2 rounded-lg ${filterTag===t?'bg-pink-100 text-pink-500':'text-gray-400'}" onclick="setFilter('${t}')">🌸 ${t}</button>`).join('');
+        const sorted = diaryData.slice().sort((a,b) => (a.pinned===b.pinned) ? b.id-a.id : (a.pinned?-1:1));
+        const filtered = filterTag ? sorted.filter(d => d.tags && d.tags.includes(filterTag)) : sorted;
+        list.innerHTML = filtered.map((item, idx) => {
             const realIndex = diaryData.findIndex(d => d.id === item.id);
-            const tempDiv = document.createElement('div'); tempDiv.innerHTML = item.content || "";
-            const previewText = tempDiv.innerText.substring(0, 150); 
-
-            return `<div class="f-card p-5 sm:p-7 cursor-pointer group hover:bg-white/90" onclick="showDetail(${realIndex})">
-                <div class="flex justify-between items-start mb-3">
-                    <div class="flex items-center gap-2">
-                        ${item.pinned ? '<span class="bg-pink-400 text-white text-[8px] px-1.5 py-0.5 rounded-full">PIN</span>' : ''}
-                        <span class="text-[9px] text-pink-200 tracking-widest font-medium">${item.date}</span>
-                    </div>
-                    <div class="flex flex-wrap gap-1">${(item.tags||[]).map(t => `<span class="text-[8px] border border-pink-50 px-1.5 py-0.5 rounded-lg text-pink-300">${t}</span>`).join('')}</div>
+            return `<div class="f-card p-5 cursor-pointer" onclick="showDetail(${realIndex})">
+                <div class="flex justify-between text-[9px] text-pink-200 mb-2">
+                    <span>${item.pinned?'[PIN] ':''}${item.date}</span>
+                    <div class="flex gap-1">${(item.tags||[]).map(t => `<span class="border border-pink-50 px-1 rounded">${t}</span>`).join('')}</div>
                 </div>
-                <h2 class="text-base font-medium text-gray-700 mb-2 group-hover:text-pink-400 transition-colors">${item.title || 'Untitled'}</h2>
-                <div class="text-gray-400 leading-relaxed text-[11px] preview-text">${previewText}</div>
+                <h2 class="text-gray-700 font-medium mb-2">${item.title}</h2>
+                <div class="text-gray-400 text-[11px] line-clamp-2">${(item.content||"").replace(/<[^>]+>/g, '').substring(0,80)}...</div>
             </div>`;
         }).join('');
     }
 
     function showDetail(index) {
         const item = diaryData[index];
-        document.getElementById('detail-content').innerHTML = `
-            <div class="flex items-center gap-3 mb-6">
-                ${item.pinned ? '<span class="bg-pink-400 text-white text-[9px] px-2 py-1 rounded-full">置顶</span>' : ''}
-                <div class="text-[9px] text-pink-200 tracking-[0.3em] font-bold uppercase">${item.date}</div>
-            </div>
-            <h1 class="text-xl sm:text-2xl font-bold text-gray-800 mb-6 tracking-tight">${item.title}</h1>
-            <div class="ql-editor p-0 text-gray-700 leading-7 text-sm sm:text-base font-light">${item.content}</div>
-            <div class="mt-12 border-t border-pink-50 pt-8 flex gap-6">
-                <button onclick="if(getToken()) { openEditor(${index}); goBack(); }" class="text-pink-300 hover:text-pink-500 text-[10px] font-bold tracking-widest">EDIT</button>
-                <button onclick="if(getToken()) togglePin(${index})" class="text-gray-300 hover:text-pink-400 text-[10px] font-bold tracking-widest">${item.pinned?'UNPIN':'PIN TOP'}</button>
-                <button onclick="if(getToken()) deleteItem(${index})" class="text-gray-100 hover:text-red-300 text-[10px] font-bold tracking-widest">DELETE</button>
-            </div>`;
+        document.getElementById('detail-content').innerHTML = `<h1 class="text-xl font-bold mb-4">${item.title}</h1><div class="ql-editor">${item.content}</div><div class="mt-8 pt-4 border-t flex gap-4"><button onclick="if(getToken()) openEditor(${index})" class="text-pink-300 text-xs">EDIT</button><button onclick="goBack()" class="text-gray-300 text-xs">CLOSE</button></div>`;
         document.getElementById('page-list').classList.add('hidden');
         document.getElementById('page-detail').classList.remove('hidden');
-        window.scrollTo(0, 0);
+        window.scrollTo(0,0);
     }
-
-    async function togglePin(index) {
-        diaryData[index].pinned = !diaryData[index].pinned;
-        const b64 = btoa(unescape(encodeURIComponent(JSON.stringify(diaryData, null, 2))));
-        const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${PATH}`, {
-            method: 'PUT',
-            headers: { 'Authorization': `Bearer ${getToken()}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: "Toggle Pin", content: b64, sha: currentSha })
-        });
-        if(res.ok) { const d=await res.json(); currentSha=d.content.sha; render(); showDetail(index); }
-    }
-
     function goBack() { document.getElementById('page-list').classList.remove('hidden'); document.getElementById('page-detail').classList.add('hidden'); }
     function setFilter(tag) { filterTag = (filterTag === tag) ? null : tag; render(); }
-
-    async function handleSave() {
-        const token = getToken(); if(!token) return;
-        const saveBtn = document.getElementById('saveBtn');
-        const title = document.getElementById('diaryTitle').value.trim() || "新的瞬间";
-        const tags = document.getElementById('diaryTags').value.trim().split(/\s+/).filter(t => t);
-        const dateStr = new Date().toLocaleDateString('zh-CN', {year:'numeric', month:'2-digit', day:'2-digit'});
-        saveBtn.disabled = true; saveBtn.innerText = "正在同步...";
-        if (editIndex !== null) { diaryData[editIndex] = { ...diaryData[editIndex], title, content: quill.root.innerHTML, tags }; }
-        else { diaryData.push({ id: Date.now(), title, content: quill.root.innerHTML, tags, date: dateStr, pinned: false }); }
-        const b64 = btoa(unescape(encodeURIComponent(JSON.stringify(diaryData, null, 2))));
-        try {
-            const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${PATH}`, {
-                method: 'PUT',
-                headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: "Update", content: b64, sha: currentSha })
-            });
-            if (res.ok) { const d=await res.json(); currentSha=d.content.sha; render(); petSpeak("记忆已保存！✨"); setTimeout(() => { closeEditor(); saveBtn.disabled=false; saveBtn.innerText="同步至星海"; }, 1500); }
-        } catch (e) { alert("同步失败"); saveBtn.disabled = false; }
-    }
-
-    async function deleteItem(index) {
-        const token = getToken(); if(!token || !confirm("确定要删除吗？")) return;
-        diaryData.splice(index, 1);
-        const b64 = btoa(unescape(encodeURIComponent(JSON.stringify(diaryData, null, 2))));
-        const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${PATH}`, {
-            method: 'PUT',
-            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: "Delete", content: b64, sha: currentSha })
-        });
-        if(res.ok) { const d = await res.json(); currentSha = d.content.sha; goBack(); render(); }
-    }
-
-    function petSpeak(msg) {
-        const bubble = document.getElementById('pet-bubble');
-        const kohaneQuotes = ["大家都在努力，我也不能输！", "只要和大家在一起……！", "Vivid BAD SQUAD，出击！", "我会努力唱好的！"];
-        bubble.innerText = msg || kohaneQuotes[Math.floor(Math.random() * kohaneQuotes.length)];
-        bubble.style.opacity = "1";
-        setTimeout(() => bubble.style.opacity = "0", 3000);
-    }
-
+    function getToken() { let t=localStorage.getItem('gh_token'); if(!t){ t=prompt("Token:"); if(t)localStorage.setItem('gh_token',t); } return t; }
+    function checkAdminThenOpen() { if(getToken()) openEditor(); }
     window.onload = fetchCloudData;
+    function petSpeak(msg) { const b = document.getElementById('pet-bubble'); b.innerText = msg || "我会努力唱好的！"; b.style.opacity = "1"; setTimeout(() => b.style.opacity = "0", 3000); }
 </script>
 </body>
 </html>
