@@ -20,100 +20,91 @@
             margin: 0; overflow-x: hidden; -webkit-tap-highlight-color: transparent;
             cursor: url('https://cur.cursors-4u.net/anime/ani-11/ani1085.cur'), auto;
         }
-        a, button, .cursor-pointer { cursor: url('https://cur.cursors-4u.net/anime/ani-11/ani1084.cur'), pointer !important; }
-
-        .nickname { font-family: 'Ma Shan Zheng', cursive; font-size: 2.2rem; color: #8a7a7a; letter-spacing: 2px; }
-
-        .header-banner { 
-            height: 200px; background: linear-gradient(to bottom, #ffdee9cc, #ffffff22), 
-            url('https://api.paugram.com/wallpaper?source=gh') center/cover no-repeat;
-            filter: saturate(0.9); border-radius: 0 0 50px 50px;
+        
+        /* 音乐按钮优化 */
+        #music-ctrl {
+            position: fixed; top: 30px; right: 30px; z-index: 1001;
+            width: 42px; height: 42px; background: white; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 15px rgba(255,177,193,0.25); border: 1px solid #fff0f3;
+            cursor: pointer; transition: 0.3s; font-size: 20px;
         }
+        .music-playing { animation: rotate 3s linear infinite; color: #ffb1c1; }
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        
+        /* 紧凑侧边栏样式 */
+        .sidebar-section-title { font-size: 10px; color: #ffb1c1; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; margin-left: 4px; }
+        .tag-btn { padding: 4px 10px !important; border-radius: 10px !important; margin-bottom: 1px !important; }
+        .social-link { font-size: 11px; padding: 5px 10px; border-radius: 10px; margin-bottom: 2px; }
 
         .f-card {
             background: var(--f-glass); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 30px;
-            box-shadow: 0 8px 30px rgba(255, 177, 193, 0.08); transition: all 0.4s ease;
+            border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 28px;
+            box-shadow: 0 8px 30px rgba(255, 177, 193, 0.06); transition: all 0.4s ease;
             word-break: break-all;
         }
-
-        /* 音乐控制器优化 - 移至右上方 */
-        #music-ctrl {
-            position: fixed; top: 30px; right: 30px; z-index: 1001;
-            width: 45px; height: 45px; background: white; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 4px 15px rgba(255,177,193,0.3); border: 2px solid #fff0f3;
-            cursor: pointer; transition: 0.3s; font-size: 24px;
-        }
-        .music-playing { animation: rotate 3s linear infinite; background: #fff5f7 !important; }
-        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-
-        /* 侧边栏紧凑化 */
-        .sidebar-section-title { font-size: 10px; color: #ffb1c1; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; margin-left: 4px; }
-        .tag-btn { padding: 6px 12px !important; border-radius: 12px !important; margin-bottom: 2px !important; }
-        .social-link { font-size: 12px; padding: 4px 8px; border-radius: 8px; }
 
         .preview-text {
             white-space: pre-line; display: -webkit-box; -webkit-line-clamp: 3;
             -webkit-box-orient: vertical; overflow: hidden;
         }
 
-        #pet-container { position: fixed; bottom: 20px; right: 20px; z-index: 999; cursor: pointer; }
-        #pet-img { width: 90px; animation: softFloat 4s ease-in-out infinite; }
-        @keyframes softFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        #pet-container { position: fixed; bottom: 20px; right: 20px; z-index: 999; }
+        #pet-img { width: 85px; animation: softFloat 4s ease-in-out infinite; }
+        @keyframes softFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
 
         @media (max-width: 640px) {
-            .header-banner { height: 160px; }
-            #music-ctrl { top: 20px; right: 20px; width: 40px; height: 40px; font-size: 20px; }
+            .header-banner { height: 140px; }
+            #music-ctrl { top: 20px; right: 20px; width: 38px; height: 38px; font-size: 18px; }
         }
     </style>
 </head>
 <body>
 
-<audio id="bgm" loop src="https://music.163.com/song/media/outer/url?id=1443831646.mp3"></audio>
-<div id="music-ctrl" onclick="toggleMusic()">📻</div>
+<audio id="bgm" loop preload="auto" src="https://music.163.com/song/media/outer/url?id=1443831646.mp3"></audio>
+<div id="music-ctrl" onclick="toggleMusic()">🎵</div>
 
 <div id="page-list">
     <div class="header-banner"></div>
-    <div class="max-w-6xl mx-auto px-4 sm:px-8 -mt-16 relative pb-24">
+    <div class="max-w-6xl mx-auto px-4 sm:px-8 -mt-12 relative pb-24">
         <div class="flex flex-col lg:flex-row gap-6">
-            <aside class="w-full lg:w-64">
-                <div class="f-card p-6 text-center sticky top-8">
-                    <img src="images/IMG_3024.webp" class="w-20 h-20 rounded-full mx-auto mb-4 bg-white object-cover border-2 border-pink-50">
+            <aside class="w-full lg:w-60">
+                <div class="f-card p-5 text-center sticky top-8">
+                    <img src="images/IMG_3024.webp" class="w-20 h-20 rounded-full mx-auto mb-3 bg-white object-cover border-2 border-pink-50">
                     <h2 class="nickname mb-1">Ancenchan</h2>
-                    <div class="text-[11px] text-gray-400 mb-6 px-4 leading-relaxed font-light">
+                    <div class="text-[11px] text-gray-400 mb-5 px-2 leading-relaxed font-light">
                         在这里记录碎碎念和星海的歌声 ✨
                     </div>
 
                     <div class="sidebar-section-title text-left">Collection</div>
-                    <nav id="tagCloud" class="flex flex-col gap-1 mb-6"></nav>
+                    <nav id="tagCloud" class="flex flex-col gap-0.5 mb-5"></nav>
 
                     <div class="sidebar-section-title text-left">Connect</div>
-                    <div class="flex flex-col gap-1 text-left">
-                        <div class="social-link bg-blue-50/30 text-blue-400">📺 Bili: 安尘子 (330870)</div>
-                        <div class="social-link bg-pink-50/30 text-pink-400">🎨 WB: kurofu</div>
-                        <div class="social-link bg-red-50/30 text-red-400">📖 XHS: 1166142003</div>
+                    <div class="flex flex-col gap-0.5 text-left">
+                        <div class="social-link bg-blue-50/40 text-blue-400">📺 Bili: 安尘子 (330870)</div>
+                        <div class="social-link bg-pink-50/40 text-pink-400">🎨 WB: kurofu</div>
+                        <div class="social-link bg-red-50/40 text-red-400">📖 XHS: 1166142003</div>
                     </div>
                 </div>
             </aside>
 
             <main class="flex-1">
-                <div class="flex justify-between items-end mb-6 px-2">
-                    <h3 class="text-xs text-pink-200 tracking-[0.2em] font-bold uppercase">Memory Stream</h3>
-                    <button onclick="checkAdminThenOpen()" class="bg-white/80 backdrop-blur px-5 py-2 rounded-2xl border border-pink-100 text-pink-400 text-sm hover:bg-pink-400 hover:text-white transition-all shadow-sm">
+                <div class="flex justify-between items-center mb-5 px-1">
+                    <h3 class="text-[10px] text-pink-200 tracking-[0.2em] font-bold uppercase">Memory Stream</h3>
+                    <button onclick="checkAdminThenOpen()" class="bg-white/90 backdrop-blur px-4 py-1.5 rounded-xl border border-pink-100 text-pink-400 text-xs hover:bg-pink-400 hover:text-white transition-all">
                         新的记忆 ✨
                     </button>
                 </div>
-                <div class="space-y-6" id="diaryList"></div>
+                <div class="space-y-4" id="diaryList"></div>
             </main>
         </div>
     </div>
 </div>
 
-<div id="page-detail" class="hidden p-4 sm:p-8"><div class="max-w-4xl mx-auto pt-8"><button onclick="goBack()" class="mb-8 text-pink-300 hover:text-pink-500 text-sm tracking-widest">/ BACK TO BASE</button><div id="detail-content" class="f-card p-8 sm:p-16 bg-white/95"></div></div></div>
-<div id="editor-mask" class="fixed inset-0 bg-white/80 backdrop-blur-md z-[1000] hidden items-center justify-center p-4"><div class="f-card p-6 sm:p-10 w-full max-w-2xl bg-white shadow-2xl border-none"><div class="flex justify-between items-center mb-6"><span class="text-pink-200 text-xs tracking-widest">MOMENT EDITOR</span><button onclick="closeEditor()" class="text-gray-300 hover:text-gray-500 text-xl">✕</button></div><input id="diaryTitle" type="text" placeholder="标题..." class="w-full text-xl sm:text-2xl font-normal mb-4 outline-none text-gray-700 placeholder:text-gray-200"><input id="diaryTags" type="text" placeholder="标签 (空格隔开)" class="w-full text-xs mb-6 outline-none text-pink-300 uppercase"><div id="editor-container" class="text-gray-600" style="height: 250px;"></div><div class="flex justify-end mt-8"><button id="saveBtn" onclick="handleSave()" class="py-3 px-10 border border-pink-200 rounded-2xl text-pink-400 bg-white hover:bg-pink-400 hover:text-white transition-all">同步至星海</button></div></div></div>
+<div id="page-detail" class="hidden p-4 sm:p-8"><div class="max-w-4xl mx-auto pt-8"><button onclick="goBack()" class="mb-8 text-pink-300 hover:text-pink-500 text-sm tracking-widest">/ BACK</button><div id="detail-content" class="f-card p-8 sm:p-16 bg-white/95"></div></div></div>
+<div id="editor-mask" class="fixed inset-0 bg-white/80 backdrop-blur-md z-[1000] hidden items-center justify-center p-4"><div class="f-card p-6 sm:p-10 w-full max-w-2xl bg-white shadow-2xl border-none"><div class="flex justify-between items-center mb-6"><span class="text-pink-200 text-xs tracking-widest">EDITOR</span><button onclick="closeEditor()" class="text-gray-300 hover:text-gray-500 text-xl">✕</button></div><input id="diaryTitle" type="text" placeholder="标题..." class="w-full text-xl font-normal mb-4 outline-none text-gray-700 placeholder:text-gray-200"><input id="diaryTags" type="text" placeholder="标签 (空格隔开)" class="w-full text-xs mb-6 outline-none text-pink-300 uppercase"><div id="editor-container" class="text-gray-600" style="height: 250px;"></div><div class="flex justify-end mt-8"><button id="saveBtn" onclick="handleSave()" class="py-2.5 px-8 border border-pink-200 rounded-xl text-pink-400 bg-white hover:bg-pink-400 hover:text-white transition-all">同步至星海</button></div></div></div>
 
-<div id="pet-container" onclick="petSpeak()"><div id="pet-bubble" style="position: absolute; bottom: 100%; right: 0; margin-bottom: 10px; background: white; padding: 10px 15px; border-radius: 18px; font-size: 12px; opacity: 0; transition: 0.4s; pointer-events: none; border: 1px solid #fef0f3; box-shadow: 0 5px 15px rgba(0,0,0,0.05); white-space: nowrap;"></div><img id="pet-img" src="images/IMG_2877.png" alt="Pet"></div>
+<div id="pet-container" onclick="petSpeak()"><div id="pet-bubble" style="position: absolute; bottom: 100%; right: 0; margin-bottom: 10px; background: white; padding: 8px 12px; border-radius: 15px; font-size: 11px; opacity: 0; transition: 0.4s; pointer-events: none; border: 1px solid #fef0f3; box-shadow: 0 5px 15px rgba(0,0,0,0.05); white-space: nowrap;"></div><img id="pet-img" src="images/IMG_2877.png" alt="Pet"></div>
 
 <script>
     const REPO = "Ancenchan/ancenchan.github.io"; 
@@ -122,43 +113,37 @@
 
     const quill = new Quill('#editor-container', { theme: 'snow', modules: { toolbar: [['bold', 'italic'], ['image', 'link']] } });
 
-    // 音乐逻辑优化
+    // 优化的音乐切换
     function toggleMusic() {
         const bgm = document.getElementById('bgm');
         const ctrl = document.getElementById('music-ctrl');
+        
         if (bgm.paused) {
-            bgm.play().then(() => {
-                ctrl.classList.add('music-playing');
-                ctrl.innerText = "📻";
-            }).catch(e => {
-                alert("移动端请先点击页面任意位置再播放音乐哦~");
-            });
+            const playPromise = bgm.play();
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    ctrl.classList.add('music-playing');
+                }).catch(error => {
+                    // 如果失败，尝试静默引导
+                    console.log("Playback failed, waiting for user interaction.");
+                    ctrl.style.animation = "shake 0.5s ease-in-out";
+                    setTimeout(() => ctrl.style.animation = "", 500);
+                });
+            }
         } else {
             bgm.pause();
             ctrl.classList.remove('music-playing');
-            ctrl.innerText = "🔇";
         }
     }
 
-    function getToken(f=false) { let t=localStorage.getItem('gh_token'); if(!t||f){ t=prompt("🗝️ Token:"); if(t)localStorage.setItem('gh_token',t); } return t; }
+    // 辅助功能：获取Token
+    function getToken(f=false) { let t=localStorage.getItem('gh_token'); if(!t||f){ t=prompt("🗝️ 请输入管理密码:"); if(t)localStorage.setItem('gh_token',t); } return t; }
     function checkAdminThenOpen() { if(getToken()) openEditor(); }
-    
     function openEditor(index=null) { 
-        editIndex=index; 
-        document.getElementById('editor-mask').style.display='flex'; 
-        document.body.style.overflow='hidden'; 
-        if(index!==null){ 
-            const item=diaryData[index]; 
-            document.getElementById('diaryTitle').value=item.title; 
-            document.getElementById('diaryTags').value=(item.tags||[]).join(' '); 
-            quill.root.innerHTML=item.content; 
-        } else {
-            document.getElementById('diaryTitle').value=""; 
-            document.getElementById('diaryTags').value=""; 
-            quill.root.innerHTML=""; 
-        }
+        editIndex=index; document.getElementById('editor-mask').style.display='flex'; document.body.style.overflow='hidden';
+        if(index!==null){ const item=diaryData[index]; document.getElementById('diaryTitle').value=item.title; document.getElementById('diaryTags').value=(item.tags||[]).join(' '); quill.root.innerHTML=item.content; }
+        else { document.getElementById('diaryTitle').value=""; document.getElementById('diaryTags').value=""; quill.root.innerHTML=""; }
     }
-
     function closeEditor() { document.getElementById('editor-mask').style.display='none'; document.body.style.overflow='auto'; }
 
     async function fetchCloudData() {
@@ -171,7 +156,7 @@
                 diaryData = JSON.parse(decodeURIComponent(escape(atob(data.content.replace(/\s/g, '')))));
                 render();
             }
-        } catch (e) { petSpeak("也要继续努力才行..."); }
+        } catch (e) { petSpeak("正在努力加载中..."); }
     }
 
     function render() {
@@ -181,7 +166,7 @@
         diaryData.forEach(d => { if(d.tags) d.tags.forEach(t => tagMap[t] = (tagMap[t] || 0) + 1); });
         
         cloud.innerHTML = Object.keys(tagMap).map(t => `
-            <button class="tag-btn flex items-center transition-all text-[12px] ${filterTag===t?'bg-pink-100 text-pink-500':'text-gray-400 hover:bg-white/60'}" onclick="setFilter('${t}')">
+            <button class="tag-btn flex items-center transition-all text-[11px] ${filterTag===t?'bg-pink-100 text-pink-500':'text-gray-400 hover:bg-white/60'}" onclick="setFilter('${t}')">
                 <span class="mr-2">🌸</span><span class="flex-1 text-left">${t}</span>
             </button>`).join('');
 
@@ -195,18 +180,18 @@
         list.innerHTML = filtered.map((item) => {
             const realIndex = diaryData.findIndex(d => d.id === item.id);
             const tempDiv = document.createElement('div'); tempDiv.innerHTML = item.content || "";
-            const previewText = tempDiv.innerText.substring(0, 200); 
+            const previewText = tempDiv.innerText.substring(0, 150); 
 
-            return `<div class="f-card p-6 sm:p-8 cursor-pointer group hover:bg-white/90" onclick="showDetail(${realIndex})">
+            return `<div class="f-card p-5 sm:p-7 cursor-pointer group hover:bg-white/90" onclick="showDetail(${realIndex})">
                 <div class="flex justify-between items-start mb-3">
                     <div class="flex items-center gap-2">
-                        ${item.pinned ? '<span class="bg-pink-400 text-white text-[9px] px-2 py-0.5 rounded-full">PIN</span>' : ''}
-                        <span class="text-[10px] text-pink-200 tracking-widest font-medium">${item.date}</span>
+                        ${item.pinned ? '<span class="bg-pink-400 text-white text-[8px] px-1.5 py-0.5 rounded-full">PIN</span>' : ''}
+                        <span class="text-[9px] text-pink-200 tracking-widest font-medium">${item.date}</span>
                     </div>
-                    <div class="flex flex-wrap gap-1">${(item.tags||[]).map(t => `<span class="text-[9px] border border-pink-50 px-2 py-0.5 rounded-lg text-pink-300">${t}</span>`).join('')}</div>
+                    <div class="flex flex-wrap gap-1">${(item.tags||[]).map(t => `<span class="text-[8px] border border-pink-50 px-1.5 py-0.5 rounded-lg text-pink-300">${t}</span>`).join('')}</div>
                 </div>
-                <h2 class="text-lg font-medium text-gray-700 mb-2 group-hover:text-pink-400 transition-colors">${item.title || 'Untitled'}</h2>
-                <div class="text-gray-400 leading-relaxed text-xs preview-text">${previewText}</div>
+                <h2 class="text-base font-medium text-gray-700 mb-2 group-hover:text-pink-400 transition-colors">${item.title || 'Untitled'}</h2>
+                <div class="text-gray-400 leading-relaxed text-[11px] preview-text">${previewText}</div>
             </div>`;
         }).join('');
     }
@@ -214,16 +199,16 @@
     function showDetail(index) {
         const item = diaryData[index];
         document.getElementById('detail-content').innerHTML = `
-            <div class="flex items-center gap-3 mb-8">
-                ${item.pinned ? '<span class="bg-pink-400 text-white text-[10px] px-3 py-1 rounded-full">置顶</span>' : ''}
-                <div class="text-[10px] text-pink-200 tracking-[0.3em] font-bold uppercase">${item.date}</div>
+            <div class="flex items-center gap-3 mb-6">
+                ${item.pinned ? '<span class="bg-pink-400 text-white text-[9px] px-2 py-1 rounded-full">置顶</span>' : ''}
+                <div class="text-[9px] text-pink-200 tracking-[0.3em] font-bold uppercase">${item.date}</div>
             </div>
-            <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-8 tracking-tight">${item.title}</h1>
-            <div class="ql-editor p-0 text-gray-700 leading-8 text-sm sm:text-base font-light">${item.content}</div>
-            <div class="mt-16 border-t border-pink-50 pt-10 flex gap-8">
-                <button onclick="if(getToken()) { openEditor(${index}); goBack(); }" class="text-pink-300 hover:text-pink-500 text-xs font-bold tracking-widest">EDIT</button>
-                <button onclick="if(getToken()) togglePin(${index})" class="text-gray-300 hover:text-pink-400 text-xs font-bold tracking-widest">${item.pinned?'UNPIN':'PIN TOP'}</button>
-                <button onclick="if(getToken()) deleteItem(${index})" class="text-gray-100 hover:text-red-300 text-xs font-bold tracking-widest">DELETE</button>
+            <h1 class="text-xl sm:text-2xl font-bold text-gray-800 mb-6 tracking-tight">${item.title}</h1>
+            <div class="ql-editor p-0 text-gray-700 leading-7 text-sm sm:text-base font-light">${item.content}</div>
+            <div class="mt-12 border-t border-pink-50 pt-8 flex gap-6">
+                <button onclick="if(getToken()) { openEditor(${index}); goBack(); }" class="text-pink-300 hover:text-pink-500 text-[10px] font-bold tracking-widest">EDIT</button>
+                <button onclick="if(getToken()) togglePin(${index})" class="text-gray-300 hover:text-pink-400 text-[10px] font-bold tracking-widest">${item.pinned?'UNPIN':'PIN TOP'}</button>
+                <button onclick="if(getToken()) deleteItem(${index})" class="text-gray-100 hover:text-red-300 text-[10px] font-bold tracking-widest">DELETE</button>
             </div>`;
         document.getElementById('page-list').classList.add('hidden');
         document.getElementById('page-detail').classList.remove('hidden');
@@ -261,7 +246,7 @@
                 body: JSON.stringify({ message: "Update", content: b64, sha: currentSha })
             });
             if (res.ok) { const d=await res.json(); currentSha=d.content.sha; render(); petSpeak("记忆已保存！✨"); setTimeout(() => { closeEditor(); saveBtn.disabled=false; saveBtn.innerText="同步至星海"; }, 1500); }
-        } catch (e) { alert("失败"); saveBtn.disabled = false; }
+        } catch (e) { alert("同步失败"); saveBtn.disabled = false; }
     }
 
     async function deleteItem(index) {
@@ -278,7 +263,7 @@
 
     function petSpeak(msg) {
         const bubble = document.getElementById('pet-bubble');
-        const kohaneQuotes = ["大家都在努力，我也不能输！", "只要和大家在一起……！", "Vivid BAD SQUAD，出击！", "虽然还会紧张，但我不会再逃避了！"];
+        const kohaneQuotes = ["大家都在努力，我也不能输！", "只要和大家在一起……！", "Vivid BAD SQUAD，出击！", "我会努力唱好的！"];
         bubble.innerText = msg || kohaneQuotes[Math.floor(Math.random() * kohaneQuotes.length)];
         bubble.style.opacity = "1";
         setTimeout(() => bubble.style.opacity = "0", 3000);
