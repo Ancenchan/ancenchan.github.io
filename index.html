@@ -11,53 +11,56 @@
     
     <style>
         :root { --f-bg: #fffcfd; --f-accent: #ffb1c1; --f-glass: rgba(255, 255, 255, 0.88); --f-text-main: #4a4a4a; }
+
         body { 
-            background-color: var(--f-bg); background-image: url('https://www.transparenttextures.com/patterns/sakura.png');
-            background-repeat: repeat; background-attachment: fixed; color: var(--f-text-main);
-            font-family: 'Noto Sans SC', sans-serif; margin: 0; overflow-x: hidden;
+            background-color: var(--f-bg);
+            background-image: url('https://www.transparenttextures.com/patterns/sakura.png');
+            background-repeat: repeat; background-attachment: fixed;
+            color: var(--f-text-main); font-family: 'Noto Sans SC', sans-serif;
+            margin: 0; overflow-x: hidden; -webkit-tap-highlight-color: transparent;
             cursor: url('https://cur.cursors-4u.net/anime/ani-11/ani1085.cur'), auto;
         }
 
-        /* 預覽區域：保留物理換行並限制高度 */
-        .preview-container {
-            max-height: 100px; overflow: hidden; position: relative;
-            line-height: 1.6; word-break: break-all;
+        /* 🎵 音乐按钮：增加点击反馈 */
+        #music-ctrl {
+            position: fixed; top: 30px; right: 30px; z-index: 1001;
+            width: 44px; height: 44px; background: white; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 15px rgba(255,177,193,0.3); border: 1px solid #fff0f3;
+            transition: transform 0.1s, background-color 0.3s; font-size: 20px;
         }
-        /* 讓預覽內的 P 標籤也換行 */
-        .preview-container p, .preview-container div { margin: 0 0 4px 0; }
-        .preview-fade {
-            position: absolute; bottom: 0; left: 0; width: 100%; height: 30px;
-            background: linear-gradient(transparent, rgba(255, 255, 255, 0.9));
+        #music-ctrl:active { transform: scale(0.9); background-color: #fff0f3; }
+        .music-playing { animation: rotate 3s linear infinite; color: #ffb1c1; }
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* 🌸 宠物：强制右下角固定 */
+        #pet-container { position: fixed; bottom: 20px; right: 20px; z-index: 999; pointer-events: auto; }
+        #pet-img { width: 90px; animation: softFloat 4s ease-in-out infinite; }
+        @keyframes softFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        
+        #pet-bubble { 
+            position: absolute; bottom: 100%; right: 0; margin-bottom: 10px;
+            background: white; padding: 8px 15px; border-radius: 18px; font-size: 11px;
+            opacity: 0; transition: 0.4s; pointer-events: none; border: 1px solid #fef0f3;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05); white-space: nowrap;
         }
 
         .f-card {
             background: var(--f-glass); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
             border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 30px;
-            box-shadow: 0 8px 30px rgba(255, 177, 193, 0.06);
+            box-shadow: 0 8px 30px rgba(255, 177, 193, 0.06); word-break: break-all;
         }
 
-        /* 寵物氣泡 */
-        #pet-container { position: fixed; bottom: 20px; right: 20px; z-index: 999; cursor: pointer; }
-        #pet-bubble { 
-            position: absolute; bottom: 100%; right: 0; margin-bottom: 10px;
-            background: white; padding: 10px 15px; border-radius: 18px; font-size: 12px;
-            opacity: 0; transition: 0.4s; border: 1px solid #fef0f3;
-            box-shadow: 0 5px 15px rgba(255,177,193,0.2); white-space: nowrap;
-        }
-        #pet-img { width: 90px; animation: softFloat 4s ease-in-out infinite; }
-        @keyframes softFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-
-        .music-playing { animation: rotate 3s linear infinite; color: #ffb1c1; }
-        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        
+        /* 分页按钮 */
         .page-btn { padding: 8px 16px; border-radius: 15px; font-size: 12px; transition: 0.3s; border: 1px solid #ffdee9; color: #ffb1c1; }
-        .page-btn:disabled { opacity: 0.3; }
+        .page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+        .page-btn:not(:disabled):hover { background: #ffdee9; color: white; }
     </style>
 </head>
 <body>
 
 <audio id="bgm" loop preload="auto" src="music/bgm.mp3"></audio>
-<div id="music-ctrl" onclick="toggleMusic()" style="position: fixed; top: 30px; right: 30px; z-index: 1001; width: 44px; height: 44px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(255,177,193,0.3); border: 1px solid #fff0f3;">🎵</div>
+<div id="music-ctrl" onclick="toggleMusic()">🎵</div>
 
 <div id="page-list">
     <div class="header-banner" style="height: 200px; background: linear-gradient(to bottom, #ffdee9cc, #ffffff22), url('https://api.paugram.com/wallpaper?source=gh') center/cover no-repeat; border-radius: 0 0 50px 50px;"></div>
@@ -66,17 +69,27 @@
             <aside class="w-full lg:w-64">
                 <div class="f-card p-6 text-center sticky top-8">
                     <img src="images/IMG_3024.webp" class="w-20 h-20 rounded-full mx-auto mb-4 object-cover border-2 border-pink-50">
-                    <h2 class="nickname mb-1 text-gray-700 font-bold">Ancenchan</h2>
-                    <div class="text-[11px] text-gray-400 mb-6">這裡記錄碎碎念和星海的歌聲 ✨</div>
+                    <h2 class="nickname mb-1">Ancenchan</h2>
+                    <div class="text-[11px] text-gray-400 mb-6">这里记录碎碎念和星海的歌声 ✨</div>
+                    <div class="text-left text-[10px] text-pink-200 tracking-widest mb-3 uppercase">Collection</div>
                     <nav id="tagCloud" class="flex flex-col gap-1 mb-6"></nav>
+                    <div class="text-left text-[10px] text-pink-200 tracking-widest mb-3 uppercase">Connect</div>
+                    <div class="flex flex-col gap-1 text-left text-[11px] text-gray-400">
+                        <div class="bg-blue-50/40 p-2 rounded-xl">📺 Bili: 安尘子 (330870)</div>
+                        <div class="bg-pink-50/40 p-2 rounded-xl">🎨 WB: kurofu</div>
+                        <div class="bg-red-50/40 p-2 rounded-xl">📖 XHS: 1166142003</div>
+                    </div>
                 </div>
             </aside>
+
             <main class="flex-1">
                 <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-xs text-pink-200 tracking-widest font-bold uppercase">Memory Stream</h3>
-                    <button onclick="checkAdminThenOpen()" class="bg-white px-5 py-2 rounded-2xl border border-pink-100 text-pink-400 text-sm shadow-sm hover:bg-pink-400 hover:text-white transition-all">新的記憶 ✨</button>
+                    <h3 class="text-xs text-pink-200 tracking-widest font-bold">MEMORY STREAM</h3>
+                    <button onclick="checkAdminThenOpen()" class="bg-white px-5 py-2 rounded-2xl border border-pink-100 text-pink-400 text-sm shadow-sm hover:bg-pink-400 hover:text-white transition-all">新的记忆 ✨</button>
                 </div>
+                
                 <div id="diaryList" class="space-y-6"></div>
+
                 <div class="flex justify-center items-center gap-6 mt-12">
                     <button id="prevPage" onclick="changePage(-1)" class="page-btn">← Previous</button>
                     <span id="pageInfo" class="text-xs text-pink-200 font-medium">Page 1</span>
@@ -87,21 +100,13 @@
     </div>
 </div>
 
-<div id="page-detail" class="hidden p-4 sm:p-8">
-    <div class="max-w-4xl mx-auto pt-8">
-        <button onclick="goBack()" class="mb-8 text-pink-300 text-sm tracking-widest">/ BACK</button>
-        <div id="detail-content" class="f-card p-8 sm:p-16 bg-white/95 shadow-xl"></div>
-    </div>
-</div>
+<div id="page-detail" class="hidden p-4 sm:p-8"><div class="max-w-4xl mx-auto pt-8"><button onclick="goBack()" class="mb-8 text-pink-300 text-sm tracking-widest">/ BACK</button><div id="detail-content" class="f-card p-8 sm:p-16 bg-white/95 shadow-xl"></div></div></div>
 
 <div id="editor-mask" class="fixed inset-0 bg-white/80 backdrop-blur-md z-[1000] hidden items-center justify-center p-4">
     <div class="f-card p-8 w-full max-w-2xl bg-white shadow-2xl">
-        <input id="diaryTitle" type="text" placeholder="標題..." class="w-full text-xl mb-4 outline-none border-b border-pink-50 pb-2">
+        <input id="diaryTitle" type="text" placeholder="标题..." class="w-full text-xl mb-4 outline-none">
         <div id="editor-container" style="height: 300px;"></div>
-        <div class="flex gap-3 mt-8">
-            <button id="saveBtn" onclick="handleSave()" class="flex-1 py-4 bg-pink-400 text-white rounded-2xl font-bold shadow-lg">同步至星海</button>
-            <button onclick="document.getElementById('editor-mask').style.display='none'" class="px-6 py-4 bg-gray-100 text-gray-400 rounded-2xl">取消</button>
-        </div>
+        <button id="saveBtn" onclick="handleSave()" class="mt-8 w-full py-4 bg-pink-400 text-white rounded-2xl font-bold shadow-lg">同步至星海</button>
     </div>
 </div>
 
@@ -113,16 +118,30 @@
 <script>
     const REPO = "Ancenchan/ancenchan.github.io", PATH = "data/articles.json";
     let diaryData = [], currentSha = "", filterTag = null, editIndex = null;
-    let currentPage = 1; const pageSize = 6;
-
-    const kohaneQuotes = ["我會努力唱好的！", "這就是……街頭音樂嗎？", "哪怕害羞，我也想傳達心情！", "大家都在努力，我也不能落後！", "這就是屬於我們的『RAD WEEKEND』！", "謝謝你一直陪著我 ✨"];
+    let currentPage = 1;
+    const pageSize = 6;
 
     const quill = new Quill('#editor-container', { theme: 'snow', modules: { toolbar: [['bold', 'italic'], ['image', 'link']] } });
 
+    // 🏆 音乐控制：增加状态反馈
     function toggleMusic() {
-        const bgm = document.getElementById('bgm'), ctrl = document.getElementById('music-ctrl');
-        if (bgm.paused) { bgm.play(); ctrl.classList.add('music-playing'); petSpeak("音樂響起來了……♪"); }
-        else { bgm.pause(); ctrl.classList.remove('music-playing'); }
+        const bgm = document.getElementById('bgm');
+        const ctrl = document.getElementById('music-ctrl');
+        
+        if (bgm.paused) {
+            bgm.play().then(() => {
+                ctrl.classList.add('music-playing');
+                petSpeak("音乐响起来了，真好听……♪");
+            }).catch(e => {
+                console.error("Playback failed", e);
+                // 播放失败时按钮闪红一下
+                ctrl.style.backgroundColor = "#fee2e2";
+                setTimeout(() => ctrl.style.backgroundColor = "white", 500);
+            });
+        } else {
+            bgm.pause();
+            ctrl.classList.remove('music-playing');
+        }
     }
 
     async function fetchCloudData() {
@@ -134,62 +153,73 @@
                 diaryData = JSON.parse(decodeURIComponent(escape(atob(data.content.replace(/\s/g, ''))))); 
                 render(); 
             }
-        } catch (e) { petSpeak("連接星海失敗了..."); }
+        } catch (e) { petSpeak("加载有点慢，请稍等我一下哦……"); }
     }
 
     function render() {
-        const list = document.getElementById('diaryList'), cloud = document.getElementById('tagCloud'), tagMap = {};
+        const list = document.getElementById('diaryList');
+        const cloud = document.getElementById('tagCloud');
+        const tagMap = {};
         diaryData.forEach(d => d.tags && d.tags.forEach(t => tagMap[t] = (tagMap[t] || 0) + 1));
-        cloud.innerHTML = Object.keys(tagMap).map(t => `<button class="text-[11px] text-left p-2 rounded-xl ${filterTag===t?'bg-pink-100 text-pink-500':'text-gray-400'}" onclick="setFilter('${t}')">🌸 ${t} (${tagMap[t]})</button>`).join('');
+        
+        cloud.innerHTML = Object.keys(tagMap).map(t => `
+            <button class="text-[11px] text-left p-2 rounded-xl transition-all ${filterTag===t?'bg-pink-100 text-pink-500':'text-gray-400 hover:bg-white'}" onclick="setFilter('${t}')">
+                🌸 ${t} <span class="text-[9px] opacity-40">(${tagMap[t]})</span>
+            </button>`).join('');
 
+        // 排序：置顶优先，其次按时间倒序
         const sorted = diaryData.slice().sort((a,b) => (a.pinned===b.pinned) ? b.id-a.id : (a.pinned?-1:1));
         const filtered = filterTag ? sorted.filter(d => d.tags && d.tags.includes(filterTag)) : sorted;
+
+        // 🏆 分页计算
         const totalPages = Math.ceil(filtered.length / pageSize) || 1;
+        if (currentPage > totalPages) currentPage = totalPages;
+        
         const start = (currentPage - 1) * pageSize;
         const pagedData = filtered.slice(start, start + pageSize);
 
         list.innerHTML = pagedData.map((item) => {
             const realIndex = diaryData.findIndex(d => d.id === item.id);
-            // 預覽處理：移除圖片，保留段落標籤以實現換行
-            let previewHTML = item.content.replace(/<img[^>]*>/g, '[圖片]');
+            const previewText = item.content.replace(/<[^>]+>/g, '').substring(0, 150);
             return `<div class="f-card p-6 sm:p-8 cursor-pointer group hover:bg-white/90 transition-all" onclick="showDetail(${realIndex})">
-                <div class="text-[10px] text-pink-200 font-bold mb-2">${item.pinned?'置頂 · ':''}${item.date}</div>
-                <h2 class="text-lg font-medium text-gray-700 mb-3 group-hover:text-pink-400">${item.title}</h2>
-                <div class="preview-container text-gray-400 text-sm">
-                    ${previewHTML}
-                    <div class="preview-fade"></div>
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-[10px] text-pink-200 font-bold">${item.pinned?'置顶 · ':''}${item.date}</span>
+                    <div class="flex gap-1">${(item.tags||[]).map(t => `<span class="text-[8px] bg-pink-50 text-pink-300 px-2 py-0.5 rounded-lg">${t}</span>`).join('')}</div>
                 </div>
+                <h2 class="text-lg font-medium text-gray-700 mb-3 group-hover:text-pink-400">${item.title}</h2>
+                <div class="text-gray-400 text-xs leading-relaxed line-clamp-3">${previewText}...</div>
             </div>`;
         }).join('');
 
+        // 更新分页 UI
         document.getElementById('pageInfo').innerText = `Page ${currentPage} / ${totalPages}`;
         document.getElementById('prevPage').disabled = (currentPage === 1);
         document.getElementById('nextPage').disabled = (currentPage === totalPages);
     }
 
+    function changePage(dir) { currentPage += dir; render(); window.scrollTo(0, 400); }
+    function setFilter(tag) { filterTag = (filterTag === tag) ? null : tag; currentPage = 1; render(); }
+
     function showDetail(index) {
-        editIndex = index; // 重要：鎖定當前正在查看的索引
         const item = diaryData[index];
-        const detailBox = document.getElementById('detail-content');
-        
-        // 渲染詳情內容以及 編輯/刪除 按鈕
-        detailBox.innerHTML = `
+        document.getElementById('detail-content').innerHTML = `
             <div class="text-[10px] text-pink-200 font-bold mb-6">${item.date}</div>
             <h1 class="text-2xl font-bold text-gray-800 mb-8">${item.title}</h1>
             <div class="ql-editor p-0 text-gray-700 leading-8">${item.content}</div>
-            <div class="mt-12 pt-8 border-t border-pink-50 flex flex-wrap gap-6">
-                <button onclick="openEditor()" class="text-pink-400 text-xs font-bold border border-pink-100 px-4 py-2 rounded-xl hover:bg-pink-50">EDIT / 編輯</button>
-                <button onclick="handleDelete()" class="text-red-400 text-xs font-bold border border-red-100 px-4 py-2 rounded-xl hover:bg-red-50">DELETE / 刪除記憶</button>
-                <button onclick="goBack()" class="text-gray-300 text-xs font-bold ml-auto px-4 py-2">CLOSE</button>
+            <div class="mt-12 pt-8 border-t border-pink-50 flex gap-6">
+                <button onclick="if(getToken()) openEditor(${index})" class="text-pink-300 text-xs font-bold">EDIT</button>
+                <button onclick="goBack()" class="text-gray-300 text-xs font-bold">CLOSE</button>
             </div>`;
-        
         document.getElementById('page-list').classList.add('hidden');
         document.getElementById('page-detail').classList.remove('hidden');
         window.scrollTo(0, 0);
     }
 
+    function goBack() { document.getElementById('page-list').classList.remove('hidden'); document.getElementById('page-detail').classList.add('hidden'); }
+    function getToken() { let t=localStorage.getItem('gh_token'); if(!t){ t=prompt("Token:"); if(t)localStorage.setItem('gh_token',t); } return t; }
+    function checkAdminThenOpen() { if(getToken()) { editIndex=null; openEditor(); } }
+    
     function openEditor() {
-        if(!getToken()) return;
         document.getElementById('editor-mask').style.display='flex';
         if(editIndex !== null) {
             const item = diaryData[editIndex];
@@ -201,96 +231,36 @@
         }
     }
 
-    async function handleSave() {
-        const title = document.getElementById('diaryTitle').value;
-        const content = quill.root.innerHTML;
-        if(!title || content === "<p><br></p>") return alert("標題和內容不能為空哦！");
+    // 🌸 小豆泽心羽的台词库
+const kohaneQuotes = [
+    "我会努力唱好的！",
+    "这就是……街头音乐吗？好期待！",
+    "虽然有点害羞，但我也想传达我的心情……",
+    "大家都在努力，我也不能落后！",
+    "要一起练习吗？我会加油的！",
+    "现在的我，是不是稍微变强了一点呢？",
+    "感觉……蛇、蛇皮果好像也挺可爱的？(并不)",
+    "这就是属于我们的『RAD WEEKEND』！",
+    "谢谢你一直陪着我 ✨"
+];
 
-        const btn = document.getElementById('saveBtn');
-        btn.innerText = "同步中..."; btn.disabled = true;
-
-        if(editIndex !== null) {
-            // 更新現有記憶
-            diaryData[editIndex].title = title;
-            diaryData[editIndex].content = content;
-        } else {
-            // 新增記憶
-            diaryData.push({ 
-                id: Date.now(), 
-                title, 
-                content, 
-                date: new Date().toLocaleDateString(), 
-                tags: ["未分類"] 
-            });
-        }
-
-        const success = await uploadToGithub();
-        if(success) {
-            document.getElementById('editor-mask').style.display='none';
-            editIndex = null;
-            render();
-            if(!document.getElementById('page-detail').classList.contains('hidden')) goBack();
-            petSpeak("回憶已存入星海 ✨");
-        }
-        btn.innerText = "同步至星海"; btn.disabled = false;
-    }
-
-    async function handleDelete() {
-        if(!confirm("小豆澤心羽：真的要刪除這段回憶嗎？不可恢復哦...")) return;
-        if(!getToken()) return;
-        
-        diaryData.splice(editIndex, 1);
-        const success = await uploadToGithub();
-        if(success) { 
-            goBack(); 
-            render(); 
-            petSpeak("那段記憶……消失了……"); 
-        }
-    }
-
-    async function uploadToGithub() {
-        const t = localStorage.getItem('gh_token');
-        const content = btoa(unescape(encodeURIComponent(JSON.stringify(diaryData, null, 2))));
-        try {
-            const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${PATH}`, {
-                method: 'PUT',
-                headers: { 'Authorization': `Bearer ${t}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: "Update Diary", content, sha: currentSha })
-            });
-            if(res.ok) {
-                const resData = await res.json();
-                currentSha = resData.content.sha;
-                return true;
-            } else { 
-                alert("GitHub 同步失敗，請檢查 Token 權限（需要 repo 權限）"); 
-                return false; 
-            }
-        } catch (e) { return false; }
-    }
-
-    function petSpeak(msg) {
-        const b = document.getElementById('pet-bubble');
-        b.innerText = msg || kohaneQuotes[Math.floor(Math.random() * kohaneQuotes.length)];
-        b.style.opacity = "1"; 
-        setTimeout(() => b.style.opacity = "0", 3000);
-    }
-
-    function goBack() { 
-        document.getElementById('page-list').classList.remove('hidden'); 
-        document.getElementById('page-detail').classList.add('hidden'); 
-        editIndex = null; 
-    }
+function petSpeak(msg) {
+    const b = document.getElementById('pet-bubble');
+    // 如果没有传入特定消息，就从台词库里随机选一句
+    const text = msg || kohaneQuotes[Math.floor(Math.random() * kohaneQuotes.length)];
     
-    function setFilter(tag) { filterTag = (filterTag === tag) ? null : tag; currentPage = 1; render(); }
-    function changePage(dir) { currentPage += dir; render(); window.scrollTo(0, 400); }
-    function getToken() { 
-        let t = localStorage.getItem('gh_token'); 
-        if(!t){ t = prompt("請輸入 GitHub Token 以解鎖管理功能："); if(t) localStorage.setItem('gh_token', t); } 
-        return t; 
-    }
-    function checkAdminThenOpen() { editIndex = null; openEditor(); }
+    b.innerText = text;
+    b.style.opacity = "1";
+    
+    // 3秒后自动消失
+    setTimeout(() => {
+        b.style.opacity = "0";
+    }, 3000);
+}
+
 
     window.onload = fetchCloudData;
 </script>
 </body>
 </html>
+请帮我增加小豆泽心羽宠物的台词，还有首页预览日记不会换行
