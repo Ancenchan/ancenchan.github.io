@@ -40,5 +40,14 @@
       "术力口"
     ],
     "date": "2026/02/16"
+  },
+  {
+    "id": 1771225745890,
+    "title": "SQL相关存档 - 2 新建数据库/表",
+    "content": "<p>教程：https://blog.csdn.net/zs1342084776/article/details/88701261</p><p><br></p><p>实际上接触了工作就会对库和表更加熟悉，有一个比较明确的层级的概念，一般也只会用到最常用的脚本x</p><p><br></p><p>【新建数据库】</p><p><br></p><p>create schema new_schema</p><p><br></p><p>1.新建Schema（数据库）此时会在左侧菜单出现Schema，底下是Table,View什么的（</p><p><br></p><p>2.双击Schema或者右键点击第二个[Set as default schema] 设定为默认数据库（后面新建表好像需要这个</p><p><br></p><p>【新建表】</p><p><br></p><p>create table biao</p><p><br></p><p>(nam varchar(10),</p><p><br></p><p>score int)</p><p><br></p><p>1.右击Schema新建Table，右上角有个灰色的箭头，点击扩展【我超之前找了半天怎么跳不出它的界面】。</p><p><br></p><p>2.直接点击这个位置好像就自动出现表了，往下方一个格子点就是增加字段（列）。</p><p><br></p><p>https://upload-images.jianshu.io/upload_images/27517198-08698b89a516cb46.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240</p><p><br></p><p>3.右键点击新表，点第一个select rows，下方会出现预览【？</p><p><br></p><p>可以在预览里直接修改表内数据。</p><p><br></p><p>4.右键，点Table Inspector可以看到表格Info</p><p><br></p><p>5.右键，点Alter Table…就是回到建表那个界面可以修改表结构啥的。</p><p><br></p><p>6.右键，删除就是Drop Table，倒数第四个。</p><p><br></p><p>PS.关于新建表的时候几个打勾的地方</p><p><br></p><p>版权声明：本文为CSDN博主「imkaifan」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。</p><p><br></p><p>原文链接：https://blog.csdn.net/weixin_43131046/article/details/107213323</p><p><br></p><p>PK：primary key 主键——设置主键字段</p><p><br></p><p>NN：not null 非空——该字段非空</p><p><br></p><p>UQ：unique 唯一索引——和主键差不多，但是可以有很多个。</p><p><br></p><p>BIN：binary 二进制数据(比text更大)</p><p><br></p><p>UN：unsigned 无符号（非负数）</p><p><br></p><p>ZF：zero fill 填充0 例如字段内容是1 int(4), 则内容显示为0001</p><p><br></p><p>AI：auto increment 自增——会在新记录插入表中时生成一个唯一的数字。</p><p><br></p><p>G: Generated Column mysql5.7新特性：这一列由其他列计算而得</p><p><br></p><p>Default/Expression 设置默认值</p>",
+    "tags": [
+      "SQL"
+    ],
+    "date": "2026/02/16"
   }
 ]
