@@ -10,24 +10,17 @@
     <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
     
     <style>
-        :root { 
-            --f-bg: #fffcfd; --f-accent: #ffb1c1; --f-glass: rgba(255, 255, 255, 0.88);
-            --f-text-main: #4a4a4a;
-        }
+        :root { --f-bg: #fffcfd; --f-accent: #ffb1c1; --f-glass: rgba(255, 255, 255, 0.88); --f-text-main: #4a4a4a; }
 
-        /* 需求 3: 可爱猫咪鼠标 */
         body { 
             background-color: var(--f-bg);
             background-image: url('https://www.transparenttextures.com/patterns/sakura.png');
             background-repeat: repeat; background-attachment: fixed;
             color: var(--f-text-main); font-family: 'Noto Sans SC', sans-serif;
             margin: 0; overflow-x: hidden; -webkit-tap-highlight-color: transparent;
-            /* 替换为一个小黑猫/猫爪光标，这里使用了标准的可爱指针图片 */
             cursor: url('https://cur.cursors-4u.net/anime/ani-11/ani1085.cur'), auto;
         }
-        a, button, .cursor-pointer { 
-            cursor: url('https://cur.cursors-4u.net/anime/ani-11/ani1084.cur'), pointer !important; 
-        }
+        a, button, .cursor-pointer { cursor: url('https://cur.cursors-4u.net/anime/ani-11/ani1084.cur'), pointer !important; }
 
         .nickname { font-family: 'Ma Shan Zheng', cursive; font-size: 2.2rem; color: #8a7a7a; letter-spacing: 2px; }
 
@@ -44,79 +37,75 @@
             word-break: break-all;
         }
 
-        /* 需求 1: 自我介绍样式 */
-        .bio-text { font-size: 0.8rem; color: #9a8a8a; line-height: 1.6; font-weight: 300; }
+        /* 音乐控制器优化 - 移至右上方 */
+        #music-ctrl {
+            position: fixed; top: 30px; right: 30px; z-index: 1001;
+            width: 45px; height: 45px; background: white; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 15px rgba(255,177,193,0.3); border: 2px solid #fff0f3;
+            cursor: pointer; transition: 0.3s; font-size: 24px;
+        }
+        .music-playing { animation: rotate 3s linear infinite; background: #fff5f7 !important; }
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* 侧边栏紧凑化 */
+        .sidebar-section-title { font-size: 10px; color: #ffb1c1; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; margin-left: 4px; }
+        .tag-btn { padding: 6px 12px !important; border-radius: 12px !important; margin-bottom: 2px !important; }
+        .social-link { font-size: 12px; padding: 4px 8px; border-radius: 8px; }
 
         .preview-text {
-            white-space: pre-line; display: -webkit-box; -webkit-line-clamp: 4;
+            white-space: pre-line; display: -webkit-box; -webkit-line-clamp: 3;
             -webkit-box-orient: vertical; overflow: hidden;
         }
 
-        #pet-container { position: fixed; bottom: 20px; right: 20px; z-index: 999; cursor: pointer; opacity: 0.8; transition: 0.3s; }
-        #pet-img { width: 100px; animation: softFloat 4s ease-in-out infinite; }
+        #pet-container { position: fixed; bottom: 20px; right: 20px; z-index: 999; cursor: pointer; }
+        #pet-img { width: 90px; animation: softFloat 4s ease-in-out infinite; }
         @keyframes softFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-        
-        #pet-bubble { 
-            position: absolute; bottom: 100%; right: 0; margin-bottom: 10px;
-            background: white; padding: 10px 15px; border-radius: 18px; font-size: 12px;
-            opacity: 0; transition: 0.4s; pointer-events: none; border: 1px solid #fef0f3;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05); white-space: nowrap;
-        }
-        #pet-bubble.active { opacity: 1; transform: translateY(-5px); }
-
-        /* 需求 5: BGM 控制器样式 */
-        #music-ctrl {
-            position: fixed; bottom: 130px; right: 35px; z-index: 998;
-            width: 40px; height: 40px; background: white; border-radius: 50%;
-            display: flex; items-center; justify-content: center;
-            box-shadow: 0 4px 15px rgba(255,177,193,0.2); border: 1px solid #fff0f3;
-            cursor: pointer; transition: 0.3s;
-        }
-        #music-ctrl:hover { transform: scale(1.1); }
-        .music-playing { animation: rotate 4s linear infinite; }
-        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
         @media (max-width: 640px) {
             .header-banner { height: 160px; }
-            .f-card { padding: 1.5rem !important; }
-            #pet-img { width: 80px; }
-            #music-ctrl { bottom: 110px; right: 25px; }
+            #music-ctrl { top: 20px; right: 20px; width: 40px; height: 40px; font-size: 20px; }
         }
     </style>
 </head>
 <body>
 
 <audio id="bgm" loop src="https://music.163.com/song/media/outer/url?id=1443831646.mp3"></audio>
-<div id="music-ctrl" onclick="toggleMusic()">🎵</div>
+<div id="music-ctrl" onclick="toggleMusic()">📻</div>
 
 <div id="page-list">
     <div class="header-banner"></div>
     <div class="max-w-6xl mx-auto px-4 sm:px-8 -mt-16 relative pb-24">
-        <div class="flex flex-col lg:flex-row gap-8 lg:gap-12">
+        <div class="flex flex-col lg:flex-row gap-6">
             <aside class="w-full lg:w-64">
-                <div class="f-card p-6 sm:p-8 text-center sticky top-8">
-                    <img src="images/IMG_3024.webp" class="w-24 h-24 rounded-full mx-auto mb-4 bg-white object-cover shadow-sm border border-pink-50">
-                    <h2 class="nickname mb-2">Ancenchan</h2>
-                    
-                    <div class="bio-text mb-6 px-2">
-                        在这里记录碎碎念和星海的歌声 ✨<br>
-                        喜欢唱歌的小豆泽心羽应援中！
+                <div class="f-card p-6 text-center sticky top-8">
+                    <img src="images/IMG_3024.webp" class="w-20 h-20 rounded-full mx-auto mb-4 bg-white object-cover border-2 border-pink-50">
+                    <h2 class="nickname mb-1">Ancenchan</h2>
+                    <div class="text-[11px] text-gray-400 mb-6 px-4 leading-relaxed font-light">
+                        在这里记录碎碎念和星海的歌声 ✨
                     </div>
 
-                    <button onclick="checkAdminThenOpen()" class="moe-btn w-full mb-8 text-sm py-3 px-4 border border-pink-200 rounded-2xl text-pink-400 bg-white hover:bg-pink-400 hover:text-white transition-all shadow-sm">新的记忆 ✨</button>
-                    
-                    <div class="text-left text-[10px] text-pink-200 uppercase tracking-widest mb-3 ml-2">Collection</div>
-                    <nav id="tagCloud" class="flex flex-col gap-2 mb-8"></nav>
+                    <div class="sidebar-section-title text-left">Collection</div>
+                    <nav id="tagCloud" class="flex flex-col gap-1 mb-6"></nav>
 
-                    <div class="text-left text-[10px] text-pink-200 uppercase tracking-widest mb-3 ml-2">Connect</div>
-                    <div class="flex flex-col gap-3 text-left px-2">
-                        <div class="text-[11px] text-gray-400"><span class="text-blue-300 mr-1">●</span> Bili: <span class="text-gray-600">安尘子 (330870)</span></div>
-                        <div class="text-[11px] text-gray-400"><span class="text-pink-300 mr-1">●</span> WB: <span class="text-gray-600">kurofu</span></div>
-                        <div class="text-[11px] text-gray-400"><span class="text-red-300 mr-1">●</span> XHS: <span class="text-gray-600">1166142003</span></div>
+                    <div class="sidebar-section-title text-left">Connect</div>
+                    <div class="flex flex-col gap-1 text-left">
+                        <div class="social-link bg-blue-50/30 text-blue-400">📺 Bili: 安尘子 (330870)</div>
+                        <div class="social-link bg-pink-50/30 text-pink-400">🎨 WB: kurofu</div>
+                        <div class="social-link bg-red-50/30 text-red-400">📖 XHS: 1166142003</div>
                     </div>
                 </div>
             </aside>
-            <main class="flex-1 space-y-6 sm:space-y-8" id="diaryList"></main>
+
+            <main class="flex-1">
+                <div class="flex justify-between items-end mb-6 px-2">
+                    <h3 class="text-xs text-pink-200 tracking-[0.2em] font-bold uppercase">Memory Stream</h3>
+                    <button onclick="checkAdminThenOpen()" class="bg-white/80 backdrop-blur px-5 py-2 rounded-2xl border border-pink-100 text-pink-400 text-sm hover:bg-pink-400 hover:text-white transition-all shadow-sm">
+                        新的记忆 ✨
+                    </button>
+                </div>
+                <div class="space-y-6" id="diaryList"></div>
+            </main>
         </div>
     </div>
 </div>
@@ -124,7 +113,7 @@
 <div id="page-detail" class="hidden p-4 sm:p-8"><div class="max-w-4xl mx-auto pt-8"><button onclick="goBack()" class="mb-8 text-pink-300 hover:text-pink-500 text-sm tracking-widest">/ BACK TO BASE</button><div id="detail-content" class="f-card p-8 sm:p-16 bg-white/95"></div></div></div>
 <div id="editor-mask" class="fixed inset-0 bg-white/80 backdrop-blur-md z-[1000] hidden items-center justify-center p-4"><div class="f-card p-6 sm:p-10 w-full max-w-2xl bg-white shadow-2xl border-none"><div class="flex justify-between items-center mb-6"><span class="text-pink-200 text-xs tracking-widest">MOMENT EDITOR</span><button onclick="closeEditor()" class="text-gray-300 hover:text-gray-500 text-xl">✕</button></div><input id="diaryTitle" type="text" placeholder="标题..." class="w-full text-xl sm:text-2xl font-normal mb-4 outline-none text-gray-700 placeholder:text-gray-200"><input id="diaryTags" type="text" placeholder="标签 (空格隔开)" class="w-full text-xs mb-6 outline-none text-pink-300 uppercase"><div id="editor-container" class="text-gray-600" style="height: 250px;"></div><div class="flex justify-end mt-8"><button id="saveBtn" onclick="handleSave()" class="py-3 px-10 border border-pink-200 rounded-2xl text-pink-400 bg-white hover:bg-pink-400 hover:text-white transition-all">同步至星海</button></div></div></div>
 
-<div id="pet-container" onclick="petSpeak()"><div id="pet-bubble"></div><img id="pet-img" src="images/IMG_2877.png" alt="Pet"></div>
+<div id="pet-container" onclick="petSpeak()"><div id="pet-bubble" style="position: absolute; bottom: 100%; right: 0; margin-bottom: 10px; background: white; padding: 10px 15px; border-radius: 18px; font-size: 12px; opacity: 0; transition: 0.4s; pointer-events: none; border: 1px solid #fef0f3; box-shadow: 0 5px 15px rgba(0,0,0,0.05); white-space: nowrap;"></div><img id="pet-img" src="images/IMG_2877.png" alt="Pet"></div>
 
 <script>
     const REPO = "Ancenchan/ancenchan.github.io"; 
@@ -133,24 +122,43 @@
 
     const quill = new Quill('#editor-container', { theme: 'snow', modules: { toolbar: [['bold', 'italic'], ['image', 'link']] } });
 
-    // 需求 5: 音乐切换逻辑
+    // 音乐逻辑优化
     function toggleMusic() {
         const bgm = document.getElementById('bgm');
         const ctrl = document.getElementById('music-ctrl');
         if (bgm.paused) {
-            bgm.play().catch(e => console.log("需手动触发播放"));
-            ctrl.classList.add('music-playing');
-            ctrl.innerText = "💿";
+            bgm.play().then(() => {
+                ctrl.classList.add('music-playing');
+                ctrl.innerText = "📻";
+            }).catch(e => {
+                alert("移动端请先点击页面任意位置再播放音乐哦~");
+            });
         } else {
             bgm.pause();
             ctrl.classList.remove('music-playing');
-            ctrl.innerText = "🎵";
+            ctrl.innerText = "🔇";
         }
     }
 
     function getToken(f=false) { let t=localStorage.getItem('gh_token'); if(!t||f){ t=prompt("🗝️ Token:"); if(t)localStorage.setItem('gh_token',t); } return t; }
     function checkAdminThenOpen() { if(getToken()) openEditor(); }
-    function openEditor(index=null) { editIndex=index; document.getElementById('editor-mask').style.display='flex'; document.body.style.overflow='hidden'; if(index!==null){ const item=diaryData[index]; document.getElementById('diaryTitle').value=item.title; document.getElementById('diaryTags').value=(item.tags||[]).join(' '); quill.root.innerHTML=item.content; }else{ document.getElementById('diaryTitle').value=""; document.getElementById('diaryTags').value=""; quill.root.innerHTML=""; }}
+    
+    function openEditor(index=null) { 
+        editIndex=index; 
+        document.getElementById('editor-mask').style.display='flex'; 
+        document.body.style.overflow='hidden'; 
+        if(index!==null){ 
+            const item=diaryData[index]; 
+            document.getElementById('diaryTitle').value=item.title; 
+            document.getElementById('diaryTags').value=(item.tags||[]).join(' '); 
+            quill.root.innerHTML=item.content; 
+        } else {
+            document.getElementById('diaryTitle').value=""; 
+            document.getElementById('diaryTags').value=""; 
+            quill.root.innerHTML=""; 
+        }
+    }
+
     function closeEditor() { document.getElementById('editor-mask').style.display='none'; document.body.style.overflow='auto'; }
 
     async function fetchCloudData() {
@@ -173,34 +181,32 @@
         diaryData.forEach(d => { if(d.tags) d.tags.forEach(t => tagMap[t] = (tagMap[t] || 0) + 1); });
         
         cloud.innerHTML = Object.keys(tagMap).map(t => `
-            <button class="flex items-center p-3 rounded-2xl transition-all text-sm ${filterTag===t?'bg-pink-100 text-pink-500':'bg-white/40 text-gray-400'}" onclick="setFilter('${t}')">
+            <button class="tag-btn flex items-center transition-all text-[12px] ${filterTag===t?'bg-pink-100 text-pink-500':'text-gray-400 hover:bg-white/60'}" onclick="setFilter('${t}')">
                 <span class="mr-2">🌸</span><span class="flex-1 text-left">${t}</span>
             </button>`).join('');
 
-        // 需求 4: 置顶逻辑优化
-        // 排序规则：置顶的文章排最前，剩下的按时间倒序
         const sortedData = diaryData.slice().sort((a, b) => {
             if (a.pinned && !b.pinned) return -1;
             if (!a.pinned && b.pinned) return 1;
-            return b.id - a.id; // 原有的倒序
+            return b.id - a.id;
         });
 
         const filtered = filterTag ? sortedData.filter(d => d.tags && d.tags.includes(filterTag)) : sortedData;
         list.innerHTML = filtered.map((item) => {
             const realIndex = diaryData.findIndex(d => d.id === item.id);
             const tempDiv = document.createElement('div'); tempDiv.innerHTML = item.content || "";
-            const previewText = tempDiv.innerText.substring(0, 300); 
+            const previewText = tempDiv.innerText.substring(0, 200); 
 
-            return `<div class="f-card p-6 sm:p-10 cursor-pointer group hover:bg-white/90" onclick="showDetail(${realIndex})">
-                <div class="flex justify-between items-start mb-4">
+            return `<div class="f-card p-6 sm:p-8 cursor-pointer group hover:bg-white/90" onclick="showDetail(${realIndex})">
+                <div class="flex justify-between items-start mb-3">
                     <div class="flex items-center gap-2">
-                        ${item.pinned ? '<span class="bg-pink-400 text-white text-[9px] px-2 py-0.5 rounded-full animate-pulse">PINNED</span>' : ''}
+                        ${item.pinned ? '<span class="bg-pink-400 text-white text-[9px] px-2 py-0.5 rounded-full">PIN</span>' : ''}
                         <span class="text-[10px] text-pink-200 tracking-widest font-medium">${item.date}</span>
                     </div>
-                    <div class="flex flex-wrap justify-end gap-1">${(item.tags||[]).map(t => `<span class="text-[9px] border border-pink-100 px-2 py-0.5 rounded-lg text-pink-300">${t}</span>`).join('')}</div>
+                    <div class="flex flex-wrap gap-1">${(item.tags||[]).map(t => `<span class="text-[9px] border border-pink-50 px-2 py-0.5 rounded-lg text-pink-300">${t}</span>`).join('')}</div>
                 </div>
-                <h2 class="text-lg sm:text-xl font-medium text-gray-700 mb-3 group-hover:text-pink-400 transition-colors">${item.title || 'Untitled'}</h2>
-                <div class="text-gray-500 leading-relaxed text-sm preview-text">${previewText}</div>
+                <h2 class="text-lg font-medium text-gray-700 mb-2 group-hover:text-pink-400 transition-colors">${item.title || 'Untitled'}</h2>
+                <div class="text-gray-400 leading-relaxed text-xs preview-text">${previewText}</div>
             </div>`;
         }).join('');
     }
@@ -215,16 +221,15 @@
             <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-8 tracking-tight">${item.title}</h1>
             <div class="ql-editor p-0 text-gray-700 leading-8 text-sm sm:text-base font-light">${item.content}</div>
             <div class="mt-16 border-t border-pink-50 pt-10 flex gap-8">
-                <button onclick="if(getToken()) { openEditor(${index}); goBack(); }" class="text-pink-300 hover:text-pink-500 text-xs font-bold tracking-widest transition-colors">EDIT</button>
-                <button onclick="if(getToken()) togglePin(${index})" class="text-gray-300 hover:text-pink-400 text-xs font-bold tracking-widest transition-colors">${item.pinned?'UNPIN':'PIN TOP'}</button>
-                <button onclick="if(getToken()) deleteItem(${index})" class="text-gray-100 hover:text-red-300 text-xs font-bold tracking-widest transition-colors">DELETE</button>
+                <button onclick="if(getToken()) { openEditor(${index}); goBack(); }" class="text-pink-300 hover:text-pink-500 text-xs font-bold tracking-widest">EDIT</button>
+                <button onclick="if(getToken()) togglePin(${index})" class="text-gray-300 hover:text-pink-400 text-xs font-bold tracking-widest">${item.pinned?'UNPIN':'PIN TOP'}</button>
+                <button onclick="if(getToken()) deleteItem(${index})" class="text-gray-100 hover:text-red-300 text-xs font-bold tracking-widest">DELETE</button>
             </div>`;
         document.getElementById('page-list').classList.add('hidden');
         document.getElementById('page-detail').classList.remove('hidden');
         window.scrollTo(0, 0);
     }
 
-    // 需求 4: 切换置顶状态函数
     async function togglePin(index) {
         diaryData[index].pinned = !diaryData[index].pinned;
         const b64 = btoa(unescape(encodeURIComponent(JSON.stringify(diaryData, null, 2))));
@@ -255,7 +260,7 @@
                 headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message: "Update", content: b64, sha: currentSha })
             });
-            if (res.ok) { const d=await res.json(); currentSha=d.content.sha; render(); petSpeak("唱出来了……我，唱出来了！✨"); setTimeout(() => { closeEditor(); saveBtn.disabled=false; saveBtn.innerText="同步至星海"; }, 2000); }
+            if (res.ok) { const d=await res.json(); currentSha=d.content.sha; render(); petSpeak("记忆已保存！✨"); setTimeout(() => { closeEditor(); saveBtn.disabled=false; saveBtn.innerText="同步至星海"; }, 1500); }
         } catch (e) { alert("失败"); saveBtn.disabled = false; }
     }
 
@@ -273,9 +278,10 @@
 
     function petSpeak(msg) {
         const bubble = document.getElementById('pet-bubble');
-        const kohaneQuotes = ["那个……我也能变得像大家一样帅气吗？", "只要和大家在一起，我感觉哪里都能去……！", "Vivid BAD SQUAD，出击……！啊，有点害羞……", "虽然还会紧张，但我不会再逃避了！"];
+        const kohaneQuotes = ["大家都在努力，我也不能输！", "只要和大家在一起……！", "Vivid BAD SQUAD，出击！", "虽然还会紧张，但我不会再逃避了！"];
         bubble.innerText = msg || kohaneQuotes[Math.floor(Math.random() * kohaneQuotes.length)];
-        bubble.classList.add('active'); setTimeout(() => bubble.classList.remove('active'), 3000);
+        bubble.style.opacity = "1";
+        setTimeout(() => bubble.style.opacity = "0", 3000);
     }
 
     window.onload = fetchCloudData;
