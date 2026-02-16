@@ -15,12 +15,18 @@
             --f-text-main: #4a4a4a;
         }
 
+        /* 需求 3: 可爱猫咪鼠标 */
         body { 
             background-color: var(--f-bg);
             background-image: url('https://www.transparenttextures.com/patterns/sakura.png');
             background-repeat: repeat; background-attachment: fixed;
             color: var(--f-text-main); font-family: 'Noto Sans SC', sans-serif;
             margin: 0; overflow-x: hidden; -webkit-tap-highlight-color: transparent;
+            /* 替换为一个小黑猫/猫爪光标，这里使用了标准的可爱指针图片 */
+            cursor: url('https://cur.cursors-4u.net/anime/ani-11/ani1085.cur'), auto;
+        }
+        a, button, .cursor-pointer { 
+            cursor: url('https://cur.cursors-4u.net/anime/ani-11/ani1084.cur'), pointer !important; 
         }
 
         .nickname { font-family: 'Ma Shan Zheng', cursive; font-size: 2.2rem; color: #8a7a7a; letter-spacing: 2px; }
@@ -35,21 +41,18 @@
             background: var(--f-glass); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
             border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 30px;
             box-shadow: 0 8px 30px rgba(255, 177, 193, 0.08); transition: all 0.4s ease;
-            /* 修复 2: 解决长链接溢出 */
             word-break: break-all;
         }
 
-        /* 修复 1: 首页摘要保留换行 */
+        /* 需求 1: 自我介绍样式 */
+        .bio-text { font-size: 0.8rem; color: #9a8a8a; line-height: 1.6; font-weight: 300; }
+
         .preview-text {
-            white-space: pre-line;
-            display: -webkit-box;
-            -webkit-line-clamp: 4; /* 最多显示4行，超过省略 */
-            -webkit-box-orient: vertical;
-            overflow: hidden;
+            white-space: pre-line; display: -webkit-box; -webkit-line-clamp: 4;
+            -webkit-box-orient: vertical; overflow: hidden;
         }
 
         #pet-container { position: fixed; bottom: 20px; right: 20px; z-index: 999; cursor: pointer; opacity: 0.8; transition: 0.3s; }
-        #pet-container:hover { opacity: 1; }
         #pet-img { width: 100px; animation: softFloat 4s ease-in-out infinite; }
         @keyframes softFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
         
@@ -61,19 +64,30 @@
         }
         #pet-bubble.active { opacity: 1; transform: translateY(-5px); }
 
-        .ql-editor { word-break: break-all; } /* 详情页也要防链接溢出 */
+        /* 需求 5: BGM 控制器样式 */
+        #music-ctrl {
+            position: fixed; bottom: 130px; right: 35px; z-index: 998;
+            width: 40px; height: 40px; background: white; border-radius: 50%;
+            display: flex; items-center; justify-content: center;
+            box-shadow: 0 4px 15px rgba(255,177,193,0.2); border: 1px solid #fff0f3;
+            cursor: pointer; transition: 0.3s;
+        }
+        #music-ctrl:hover { transform: scale(1.1); }
+        .music-playing { animation: rotate 4s linear infinite; }
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
         @media (max-width: 640px) {
             .header-banner { height: 160px; }
             .f-card { padding: 1.5rem !important; }
-            .nickname { font-size: 1.8rem; }
             #pet-img { width: 80px; }
+            #music-ctrl { bottom: 110px; right: 25px; }
         }
-
-        .moe-btn:disabled { background: #f5f5f5; color: #bbb; border-color: #eee; cursor: not-allowed; }
     </style>
 </head>
 <body>
+
+<audio id="bgm" loop src="https://music.163.com/song/media/outer/url?id=1443831646.mp3"></audio>
+<div id="music-ctrl" onclick="toggleMusic()">🎵</div>
 
 <div id="page-list">
     <div class="header-banner"></div>
@@ -82,10 +96,24 @@
             <aside class="w-full lg:w-64">
                 <div class="f-card p-6 sm:p-8 text-center sticky top-8">
                     <img src="images/IMG_3024.webp" class="w-24 h-24 rounded-full mx-auto mb-4 bg-white object-cover shadow-sm border border-pink-50">
-                    <h2 class="nickname mb-4">Ancenchan</h2>
-                    <button onclick="checkAdminThenOpen()" class="moe-btn w-full mb-6 text-sm py-3 px-4 border border-pink-200 rounded-2xl text-pink-400 bg-white hover:bg-pink-400 hover:text-white transition-all">新的记忆 ✨</button>
+                    <h2 class="nickname mb-2">Ancenchan</h2>
+                    
+                    <div class="bio-text mb-6 px-2">
+                        在这里记录碎碎念和星海的歌声 ✨<br>
+                        喜欢唱歌的小豆泽心羽应援中！
+                    </div>
+
+                    <button onclick="checkAdminThenOpen()" class="moe-btn w-full mb-8 text-sm py-3 px-4 border border-pink-200 rounded-2xl text-pink-400 bg-white hover:bg-pink-400 hover:text-white transition-all shadow-sm">新的记忆 ✨</button>
+                    
                     <div class="text-left text-[10px] text-pink-200 uppercase tracking-widest mb-3 ml-2">Collection</div>
-                    <nav id="tagCloud" class="flex flex-col gap-2"></nav>
+                    <nav id="tagCloud" class="flex flex-col gap-2 mb-8"></nav>
+
+                    <div class="text-left text-[10px] text-pink-200 uppercase tracking-widest mb-3 ml-2">Connect</div>
+                    <div class="flex flex-col gap-3 text-left px-2">
+                        <div class="text-[11px] text-gray-400"><span class="text-blue-300 mr-1">●</span> Bili: <span class="text-gray-600">安尘子 (330870)</span></div>
+                        <div class="text-[11px] text-gray-400"><span class="text-pink-300 mr-1">●</span> WB: <span class="text-gray-600">kurofu</span></div>
+                        <div class="text-[11px] text-gray-400"><span class="text-red-300 mr-1">●</span> XHS: <span class="text-gray-600">1166142003</span></div>
+                    </div>
                 </div>
             </aside>
             <main class="flex-1 space-y-6 sm:space-y-8" id="diaryList"></main>
@@ -93,82 +121,45 @@
     </div>
 </div>
 
-<div id="page-detail" class="hidden p-4 sm:p-8">
-    <div class="max-w-4xl mx-auto pt-8">
-        <button onclick="goBack()" class="mb-8 text-pink-300 hover:text-pink-500 text-sm tracking-widest">/ BACK TO BASE</button>
-        <div id="detail-content" class="f-card p-8 sm:p-16 bg-white/95"></div>
-    </div>
-</div>
+<div id="page-detail" class="hidden p-4 sm:p-8"><div class="max-w-4xl mx-auto pt-8"><button onclick="goBack()" class="mb-8 text-pink-300 hover:text-pink-500 text-sm tracking-widest">/ BACK TO BASE</button><div id="detail-content" class="f-card p-8 sm:p-16 bg-white/95"></div></div></div>
+<div id="editor-mask" class="fixed inset-0 bg-white/80 backdrop-blur-md z-[1000] hidden items-center justify-center p-4"><div class="f-card p-6 sm:p-10 w-full max-w-2xl bg-white shadow-2xl border-none"><div class="flex justify-between items-center mb-6"><span class="text-pink-200 text-xs tracking-widest">MOMENT EDITOR</span><button onclick="closeEditor()" class="text-gray-300 hover:text-gray-500 text-xl">✕</button></div><input id="diaryTitle" type="text" placeholder="标题..." class="w-full text-xl sm:text-2xl font-normal mb-4 outline-none text-gray-700 placeholder:text-gray-200"><input id="diaryTags" type="text" placeholder="标签 (空格隔开)" class="w-full text-xs mb-6 outline-none text-pink-300 uppercase"><div id="editor-container" class="text-gray-600" style="height: 250px;"></div><div class="flex justify-end mt-8"><button id="saveBtn" onclick="handleSave()" class="py-3 px-10 border border-pink-200 rounded-2xl text-pink-400 bg-white hover:bg-pink-400 hover:text-white transition-all">同步至星海</button></div></div></div>
 
-<div id="editor-mask" class="fixed inset-0 bg-white/80 backdrop-blur-md z-[1000] hidden items-center justify-center p-4">
-    <div class="f-card p-6 sm:p-10 w-full max-w-2xl bg-white shadow-2xl border-none">
-        <div class="flex justify-between items-center mb-6">
-            <span class="text-pink-200 text-xs tracking-widest">MOMENT EDITOR</span>
-            <button onclick="closeEditor()" class="text-gray-300 hover:text-gray-500 text-xl">✕</button>
-        </div>
-        <input id="diaryTitle" type="text" placeholder="标题..." class="w-full text-xl sm:text-2xl font-normal mb-4 outline-none text-gray-700 placeholder:text-gray-200">
-        <input id="diaryTags" type="text" placeholder="标签 (空格隔开)" class="w-full text-xs mb-6 outline-none text-pink-300 uppercase">
-        <div id="editor-container" class="text-gray-600" style="height: 250px;"></div>
-        <div class="flex justify-end mt-8">
-            <button id="saveBtn" onclick="handleSave()" class="py-3 px-10 border border-pink-200 rounded-2xl text-pink-400 bg-white hover:bg-pink-400 hover:text-white transition-all">同步至星海</button>
-        </div>
-    </div>
-</div>
-
-<div id="pet-container" onclick="petSpeak()">
-    <div id="pet-bubble"></div>
-    <img id="pet-img" src="images/IMG_2877.png" alt="Pet">
-</div>
+<div id="pet-container" onclick="petSpeak()"><div id="pet-bubble"></div><img id="pet-img" src="images/IMG_2877.png" alt="Pet"></div>
 
 <script>
     const REPO = "Ancenchan/ancenchan.github.io"; 
     const PATH = "data/articles.json";
     let diaryData = [], currentSha = "", filterTag = null, editIndex = null;
 
-    const quill = new Quill('#editor-container', {
-        theme: 'snow',
-        modules: { toolbar: [['bold', 'italic'], ['image', 'link']] }
-    });
+    const quill = new Quill('#editor-container', { theme: 'snow', modules: { toolbar: [['bold', 'italic'], ['image', 'link']] } });
 
-    function getToken(forcePrompt = false) {
-        let t = localStorage.getItem('gh_token');
-        if (!t || forcePrompt) {
-            t = prompt("🗝️ 请输入管理密码 (GitHub Token):");
-            if (t) localStorage.setItem('gh_token', t);
-        }
-        return t;
-    }
-
-    function checkAdminThenOpen() { if(getToken()) openEditor(); }
-
-    function openEditor(index = null) {
-        editIndex = index;
-        document.getElementById('editor-mask').style.display = 'flex';
-        document.body.style.overflow = 'hidden';
-        const saveBtn = document.getElementById('saveBtn');
-        saveBtn.innerText = "同步至星海"; saveBtn.disabled = false;
-        if (index !== null) {
-            const item = diaryData[index];
-            document.getElementById('diaryTitle').value = item.title;
-            document.getElementById('diaryTags').value = (item.tags || []).join(' ');
-            quill.root.innerHTML = item.content;
+    // 需求 5: 音乐切换逻辑
+    function toggleMusic() {
+        const bgm = document.getElementById('bgm');
+        const ctrl = document.getElementById('music-ctrl');
+        if (bgm.paused) {
+            bgm.play().catch(e => console.log("需手动触发播放"));
+            ctrl.classList.add('music-playing');
+            ctrl.innerText = "💿";
         } else {
-            document.getElementById('diaryTitle').value = "";
-            document.getElementById('diaryTags').value = "";
-            quill.root.innerHTML = "";
+            bgm.pause();
+            ctrl.classList.remove('music-playing');
+            ctrl.innerText = "🎵";
         }
     }
 
-    function closeEditor() { document.getElementById('editor-mask').style.display = 'none'; document.body.style.overflow = 'auto'; }
+    function getToken(f=false) { let t=localStorage.getItem('gh_token'); if(!t||f){ t=prompt("🗝️ Token:"); if(t)localStorage.setItem('gh_token',t); } return t; }
+    function checkAdminThenOpen() { if(getToken()) openEditor(); }
+    function openEditor(index=null) { editIndex=index; document.getElementById('editor-mask').style.display='flex'; document.body.style.overflow='hidden'; if(index!==null){ const item=diaryData[index]; document.getElementById('diaryTitle').value=item.title; document.getElementById('diaryTags').value=(item.tags||[]).join(' '); quill.root.innerHTML=item.content; }else{ document.getElementById('diaryTitle').value=""; document.getElementById('diaryTags').value=""; quill.root.innerHTML=""; }}
+    function closeEditor() { document.getElementById('editor-mask').style.display='none'; document.body.style.overflow='auto'; }
 
     async function fetchCloudData() {
-        const token = localStorage.getItem('gh_token');
-        const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+        const t = localStorage.getItem('gh_token');
+        const h = t ? { 'Authorization': `Bearer ${t}` } : {};
         try {
-            const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${PATH}?v=${Date.now()}`, { headers });
+            const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${PATH}?v=${Date.now()}`, { headers: h });
             if (res.ok) {
-                const data = await res.json();
-                currentSha = data.sha;
+                const data = await res.json(); currentSha = data.sha;
                 diaryData = JSON.parse(decodeURIComponent(escape(atob(data.content.replace(/\s/g, '')))));
                 render();
             }
@@ -182,23 +173,30 @@
         diaryData.forEach(d => { if(d.tags) d.tags.forEach(t => tagMap[t] = (tagMap[t] || 0) + 1); });
         
         cloud.innerHTML = Object.keys(tagMap).map(t => `
-            <button class="flex items-center p-3 rounded-2xl transition-all text-sm ${filterTag===t?'bg-pink-100 text-pink-500 shadow-sm':'bg-white/40 text-gray-400 hover:bg-white'}" onclick="setFilter('${t}')">
+            <button class="flex items-center p-3 rounded-2xl transition-all text-sm ${filterTag===t?'bg-pink-100 text-pink-500':'bg-white/40 text-gray-400'}" onclick="setFilter('${t}')">
                 <span class="mr-2">🌸</span><span class="flex-1 text-left">${t}</span>
-                <span class="text-[10px] opacity-40 font-mono">${tagMap[t]}</span>
-            </button>
-        `).join('');
+            </button>`).join('');
 
-        const filtered = filterTag ? diaryData.filter(d => d.tags && d.tags.includes(filterTag)) : diaryData;
-        list.innerHTML = filtered.slice().reverse().map((item) => {
+        // 需求 4: 置顶逻辑优化
+        // 排序规则：置顶的文章排最前，剩下的按时间倒序
+        const sortedData = diaryData.slice().sort((a, b) => {
+            if (a.pinned && !b.pinned) return -1;
+            if (!a.pinned && b.pinned) return 1;
+            return b.id - a.id; // 原有的倒序
+        });
+
+        const filtered = filterTag ? sortedData.filter(d => d.tags && d.tags.includes(filterTag)) : sortedData;
+        list.innerHTML = filtered.map((item) => {
             const realIndex = diaryData.findIndex(d => d.id === item.id);
-            // 修复 1: 提取内容并保留换行，但不提取HTML标签
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = item.content || "";
+            const tempDiv = document.createElement('div'); tempDiv.innerHTML = item.content || "";
             const previewText = tempDiv.innerText.substring(0, 300); 
 
             return `<div class="f-card p-6 sm:p-10 cursor-pointer group hover:bg-white/90" onclick="showDetail(${realIndex})">
                 <div class="flex justify-between items-start mb-4">
-                    <span class="text-[10px] text-pink-200 tracking-widest font-medium">${item.date}</span>
+                    <div class="flex items-center gap-2">
+                        ${item.pinned ? '<span class="bg-pink-400 text-white text-[9px] px-2 py-0.5 rounded-full animate-pulse">PINNED</span>' : ''}
+                        <span class="text-[10px] text-pink-200 tracking-widest font-medium">${item.date}</span>
+                    </div>
                     <div class="flex flex-wrap justify-end gap-1">${(item.tags||[]).map(t => `<span class="text-[9px] border border-pink-100 px-2 py-0.5 rounded-lg text-pink-300">${t}</span>`).join('')}</div>
                 </div>
                 <h2 class="text-lg sm:text-xl font-medium text-gray-700 mb-3 group-hover:text-pink-400 transition-colors">${item.title || 'Untitled'}</h2>
@@ -210,16 +208,32 @@
     function showDetail(index) {
         const item = diaryData[index];
         document.getElementById('detail-content').innerHTML = `
-            <div class="text-[10px] text-pink-200 tracking-[0.3em] mb-8 font-bold uppercase">${item.date}</div>
+            <div class="flex items-center gap-3 mb-8">
+                ${item.pinned ? '<span class="bg-pink-400 text-white text-[10px] px-3 py-1 rounded-full">置顶</span>' : ''}
+                <div class="text-[10px] text-pink-200 tracking-[0.3em] font-bold uppercase">${item.date}</div>
+            </div>
             <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-8 tracking-tight">${item.title}</h1>
             <div class="ql-editor p-0 text-gray-700 leading-8 text-sm sm:text-base font-light">${item.content}</div>
             <div class="mt-16 border-t border-pink-50 pt-10 flex gap-8">
                 <button onclick="if(getToken()) { openEditor(${index}); goBack(); }" class="text-pink-300 hover:text-pink-500 text-xs font-bold tracking-widest transition-colors">EDIT</button>
-                <button onclick="if(getToken()) deleteItem(${index})" class="text-gray-200 hover:text-red-300 text-xs font-bold tracking-widest transition-colors">DELETE</button>
+                <button onclick="if(getToken()) togglePin(${index})" class="text-gray-300 hover:text-pink-400 text-xs font-bold tracking-widest transition-colors">${item.pinned?'UNPIN':'PIN TOP'}</button>
+                <button onclick="if(getToken()) deleteItem(${index})" class="text-gray-100 hover:text-red-300 text-xs font-bold tracking-widest transition-colors">DELETE</button>
             </div>`;
         document.getElementById('page-list').classList.add('hidden');
         document.getElementById('page-detail').classList.remove('hidden');
         window.scrollTo(0, 0);
+    }
+
+    // 需求 4: 切换置顶状态函数
+    async function togglePin(index) {
+        diaryData[index].pinned = !diaryData[index].pinned;
+        const b64 = btoa(unescape(encodeURIComponent(JSON.stringify(diaryData, null, 2))));
+        const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${PATH}`, {
+            method: 'PUT',
+            headers: { 'Authorization': `Bearer ${getToken()}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: "Toggle Pin", content: b64, sha: currentSha })
+        });
+        if(res.ok) { const d=await res.json(); currentSha=d.content.sha; render(); showDetail(index); }
     }
 
     function goBack() { document.getElementById('page-list').classList.remove('hidden'); document.getElementById('page-detail').classList.add('hidden'); }
@@ -231,11 +245,9 @@
         const title = document.getElementById('diaryTitle').value.trim() || "新的瞬间";
         const tags = document.getElementById('diaryTags').value.trim().split(/\s+/).filter(t => t);
         const dateStr = new Date().toLocaleDateString('zh-CN', {year:'numeric', month:'2-digit', day:'2-digit'});
-
         saveBtn.disabled = true; saveBtn.innerText = "正在同步...";
         if (editIndex !== null) { diaryData[editIndex] = { ...diaryData[editIndex], title, content: quill.root.innerHTML, tags }; }
-        else { diaryData.push({ id: Date.now(), title, content: quill.root.innerHTML, tags, date: dateStr }); }
-
+        else { diaryData.push({ id: Date.now(), title, content: quill.root.innerHTML, tags, date: dateStr, pinned: false }); }
         const b64 = btoa(unescape(encodeURIComponent(JSON.stringify(diaryData, null, 2))));
         try {
             const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${PATH}`, {
@@ -243,16 +255,7 @@
                 headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message: "Update", content: b64, sha: currentSha })
             });
-            if (res.status === 401) { alert("Token 错误"); localStorage.removeItem('gh_token'); window.location.reload(); }
-            if (res.ok) {
-                const d = await res.json(); currentSha = d.content.sha; render(); petSpeak("唱出来了……我，唱出来了！✨");
-                let count = 5;
-                const timer = setInterval(() => {
-                    count--;
-                    if (count > 0) saveBtn.innerText = `冷却中(${count}s)`;
-                    else { clearInterval(timer); saveBtn.innerText = "同步至星海"; saveBtn.disabled = false; closeEditor(); }
-                }, 1000);
-            }
+            if (res.ok) { const d=await res.json(); currentSha=d.content.sha; render(); petSpeak("唱出来了……我，唱出来了！✨"); setTimeout(() => { closeEditor(); saveBtn.disabled=false; saveBtn.innerText="同步至星海"; }, 2000); }
         } catch (e) { alert("失败"); saveBtn.disabled = false; }
     }
 
@@ -268,21 +271,11 @@
         if(res.ok) { const d = await res.json(); currentSha = d.content.sha; goBack(); render(); }
     }
 
-    // 修复 3: 心羽台词替换
     function petSpeak(msg) {
         const bubble = document.getElementById('pet-bubble');
-        const kohaneQuotes = [
-            "那个……我也能变得像大家一样帅气吗？",
-            "我也想……唱出能让大家露出笑容的歌！",
-            "只要和大家在一起，我感觉哪里都能去……！",
-            "Humming……♪ 嗯，今天的状态很不错！",
-            "Vivid BAD SQUAD，出击……！啊，有点害羞……",
-            "虽然还会紧张，但我不会再逃避了！",
-            "多亏了白石同学，我才能站在这里……"
-        ];
+        const kohaneQuotes = ["那个……我也能变得像大家一样帅气吗？", "只要和大家在一起，我感觉哪里都能去……！", "Vivid BAD SQUAD，出击……！啊，有点害羞……", "虽然还会紧张，但我不会再逃避了！"];
         bubble.innerText = msg || kohaneQuotes[Math.floor(Math.random() * kohaneQuotes.length)];
-        bubble.classList.add('active');
-        setTimeout(() => bubble.classList.remove('active'), 3000);
+        bubble.classList.add('active'); setTimeout(() => bubble.classList.remove('active'), 3000);
     }
 
     window.onload = fetchCloudData;
