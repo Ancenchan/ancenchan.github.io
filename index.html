@@ -11,80 +11,48 @@
     
     <style>
         :root { 
-            --f-bg: #fffcfd; 
-            --f-accent: #ffb1c1; 
-            --f-glass: rgba(255, 255, 255, 0.88);
+            --f-bg: #fffcfd; --f-accent: #ffb1c1; --f-glass: rgba(255, 255, 255, 0.88);
             --f-text-main: #4a4a4a;
         }
 
         body { 
             background-color: var(--f-bg);
             background-image: url('https://www.transparenttextures.com/patterns/sakura.png');
-            background-repeat: repeat;
-            background-attachment: fixed;
-            color: var(--f-text-main);
-            font-family: 'Noto Sans SC', sans-serif;
-            margin: 0;
-            overflow-x: hidden;
-            -webkit-tap-highlight-color: transparent; /* 移除移动端点击阴影 */
+            background-repeat: repeat; background-attachment: fixed;
+            color: var(--f-text-main); font-family: 'Noto Sans SC', sans-serif;
+            margin: 0; overflow-x: hidden; -webkit-tap-highlight-color: transparent;
         }
 
-        /* 昵称专用字体 */
-        .nickname {
-            font-family: 'Ma Shan Zheng', cursive;
-            font-size: 2.2rem;
-            color: #8a7a7a;
-            letter-spacing: 2px;
-        }
+        .nickname { font-family: 'Ma Shan Zheng', cursive; font-size: 2.2rem; color: #8a7a7a; letter-spacing: 2px; }
 
         .header-banner { 
-            height: 200px; /* 稍微调矮一点，更清爽 */
-            background: linear-gradient(to bottom, #ffdee9cc, #ffffff22), 
-                        url('https://api.paugram.com/wallpaper?source=gh') center/cover no-repeat;
-            filter: saturate(0.9);
-            border-radius: 0 0 50px 50px;
+            height: 200px; background: linear-gradient(to bottom, #ffdee9cc, #ffffff22), 
+            url('https://api.paugram.com/wallpaper?source=gh') center/cover no-repeat;
+            filter: saturate(0.9); border-radius: 0 0 50px 50px;
         }
 
         .f-card {
-            background: var(--f-glass);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.8);
-            border-radius: 30px;
-            box-shadow: 0 8px 30px rgba(255, 177, 193, 0.08);
-            transition: all 0.4s ease;
+            background: var(--f-glass); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 30px;
+            box-shadow: 0 8px 30px rgba(255, 177, 193, 0.08); transition: all 0.4s ease;
         }
 
-        /* 3. 宠物位置：移至右下角，避免遮挡按钮 */
-        #pet-container { 
-            position: fixed; 
-            bottom: 20px; 
-            right: 20px; 
-            z-index: 999; 
-            cursor: pointer;
-            opacity: 0.8;
-            transition: 0.3s;
-        }
+        #pet-container { position: fixed; bottom: 20px; right: 20px; z-index: 999; cursor: pointer; opacity: 0.8; transition: 0.3s; }
         #pet-container:hover { opacity: 1; }
-        #pet-img { 
-            width: 100px; /* 缩小一点，手机上更友好 */
-            animation: softFloat 4s ease-in-out infinite;
-        }
+        #pet-img { width: 100px; animation: softFloat 4s ease-in-out infinite; }
         @keyframes softFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
         
         #pet-bubble { 
             position: absolute; bottom: 100%; right: 0; margin-bottom: 10px;
             background: white; padding: 10px 15px; border-radius: 18px; font-size: 12px;
             opacity: 0; transition: 0.4s; pointer-events: none; border: 1px solid #fef0f3;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            white-space: nowrap;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05); white-space: nowrap;
         }
         #pet-bubble.active { opacity: 1; transform: translateY(-5px); }
 
-        /* 移动端间距微调 */
         @media (max-width: 640px) {
             .header-banner { height: 160px; }
-            .f-card { padding: 1.5rem !important; border-radius: 20px; }
+            .f-card { padding: 1.5rem !important; }
             .nickname { font-size: 1.8rem; }
             #pet-img { width: 80px; }
         }
@@ -100,9 +68,9 @@
         <div class="flex flex-col lg:flex-row gap-8 lg:gap-12">
             <aside class="w-full lg:w-64">
                 <div class="f-card p-6 sm:p-8 text-center sticky top-8">
-                    <img src="./images/IMG_3024.webp" class="w-24 h-24 rounded-full mx-auto mb-4 bg-white object-contain shadow-sm border border-pink-50">
+                    <img src="images/IMG_3024.webp" class="w-24 h-24 rounded-full mx-auto mb-4 bg-white object-cover shadow-sm border border-pink-50">
                     <h2 class="nickname mb-4">Ancenchan</h2>
-                    <button onclick="openEditor()" class="moe-btn w-full mb-6 text-sm py-3 px-4 border border-pink-200 rounded-2xl text-pink-400 bg-white hover:bg-pink-400 hover:text-white transition-all">新的记忆 ✨</button>
+                    <button onclick="checkAdminThenOpen()" class="moe-btn w-full mb-6 text-sm py-3 px-4 border border-pink-200 rounded-2xl text-pink-400 bg-white hover:bg-pink-400 hover:text-white transition-all">新的记忆 ✨</button>
                     <div class="text-left text-[10px] text-pink-200 uppercase tracking-widest mb-3 ml-2">Collection</div>
                     <nav id="tagCloud" class="flex flex-col gap-2"></nav>
                 </div>
@@ -136,7 +104,7 @@
 
 <div id="pet-container" onclick="petSpeak()">
     <div id="pet-bubble"></div>
-    <img id="pet-img" src="./images/IMG_2877.png" alt="Pet">
+    <img id="pet-img" src="images/IMG_2877.png" alt="Pet">
 </div>
 
 <script>
@@ -149,14 +117,27 @@
         modules: { toolbar: [['bold', 'italic'], ['image', 'link']] }
     });
 
+    // 鉴权逻辑：只有需要写操作时才检查 Token
+    function getToken(forcePrompt = false) {
+        let t = localStorage.getItem('gh_token');
+        if (!t || forcePrompt) {
+            t = prompt("🗝️ 请输入管理密码 (GitHub Token):");
+            if (t) localStorage.setItem('gh_token', t);
+        }
+        return t;
+    }
+
+    function checkAdminThenOpen() {
+        if(getToken()) openEditor();
+    }
+
     function openEditor(index = null) {
         editIndex = index;
         document.getElementById('editor-mask').style.display = 'flex';
-        document.body.style.overflow = 'hidden'; // 禁止背景滚动
+        document.body.style.overflow = 'hidden';
         const saveBtn = document.getElementById('saveBtn');
         saveBtn.innerText = "同步至星海";
         saveBtn.disabled = false;
-
         if (index !== null) {
             const item = diaryData[index];
             document.getElementById('diaryTitle').value = item.title;
@@ -176,28 +157,16 @@
 
     async function fetchCloudData() {
         const token = localStorage.getItem('gh_token');
-        if(!token) {
-            const t = prompt("🗝️ Token:");
-            if(t) { localStorage.setItem('gh_token', t); fetchCloudData(); }
-            return;
-        }
+        const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
         try {
-            const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${PATH}?v=${Date.now()}`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            if (res.status === 401 || res.status === 403) {
-                alert("Token 失效，请重新输入！");
-                localStorage.removeItem('gh_token');
-                window.location.reload();
-                return;
-            }
+            const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${PATH}?v=${Date.now()}`, { headers });
             if (res.ok) {
                 const data = await res.json();
                 currentSha = data.sha;
                 diaryData = JSON.parse(decodeURIComponent(escape(atob(data.content.replace(/\s/g, '')))));
                 render();
             }
-        } catch (e) { petSpeak("连接中..."); }
+        } catch (e) { petSpeak("星海连接中..."); }
     }
 
     function render() {
@@ -208,8 +177,7 @@
         
         cloud.innerHTML = Object.keys(tagMap).map(t => `
             <button class="flex items-center p-3 rounded-2xl transition-all text-sm ${filterTag===t?'bg-pink-100 text-pink-500 shadow-sm':'bg-white/40 text-gray-400 hover:bg-white'}" onclick="setFilter('${t}')">
-                <span class="mr-2">🌸</span>
-                <span class="flex-1 text-left">${t}</span>
+                <span class="mr-2">🌸</span><span class="flex-1 text-left">${t}</span>
                 <span class="text-[10px] opacity-40 font-mono">${tagMap[t]}</span>
             </button>
         `).join('');
@@ -236,22 +204,20 @@
             <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-8 tracking-tight">${item.title}</h1>
             <div class="ql-editor p-0 text-gray-700 leading-8 text-sm sm:text-base font-light">${item.content}</div>
             <div class="mt-16 border-t border-pink-50 pt-10 flex gap-8">
-                <button onclick="openEditor(${index}); goBack();" class="text-pink-300 hover:text-pink-500 text-xs font-bold tracking-widest transition-colors">EDIT</button>
-                <button onclick="deleteItem(${index})" class="text-gray-200 hover:text-red-300 text-xs font-bold tracking-widest transition-colors">DELETE</button>
+                <button onclick="if(getToken()) { openEditor(${index}); goBack(); }" class="text-pink-300 hover:text-pink-500 text-xs font-bold tracking-widest transition-colors">EDIT</button>
+                <button onclick="if(getToken()) deleteItem(${index})" class="text-gray-200 hover:text-red-300 text-xs font-bold tracking-widest transition-colors">DELETE</button>
             </div>`;
         document.getElementById('page-list').classList.add('hidden');
         document.getElementById('page-detail').classList.remove('hidden');
         window.scrollTo(0, 0);
     }
 
-    function goBack() {
-        document.getElementById('page-list').classList.remove('hidden');
-        document.getElementById('page-detail').classList.add('hidden');
-    }
-
+    function goBack() { document.getElementById('page-list').classList.remove('hidden'); document.getElementById('page-detail').classList.add('hidden'); }
     function setFilter(tag) { filterTag = (filterTag === tag) ? null : tag; render(); }
 
     async function handleSave() {
+        const token = getToken();
+        if(!token) return;
         const saveBtn = document.getElementById('saveBtn');
         const title = document.getElementById('diaryTitle').value.trim() || "新的瞬间";
         const tags = document.getElementById('diaryTags').value.trim().split(/\s+/).filter(t => t);
@@ -267,49 +233,30 @@
         }
 
         const b64 = btoa(unescape(encodeURIComponent(JSON.stringify(diaryData, null, 2))));
-        const token = localStorage.getItem('gh_token');
-        
         try {
             const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${PATH}`, {
                 method: 'PUT',
                 headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message: "Update", content: b64, sha: currentSha })
             });
-            
+            if (res.status === 401) { alert("Token 错误"); localStorage.removeItem('gh_token'); window.location.reload(); }
             if (res.ok) {
-                const d = await res.json();
-                currentSha = d.content.sha;
-                render();
-                petSpeak("记忆已保存 ✨");
-                
+                const d = await res.json(); currentSha = d.content.sha; render(); petSpeak("记忆已保存 ✨");
                 let count = 5;
                 const timer = setInterval(() => {
                     count--;
-                    if (count > 0) {
-                        saveBtn.innerText = `冷却中(${count}s)`;
-                    } else {
-                        clearInterval(timer);
-                        saveBtn.innerText = "同步至星海";
-                        saveBtn.disabled = false;
-                        closeEditor();
-                    }
+                    if (count > 0) saveBtn.innerText = `冷却中(${count}s)`;
+                    else { clearInterval(timer); saveBtn.innerText = "同步至星海"; saveBtn.disabled = false; closeEditor(); }
                 }, 1000);
-
-            } else {
-                throw new Error("同步失败");
             }
-        } catch (e) { 
-            alert("同步失败，请检查网络。");
-            saveBtn.disabled = false;
-            saveBtn.innerText = "重试同步";
-        }
+        } catch (e) { alert("失败"); saveBtn.disabled = false; }
     }
 
     async function deleteItem(index) {
-        if(!confirm("确定要删除吗？")) return;
+        const token = getToken();
+        if(!token || !confirm("确定要删除吗？")) return;
         diaryData.splice(index, 1);
         const b64 = btoa(unescape(encodeURIComponent(JSON.stringify(diaryData, null, 2))));
-        const token = localStorage.getItem('gh_token');
         const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${PATH}`, {
             method: 'PUT',
             headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
@@ -320,7 +267,7 @@
 
     function petSpeak(msg) {
         const bubble = document.getElementById('pet-bubble');
-        const quotes = ["チョココロネ~", "现在的字体清透多了！", "手机上也能轻松看哦。", "右下角是我的新家~"];
+        const quotes = ["チョココロネ~", "欢迎来到我的秘密基地！", "访客模式已开启 🍃", "这里的记忆都是彩色的。"];
         bubble.innerText = msg || quotes[Math.floor(Math.random() * quotes.length)];
         bubble.classList.add('active');
         setTimeout(() => bubble.classList.remove('active'), 3000);
@@ -330,6 +277,3 @@
 </script>
 </body>
 </html>
-
-
-
