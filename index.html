@@ -201,7 +201,42 @@ textarea,
 
     const quill = new Quill('#editor-container', { 
         theme: 'snow', 
-        modules: { toolbar: [['bold', 'italic'], ['image', 'link'], [{ 'header': [2, 3, false] }]] } 
+       modules: { 
+        toolbar: {
+            container: [
+                ['bold', 'italic'], 
+                ['image', 'link'], 
+                [{ 'header': [2, 3, false] }]
+            ],
+            handlers: {
+                // 接管图片按钮点击事件
+                image: function() {
+                    const input = document.createElement('input');
+                    input.setAttribute('type', 'file');
+                    input.setAttribute('accept', 'image/*');
+                    input.click();
+
+                    input.onchange = async () => {
+                        const file = input.files[0];
+                        if (!file) return;
+
+                        petSpeak("正在把照片存入星海... ☁️");
+                        
+                        // 调用上传函数
+                        const url = await uploadToGithub(file);
+                        
+                        if (url) {
+                            const range = this.quill.getSelection();
+                            this.quill.insertEmbed(range.index, 'image', url);
+                            petSpeak("同步成功！🐾");
+                        } else {
+                            petSpeak("同步失败了... 😿");
+                        }
+                    };
+                }
+            }
+        }
+    } } 
     });
 
     // 1. 获取目录
@@ -218,6 +253,52 @@ textarea,
         } catch (e) { petSpeak("Connect Error"); }
     }
 
+    // 新增：图片上传到 GitHub 逻辑
+async function uploadToGithub(file) {
+    const t = localStorage.getItem('gh_token');
+    if (!t) { alert("请先设置 Token"); return null; }
+
+    // 生成文件名：img_时间戳.png
+    const fileName = `img_${Date.now()}.png`;
+    const path = `images/posts/${fileName}`; // 确保你仓库里有 images/posts 文件夹
+    
+    // 将文件读取为 Base64 字符串
+    const reader = new FileReader();
+    const base64Promise = new Promise(resolve => {
+        reader.onload = () => resolve(reader.result.split(',')[1]);
+        reader.readAsDataURL(file);
+    });
+    const content = await base64Promise;
+
+    try {
+        const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, {
+            method: 'PUT',
+            headers: { 
+                'Authorization': `Bearer ${t}`, 
+                'Content-Type': 'application/json' 
+            },
+            body: JSON.stringify({
+                message: `Upload image: ${fileName}`,
+                content: content
+            })
+        });
+
+        if (res.ok) {
+            // 返回你的 GitHub Pages 访问链接
+            const username = REPO.split('/')[0];
+            const repoName = REPO.split('/')[1];
+            // 注意：这里默认你开启了 GitHub Pages
+            return `https://${username}.github.io/${repoName}/${path}`;
+        } else {
+            const err = await res.json();
+            console.error("上传错误详情:", err);
+            return null;
+        }
+    } catch (e) {
+        console.error("网络请求失败:", e);
+        return null;
+    }
+}
     // 2. 渲染首页
     function render() {
         const listEl = document.getElementById('diaryList'), cloud = document.getElementById('tagCloud'), tagMap = {};
@@ -468,3 +549,4 @@ textarea,
 </script>
 </body>
 </html>
+
