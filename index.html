@@ -39,12 +39,12 @@
           
 a, a *, button, button *, [onclick], .cursor-pointer {
     /* 这是一个粉色猫爪的 Base64 编码，不依赖本地文件，100% 成功 */
-    cursor: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACNklEQVRYR+2Xz0sVURDHPzPeU19SREUuS8SloIuIInAhpIUKWvQXtGvXv6Bdu9atW6GQChK6CQX9A6SloIuIInAhRER9772ZuePMvXmvr7S89968By4M78yZ75kzZ74zc4Uat6hxCxofAt8A9YAtS7YAtYAtQCOvAr6Ad8A7oA60AnWvAbUADfAnYAngM2AtYAtQD9gMWAf4DFgL2AK8BNYCPgPWAzYD1gM+A9YCPgPWA6+Bl8B6wFrAd8BnwHrA6+BnwGrA98B7wBrAd8BnwLp3nK/An8CbwCvAK8AqwN3AbWA3MBXfA3uBe8CHwI/AL8CvwG/An8BvgD+BXwGfAn8CPwE/Aj8CPwK/Av8B/wH/Af8B/wH/Af8Bv8X8DfgX+Bf4NfAr8BPwE/AT8BPwE/AT8BPwG8zfgH+Bf4FfA78CPwE/AT8BPwE/AT8BPwHfgN9u/gb8C/wL/Br4FfgJ+An4CfgJ+An4CfgG/E7zN+Bf4Ffg18CvwE/AT8BPwE/AT8BPwDfgt5u/Af8CvwK+Bn4FfgJ+An4CfgJ+An4CvgG/2/wN+Bf4FfA18CvwE/AT8BPwE/AT8BPwDfjt5m/Av8CvgK+BX4GfgJ+An4CfgJ+An4BvwO82fwP+BX4FfA38CvwE/AT8BPwE/AT8BHwDfof5G/Av8Cvga+BX4CfgJ+An4CfgJ+Ab8LvN34B/gV8DXwO/Aj8BPwE/AT8BPwE/Ad+A32X+BvwL/Ar4DfgX+BX4CfgJ+An4CfgfW09866vW0CcAAAAASUVORK5CYII="), pointer !important;
+    cursor: url('ani1039.cur'), pointer !important;
 }
 
 /* 专门针对悬停瞬间的强制处理 */
 a:hover, button:hover, [onclick]:hover {
-    cursor: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACNklEQVRYR+2Xz0sVURDHPzPeU19SREUuS8SloIuIInAhpIUKWvQXtGvXv6Bdu9atW6GQChK6CQX9A6SloIuIInAhRER9772ZuePMvXmvr7S89968By4M78yZ75kzZ74zc4Uat6hxCxofAt8A9YAtS7YAtYAtQCOvAr6Ad8A7oA60AnWvAbUADfAnYAngM2AtYAtQD9gMWAf4DFgL2AK8BNYCPgPWAzYD1gM+A9YCPgPWA6+Bl8B6wFrAd8BnwHrA6+BnwGrA98B7wBrAd8BnwLp3nK/An8CbwCvAK8AqwN3AbWA3MBXfA3uBe8CHwI/AL8CvwG/An8BvgD+BXwGfAn8CPwE/Aj8CPwK/Av8B/wH/Af8B/wH/Af8Bv8X8DfgX+Bf4NfAr8BPwE/AT8BPwE/AT8BPwG8zfgH+Bf4FfA78CPwE/AT8BPwE/AT8BPwHfgN9u/gb8C/wL/Br4FfgJ+An4CfgJ+An4CfgG/E7zN+Bf4Ffg18CvwE/AT8BPwE/AT8BPwDfgt5u/Af8CvwK+Bn4FfgJ+An4CfgJ+An4CvgG/2/wN+Bf4FfA18CvwE/AT8BPwE/AT8BPwDfjt5m/Av8CvgK+BX4GfgJ+An4CfgJ+An4BvwO82fwP+BX4FfA38CvwE/AT8BPwE/AT8BHwDfof5G/Av8Cvga+BX4CfgJ+An4CfgJ+Ab8LvN34B/gV8DXwO/Aj8BPwE/AT8BPwE/Ad+A32X+BvwL/Ar4DfgX+BX4CfgJ+An4CfgfW09866vW0CcAAAAASUVORK5CYII="), pointer !important;
+    cursor: url('ani1039.cur'), pointer !important;
 }
           
 input, 
@@ -100,6 +100,14 @@ textarea,
         .loading-spin { border: 2px solid #f3f3f3; border-top: 2px solid #ffb1c1; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; display: inline-block; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
+    <style>
+    /* 暴力增加权重：通过 html body 前缀提升等级 */
+    html body button, 
+    html body [role="button"], 
+    html body a {
+        cursor: url('ani1039.cur'), pointer !important;
+    }
+</style>
 </head>
 <body>
 <body style="cursor: url('ani1053.cur'), auto !important;">
@@ -455,6 +463,7 @@ textarea,
 </script>
 </body>
 </html>
+
 
 
 
