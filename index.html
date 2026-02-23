@@ -38,15 +38,17 @@
         }
 
         /* --- UI 样式 --- */
-        .preview-container {
-            max-height: 4.8em; 
-            overflow: hidden;
-            display: -webkit-box; 
-            -webkit-box-orient: vertical; 
-            -webkit-line-clamp: 3; 
-            line-height: 1.6; 
-            word-break: break-all;
-        }
+      .preview-container {
+    max-height: 4.8em; 
+    overflow: hidden;
+    display: -webkit-box; 
+    -webkit-box-orient: vertical; 
+    -webkit-line-clamp: 3; 
+    line-height: 1.6; 
+    word-break: break-all;
+    /* --- 添加下面这一行 --- */
+    white-space: pre-wrap; 
+}
 
         .f-card {
             background: var(--f-glass); 
@@ -388,4 +390,5 @@
 </script>
 </body>
 </html>
+
 
