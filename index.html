@@ -265,7 +265,7 @@
         const tags = tagsInput.split(/[\s,，]+/).filter(t => t.trim() !== "");
         const id = editIndex !== null ? diaryList[editIndex].id : Date.now();
         const date = editIndex !== null ? diaryList[editIndex].date : new Date().toLocaleDateString();
-        const summary = quill.getText(0, 120).replace(/\n/g, ' ') + '...';
+        const summary = quill.getText(0, 100).trim() + (quill.getLength() > 100 ? '...' : '');
 
         try {
             // A. 先处理详情内容 (posts/id.json)
@@ -380,6 +380,7 @@
 </script>
 </body>
 </html>
+
 
 
 
