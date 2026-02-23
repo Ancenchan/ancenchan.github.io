@@ -199,17 +199,16 @@ textarea,
     const pageSize = 6;
     const kohaneQuotes = ["我会努力唱好的！", "这就是……街头音乐吗？", "哪怕害羞，我也想传达心情！", "大家都在努力，我也不能落后！", "谢谢你一直陪着我 ✨"];
 
-    const quill = new Quill('#editor-container', { 
-        theme: 'snow', 
-       modules: { 
+const quill = new Quill('#editor-container', {
+    theme: 'snow',
+    modules: {
         toolbar: {
             container: [
-                ['bold', 'italic'], 
-                ['image', 'link'], 
+                ['bold', 'italic'],
+                ['image', 'link'],
                 [{ 'header': [2, 3, false] }]
             ],
             handlers: {
-                // 接管图片按钮点击事件
                 image: function() {
                     const input = document.createElement('input');
                     input.setAttribute('type', 'file');
@@ -221,13 +220,12 @@ textarea,
                         if (!file) return;
 
                         petSpeak("正在把照片存入星海... ☁️");
-                        
-                        // 调用上传函数
                         const url = await uploadToGithub(file);
                         
                         if (url) {
-                            const range = this.quill.getSelection();
-                            this.quill.insertEmbed(range.index, 'image', url);
+                            // 使用 quill 变量直接操作，避免 this 指向错误
+                            const range = quill.getSelection();
+                            quill.insertEmbed(range.index, 'image', url);
                             petSpeak("同步成功！🐾");
                         } else {
                             petSpeak("同步失败了... 😿");
@@ -236,8 +234,8 @@ textarea,
                 }
             }
         }
-    } 
-    });
+    }
+}); // 结尾只有这一组，非常干净
 
     // 1. 获取目录
     async function fetchCloudData() {
@@ -549,5 +547,6 @@ async function uploadToGithub(file) {
 </script>
 </body>
 </html>
+
 
 
