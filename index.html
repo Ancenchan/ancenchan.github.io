@@ -513,6 +513,18 @@ async function uploadToGithub(file) {
         btn.disabled = false;
     }
 }
+    // --- 新增：专门处理编辑点击的中转函数 ---
+function prepareEdit(encodedContent) {
+    try {
+        // 1. 将 Base64 编码还原为原始 HTML 内容
+        const originalContent = decodeURIComponent(escape(atob(encodedContent)));
+        // 2. 带着内容打开编辑器
+        openEditor(originalContent);
+    } catch (e) {
+        console.error("解码失败:", e);
+        petSpeak("这段记忆读取失败了... 😿");
+    }
+}
     function openEditor(savedContent = "") {
         if(!getToken()) return;
         document.getElementById('editor-mask').style.display = 'flex';
@@ -559,6 +571,7 @@ async function uploadToGithub(file) {
 </script>
 </body>
 </html>
+
 
 
 
