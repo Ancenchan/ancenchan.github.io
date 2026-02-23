@@ -412,7 +412,7 @@
     function petSpeak(msg) {
         const b = document.getElementById('pet-bubble');
         b.innerText = msg || kohaneQuotes[Math.floor(Math.random() * kohaneQuotes.length)];
-        b.style.opacity = "1"; setTimeout(() => b.style.opacity = "0", 3000);
+        b.style.opacity = "1"; setTimeout(() => b.style.opacity = "0", 5000);
     }
 
     function goBack() { 
@@ -434,6 +434,7 @@
 </script>
 </body>
 </html>
+
 
 
 
