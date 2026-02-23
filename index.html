@@ -18,14 +18,11 @@
             cursor: url('https://cur.cursors-4u.net/anime/ani-11/ani1085.cur'), auto;
         }
 
-        /* 纯净截断预览 */
         .preview-container {
             max-height: 5em; overflow: hidden;
             display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3;
             line-height: 1.6; word-break: break-all;
         }
-        .preview-container p, .preview-container div { margin-bottom: 2px; display: inline; }
-        .preview-container p::after, .preview-container div::after { content: '\A'; white-space: pre; }
 
         .f-card {
             background: var(--f-glass); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
@@ -48,6 +45,10 @@
         
         .page-btn { padding: 8px 16px; border-radius: 15px; font-size: 12px; transition: 0.3s; border: 1px solid #ffdee9; color: #ffb1c1; }
         .page-btn:disabled { opacity: 0.3; }
+        
+        /* 加载动画 */
+        .loading-spin { border: 2px solid #f3f3f3; border-top: 2px solid #ffb1c1; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; margin-right: 8px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -63,11 +64,9 @@
                 <div class="f-card p-6 text-center sticky top-8">
                     <img src="images/IMG_3024.webp" class="w-20 h-20 rounded-full mx-auto mb-4 object-cover border-2 border-pink-50">
                     <h2 class="nickname mb-1">Ancenchan</h2>
-                    <div class="text-[11px] text-gray-400 mb-6">这里是飘酱记录一切的地方 ✨</div>
-                    
+                    <div class="text-[11px] text-gray-400 mb-6">这里记录碎碎念和星海的歌声 ✨</div>
                     <div class="text-left text-[10px] text-pink-200 tracking-widest mb-3 uppercase">Collection</div>
                     <nav id="tagCloud" class="flex flex-col gap-1 mb-6"></nav>
-                    
                     <div class="text-left text-[10px] text-pink-200 tracking-widest mb-3 uppercase">Connect</div>
                     <div class="flex flex-col gap-1 text-left text-[11px] text-gray-400">
                         <div class="bg-blue-50/40 p-2 rounded-xl">📺 Bili: 安尘子 (330870)</div>
@@ -95,7 +94,13 @@
 <div id="page-detail" class="hidden p-4 sm:p-8">
     <div class="max-w-4xl mx-auto pt-8">
         <button onclick="goBack()" class="mb-8 text-pink-300 text-sm tracking-widest">/ BACK</button>
-        <div id="detail-content" class="f-card p-8 sm:p-16 bg-white/95 shadow-xl"></div>
+        <div id="detail-content" class="f-card p-8 sm:p-16 bg-white/95 shadow-xl min-h-[400px]">
+            <div id="detail-loading" class="flex flex-col items-center justify-center h-64 text-pink-200">
+                <div class="loading-spin"></div>
+                <span class="text-xs tracking-widest">LOADING CONTENT...</span>
+            </div>
+            <div id="detail-actual-content"></div>
+        </div>
     </div>
 </div>
 
@@ -103,7 +108,6 @@
     <div class="f-card p-8 w-full max-w-2xl bg-white shadow-2xl">
         <input id="diaryTitle" type="text" placeholder="Title..." class="w-full text-xl mb-2 outline-none border-b border-pink-50 pb-2">
         <input id="diaryTags" type="text" placeholder="Tags (space or comma separated)..." class="w-full text-xs mb-4 outline-none text-pink-300 italic bg-transparent">
-        
         <div id="editor-container" style="height: 300px;"></div>
         <div class="flex gap-3 mt-8">
             <button id="saveBtn" onclick="handleSave()" class="flex-1 py-4 bg-pink-400 text-white rounded-2xl font-bold shadow-lg uppercase">Sync to Starsea</button>
@@ -118,53 +122,52 @@
 </div>
 
 <script>
-    const REPO = "Ancenchan/ancenchan.github.io", PATH = "data/articles.json";
-    let diaryData = [], currentSha = "", filterTag = null, editIndex = null;
-    let currentPage = 1; const pageSize = 6;
-
+    const REPO = "Ancenchan/ancenchan.github.io";
+    const LIST_PATH = "data/list.json"; // 仅存列表和摘要
+    const POSTS_DIR = "data/posts";      // 存放具体文章内容的文件夹
+    
+    let diaryList = [], listSha = "", filterTag = null, editIndex = null, currentPage = 1;
+    const pageSize = 6;
     const kohaneQuotes = ["我会努力唱好的！", "这就是……街头音乐吗？", "哪怕害羞，我也想传达心情！", "大家都在努力，我也不能落后！", "这就是属于我们的『RAD WEEKEND』！", "谢谢你一直陪着我 ✨"];
 
     const quill = new Quill('#editor-container', { theme: 'snow', modules: { toolbar: [['bold', 'italic'], ['image', 'link']] } });
 
-    function toggleMusic() {
-        const bgm = document.getElementById('bgm'), ctrl = document.getElementById('music-ctrl');
-        if (bgm.paused) { bgm.play(); ctrl.classList.add('music-playing'); petSpeak("Music is playing...♪"); }
-        else { bgm.pause(); ctrl.classList.remove('music-playing'); }
-    }
-
+    // 1. 加载列表 (轻量化)
     async function fetchCloudData() {
         const t = localStorage.getItem('gh_token'), h = t ? { 'Authorization': `Bearer ${t}` } : {};
         try {
-            const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${PATH}?v=${Date.now()}`, { headers: h });
+            const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${LIST_PATH}?v=${Date.now()}`, { headers: h });
             if (res.ok) { 
-                const data = await res.json(); currentSha = data.sha; 
-                diaryData = JSON.parse(decodeURIComponent(escape(atob(data.content.replace(/\s/g, ''))))); 
+                const data = await res.json(); listSha = data.sha; 
+                diaryList = JSON.parse(decodeURIComponent(escape(atob(data.content.replace(/\s/g, ''))))); 
                 render(); 
+            } else {
+                // 如果文件不存在，初始化为空数组
+                diaryList = []; render();
             }
-        } catch (e) { petSpeak("Loading failed..."); }
+        } catch (e) { petSpeak("Connect Error"); }
     }
 
     function render() {
-        const list = document.getElementById('diaryList'), cloud = document.getElementById('tagCloud'), tagMap = {};
-        diaryData.forEach(d => d.tags && d.tags.forEach(t => tagMap[t] = (tagMap[t] || 0) + 1));
+        const listEl = document.getElementById('diaryList'), cloud = document.getElementById('tagCloud'), tagMap = {};
+        diaryList.forEach(d => d.tags && d.tags.forEach(t => tagMap[t] = (tagMap[t] || 0) + 1));
         cloud.innerHTML = Object.keys(tagMap).map(t => `<button class="text-[11px] text-left p-2 rounded-xl transition-all ${filterTag===t?'bg-pink-100 text-pink-500':'text-gray-400 hover:bg-white'}" onclick="setFilter('${t}')">🌸 ${t} (${tagMap[t]})</button>`).join('');
 
-        const sorted = diaryData.slice().sort((a,b) => (a.pinned===b.pinned) ? b.id-a.id : (a.pinned?-1:1));
+        const sorted = diaryList.slice().sort((a,b) => (a.pinned===b.pinned) ? b.id-a.id : (a.pinned?-1:1));
         const filtered = filterTag ? sorted.filter(d => d.tags && d.tags.includes(filterTag)) : sorted;
         const totalPages = Math.ceil(filtered.length / pageSize) || 1;
         const start = (currentPage - 1) * pageSize;
         const pagedData = filtered.slice(start, start + pageSize);
 
-        list.innerHTML = pagedData.map((item) => {
-            const realIndex = diaryData.findIndex(d => d.id === item.id);
-            let previewHTML = item.content.replace(/<img[^>]*>/g, '[PIC]');
+        listEl.innerHTML = pagedData.map((item) => {
+            const realIndex = diaryList.findIndex(d => d.id === item.id);
             return `<div class="f-card p-6 sm:p-8 cursor-pointer group hover:bg-white/90 transition-all" onclick="showDetail(${realIndex})">
                 <div class="flex justify-between items-center mb-2">
                     <span class="text-[10px] text-pink-200 font-bold">${item.pinned?'PINNED · ':''}${item.date}</span>
                     <div class="flex gap-1">${(item.tags||[]).map(t => `<span class="text-[8px] bg-pink-50 text-pink-300 px-2 py-0.5 rounded-lg">${t}</span>`).join('')}</div>
                 </div>
                 <h2 class="text-lg font-medium text-gray-700 mb-3 group-hover:text-pink-400">${item.title}</h2>
-                <div class="preview-container text-gray-400 text-sm">${previewHTML}</div>
+                <div class="preview-container text-gray-400 text-sm">${item.summary || 'No summary available.'}</div>
             </div>`;
         }).join('');
 
@@ -173,34 +176,145 @@
         document.getElementById('nextPage').disabled = (currentPage === totalPages);
     }
 
-    function showDetail(index) {
+    // 2. 加载单篇文章内容 (按需加载)
+    async function showDetail(index) {
         editIndex = index;
-        const item = diaryData[index];
-        document.getElementById('detail-content').innerHTML = `
-            <div class="flex justify-between items-center mb-6">
-                <span class="text-[10px] text-pink-200 font-bold">${item.date}</span>
-                <div class="flex gap-2">${(item.tags||[]).map(t => `<span class="text-[9px] bg-pink-50 text-pink-400 px-3 py-1 rounded-full">#${t}</span>`).join('')}</div>
-            </div>
-            <h1 class="text-2xl font-bold text-gray-800 mb-8">${item.title}</h1>
-            <div class="ql-editor p-0 text-gray-700 leading-8">${item.content}</div>
-            <div class="mt-12 pt-8 border-t border-pink-50 flex gap-6">
-                <button onclick="openEditor()" class="text-pink-400 text-xs font-bold uppercase tracking-widest">EDIT</button>
-                <button onclick="handleDelete()" class="text-red-300 text-xs font-bold uppercase tracking-widest">DELETE</button>
-                <button onclick="goBack()" class="text-gray-300 text-xs font-bold uppercase tracking-widest ml-auto">CLOSE</button>
-            </div>`;
+        const item = diaryList[index];
+        const detailLoading = document.getElementById('detail-loading');
+        const detailActual = document.getElementById('detail-actual-content');
+        
         document.getElementById('page-list').classList.add('hidden');
         document.getElementById('page-detail').classList.remove('hidden');
+        detailLoading.style.display = 'flex';
+        detailActual.innerHTML = '';
         window.scrollTo(0, 0);
+
+        try {
+            const t = localStorage.getItem('gh_token'), h = t ? { 'Authorization': `Bearer ${t}` } : {};
+            const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${POSTS_DIR}/${item.id}.json?v=${Date.now()}`, { headers: h });
+            
+            if (res.ok) {
+                const data = await res.json();
+                const contentObj = JSON.parse(decodeURIComponent(escape(atob(data.content.replace(/\s/g, '')))));
+                
+                detailLoading.style.display = 'none';
+                detailActual.innerHTML = `
+                    <div class="flex justify-between items-center mb-6">
+                        <span class="text-[10px] text-pink-200 font-bold">${item.date}</span>
+                        <div class="flex gap-2">${(item.tags||[]).map(t => `<span class="text-[9px] bg-pink-50 text-pink-400 px-3 py-1 rounded-full">#${t}</span>`).join('')}</div>
+                    </div>
+                    <h1 class="text-2xl font-bold text-gray-800 mb-8">${item.title}</h1>
+                    <div class="ql-editor p-0 text-gray-700 leading-8">${contentObj.content}</div>
+                    <div class="mt-12 pt-8 border-t border-pink-50 flex gap-6">
+                        <button onclick="openEditor('${contentObj.content.replace(/'/g, "\\'")}')" class="text-pink-400 text-xs font-bold uppercase tracking-widest">EDIT</button>
+                        <button onclick="handleDelete()" class="text-red-300 text-xs font-bold uppercase tracking-widest">DELETE</button>
+                        <button onclick="goBack()" class="text-gray-300 text-xs font-bold uppercase tracking-widest ml-auto">CLOSE</button>
+                    </div>`;
+            } else {
+                throw new Error("Content not found");
+            }
+        } catch (e) {
+            detailLoading.style.display = 'none';
+            detailActual.innerHTML = `<div class="text-center py-20 text-gray-400">Failed to load content. Please check if the file exists.</div>`;
+        }
     }
 
-    function openEditor() {
+    // 3. 分两步保存：存内容文件 + 更新列表文件
+    async function handleSave() {
+        const title = document.getElementById('diaryTitle').value;
+        const tagsInput = document.getElementById('diaryTags').value;
+        const fullContent = quill.root.innerHTML;
+        if(!title || fullContent === "<p><br></p>") return alert("Empty!");
+
+        const btn = document.getElementById('saveBtn');
+        btn.innerText = "SYNCING..."; btn.disabled = true;
+
+        const tags = tagsInput.split(/[\s,，]+/).filter(t => t.trim() !== "");
+        const id = editIndex !== null ? diaryList[editIndex].id : Date.now();
+        const date = editIndex !== null ? diaryList[editIndex].date : new Date().toLocaleDateString();
+        
+        // 生成摘要 (剥离HTML标签，取前200字)
+        const summary = quill.getText(0, 200).replace(/\n/g, ' ') + '...';
+
+        try {
+            const t = localStorage.getItem('gh_token');
+            // 第一步：上传内容 JSON 到 posts/ 文件夹
+            const contentBody = btoa(unescape(encodeURIComponent(JSON.stringify({ content: fullContent }))));
+            
+            // 需要获取旧内容的 SHA 以便覆盖
+            let contentSha = "";
+            const existCheck = await fetch(`https://api.github.com/repos/${REPO}/contents/${POSTS_DIR}/${id}.json`, {
+                headers: { 'Authorization': `Bearer ${t}` }
+            });
+            if (existCheck.ok) {
+                const existData = await existCheck.json();
+                contentSha = existData.sha;
+            }
+
+            const postRes = await fetch(`https://api.github.com/repos/${REPO}/contents/${POSTS_DIR}/${id}.json`, {
+                method: 'PUT',
+                headers: { 'Authorization': `Bearer ${t}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: `Post ${id}`, content: contentBody, sha: contentSha })
+            });
+
+            if(!postRes.ok) throw new Error("Post Sync Failed");
+
+            // 第二步：更新 list.json
+            if(editIndex !== null) {
+                diaryList[editIndex] = { id, title, tags, date, summary };
+            } else {
+                diaryList.push({ id, title, tags, date, summary });
+            }
+
+            const listBody = btoa(unescape(encodeURIComponent(JSON.stringify(diaryList, null, 2))));
+            const listRes = await fetch(`https://api.github.com/repos/${REPO}/contents/${LIST_PATH}`, {
+                method: 'PUT',
+                headers: { 'Authorization': `Bearer ${t}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: "Update List", content: listBody, sha: listSha })
+            });
+
+            if(listRes.ok) {
+                const listData = await listRes.json();
+                listSha = listData.content.sha;
+                document.getElementById('editor-mask').style.display='none';
+                editIndex = null; render();
+                if(!document.getElementById('page-detail').classList.contains('hidden')) goBack();
+                petSpeak("Starsea Updated ✨");
+            }
+
+        } catch (e) { alert(e.message); }
+        btn.innerText = "Sync to Starsea"; btn.disabled = false;
+    }
+
+    async function handleDelete() {
+        if(!confirm("Erase this memory?")) return;
+        const id = diaryList[editIndex].id;
+        diaryList.splice(editIndex, 1);
+        
+        const t = localStorage.getItem('gh_token');
+        const listBody = btoa(unescape(encodeURIComponent(JSON.stringify(diaryList, null, 2))));
+        const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${LIST_PATH}`, {
+            method: 'PUT',
+            headers: { 'Authorization': `Bearer ${t}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: "Delete Post", content: listBody, sha: listSha })
+        });
+
+        if(res.ok) {
+            const data = await res.json();
+            listSha = data.content.sha;
+            goBack(); render(); petSpeak("Deleted.");
+        }
+    }
+
+    // 辅助功能保持不变
+    function openEditor(savedContent = "") {
         if(!getToken()) return;
         document.getElementById('editor-mask').style.display='flex';
         if(editIndex !== null) {
-            const item = diaryData[editIndex];
+            const item = diaryList[editIndex];
             document.getElementById('diaryTitle').value = item.title;
             document.getElementById('diaryTags').value = (item.tags || []).join(', ');
-            quill.root.innerHTML = item.content;
+            quill.root.innerHTML = savedContent || ""; 
         } else {
             document.getElementById('diaryTitle').value = "";
             document.getElementById('diaryTags').value = "";
@@ -208,73 +322,16 @@
         }
     }
 
-    async function handleSave() {
-        const title = document.getElementById('diaryTitle').value;
-        const tagsInput = document.getElementById('diaryTags').value;
-        const content = quill.root.innerHTML;
-        
-        if(!title || content === "<p><br></p>") return alert("Empty content!");
-
-        // 处理标签：分割并去重、去空
-        const tags = tagsInput.split(/[\s,，]+/).filter(t => t.trim() !== "");
-
-        const btn = document.getElementById('saveBtn');
-        btn.innerText = "SYNCING..."; btn.disabled = true;
-
-        if(editIndex !== null) {
-            diaryData[editIndex].title = title;
-            diaryData[editIndex].tags = tags.length > 0 ? tags : ["Diary"];
-            diaryData[editIndex].content = content;
-        } else {
-            diaryData.push({ 
-                id: Date.now(), 
-                title, 
-                tags: tags.length > 0 ? tags : ["Diary"], 
-                content, 
-                date: new Date().toLocaleDateString() 
-            });
-        }
-
-        const success = await uploadToGithub();
-        if(success) {
-            document.getElementById('editor-mask').style.display='none';
-            editIndex = null; render();
-            if(!document.getElementById('page-detail').classList.contains('hidden')) goBack();
-        }
-        btn.innerText = "Sync to Starsea"; btn.disabled = false;
+    function toggleMusic() {
+        const bgm = document.getElementById('bgm'), ctrl = document.getElementById('music-ctrl');
+        if (bgm.paused) { bgm.play(); ctrl.classList.add('music-playing'); }
+        else { bgm.pause(); ctrl.classList.remove('music-playing'); }
     }
-
-    async function handleDelete() {
-        if(!confirm("Erase this memory?")) return;
-        if(!getToken()) return;
-        diaryData.splice(editIndex, 1);
-        const success = await uploadToGithub();
-        if(success) { goBack(); render(); petSpeak("Memory erased..."); }
-    }
-
-    async function uploadToGithub() {
-        const t = localStorage.getItem('gh_token');
-        const content = btoa(unescape(encodeURIComponent(JSON.stringify(diaryData, null, 2))));
-        try {
-            const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${PATH}`, {
-                method: 'PUT',
-                headers: { 'Authorization': `Bearer ${t}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: "Update Data", content, sha: currentSha })
-            });
-            if(res.ok) {
-                const resData = await res.json();
-                currentSha = resData.content.sha;
-                return true;
-            } else { alert("Sync failed."); return false; }
-        } catch (e) { return false; }
-    }
-
     function petSpeak(msg) {
         const b = document.getElementById('pet-bubble');
         b.innerText = msg || kohaneQuotes[Math.floor(Math.random() * kohaneQuotes.length)];
         b.style.opacity = "1"; setTimeout(() => b.style.opacity = "0", 3000);
     }
-
     function goBack() { document.getElementById('page-list').classList.remove('hidden'); document.getElementById('page-detail').classList.add('hidden'); editIndex = null; }
     function setFilter(tag) { filterTag = (filterTag === tag) ? null : tag; currentPage = 1; render(); }
     function changePage(dir) { currentPage += dir; render(); window.scrollTo(0, 400); }
@@ -285,4 +342,3 @@
 </script>
 </body>
 </html>
-
