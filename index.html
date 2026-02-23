@@ -99,15 +99,29 @@ textarea,
 
         .loading-spin { border: 2px solid #f3f3f3; border-top: 2px solid #ffb1c1; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; display: inline-block; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+            /* 1. 用更具体的属性选择器去压制 Tailwind */
+button, 
+[role="button"], 
+[type="button"], 
+[type="reset"], 
+[type="submit"] {
+    /* 必须加 !important，且确保路径正确 */
+    cursor: url('ani1039.cur'), pointer !important;
+}
+
+/* 2. 必须强制处理 hover 状态，否则悬停瞬间会回弹 */
+button:hover, 
+[role="button"]:hover,
+.cursor-pointer:hover {
+    cursor: url('ani1039.cur'), pointer !important;
+}
+
+/* 3. 针对按钮内的文字/图标，强制它们继承父级的指针 */
+button *, 
+[role="button"] * {
+    cursor: inherit !important;
+}
     </style>
-    <style>
-    /* 暴力增加权重：通过 html body 前缀提升等级 */
-    html body button, 
-    html body [role="button"], 
-    html body a {
-        cursor: url('ani1039.cur'), pointer !important;
-    }
-</style>
 </head>
 <body>
 <body style="cursor: url('ani1053.cur'), auto !important;">
@@ -463,6 +477,7 @@ textarea,
 </script>
 </body>
 </html>
+
 
 
 
