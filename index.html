@@ -31,7 +31,14 @@
 
         /* --- UI 样式 --- */
       .preview-container {
-    white-space: pre-wrap !important;
+   white-space: pre-wrap !important; 
+    
+    /* 解决部分浏览器下 display: -webkit-box 与 white-space 的冲突 */
+    display: block !important; 
+    max-height: 5.4em; /* 1.8 line-height * 3 lines */
+    line-height: 1.8;
+    overflow: hidden;
+    text-overflow: ellipsis;
     max-height: 4.8em; 
     overflow: hidden;
     display: -webkit-box; 
@@ -427,6 +434,7 @@
 </script>
 </body>
 </html>
+
 
 
 
