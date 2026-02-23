@@ -315,25 +315,71 @@
     }
 
     // 5. 删除
-    async function handleDelete() {
-        if(!confirm("Erase this memory forever?")) return;
-        const t = localStorage.getItem('gh_token');
+   async function handleDelete() {
+    // 1. 先验证 Token 是否存在，不存在则弹出输入框
+    const t = getToken();
+    if (!t) return; // 如果用户取消了输入，直接返回
+
+    // 2. 二次确认删除意图
+    if (!confirm("Erase this memory forever? (此操作不可撤销)")) return;
+
+    const btn = event.target; // 获取点击的按钮
+    const originalText = btn.innerText;
+    btn.innerText = "ERASING...";
+    btn.disabled = true;
+
+    try {
+        // 3. 从本地列表中移除
         diaryList.splice(editIndex, 1);
         
+        // 4. 获取最新的 list.json SHA（防止 409 冲突）
         const latest = await fetch(`https://api.github.com/repos/${REPO}/contents/${LIST_PATH}?v=${Date.now()}`, {
             headers: { 'Authorization': `Bearer ${t}` }
         });
-        if (latest.ok) { const d = await latest.json(); listSha = d.sha; }
+        
+        if (latest.status === 401) {
+            localStorage.removeItem('gh_token');
+            alert("Token invalid! Please try again.");
+            location.reload();
+            return;
+        }
 
+        if (latest.ok) {
+            const d = await latest.json();
+            listSha = d.sha;
+        }
+
+        // 5. 将更新后的列表同步回 GitHub
         const listBody = btoa(unescape(encodeURIComponent(JSON.stringify(diaryList, null, 2))));
         const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${LIST_PATH}`, {
             method: 'PUT',
-            headers: { 'Authorization': `Bearer ${t}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: "Delete", content: listBody, sha: listSha })
+            headers: { 
+                'Authorization': `Bearer ${t}`,
+                'Content-Type': 'application/json' 
+            },
+            body: JSON.stringify({ 
+                message: "Delete post from index", 
+                content: listBody, 
+                sha: listSha 
+            })
         });
-        if(res.ok) { const d = await res.json(); listSha = d.content.sha; goBack(); render(); }
-    }
 
+        if (res.ok) {
+            petSpeak("Memory erased from the stars. 🌌");
+            // 延迟一秒回首页，让用户看到提示
+            setTimeout(() => {
+                goBack();
+                render();
+            }, 1000);
+        } else {
+            throw new Error("Sync failed");
+        }
+    } catch (e) {
+        alert("Delete failed: " + e.message);
+        btn.innerText = originalText;
+        btn.disabled = false;
+    }
+}
     function openEditor(savedContent = "") {
         if(!getToken()) return;
         document.getElementById('editor-mask').style.display = 'flex';
@@ -380,6 +426,7 @@
 </script>
 </body>
 </html>
+
 
 
 
