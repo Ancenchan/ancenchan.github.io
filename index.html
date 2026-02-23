@@ -351,6 +351,7 @@ async function uploadToGithub(file) {
                 const data = await res.json();
                 const contentObj = JSON.parse(decodeURIComponent(escape(atob(data.content.replace(/\s/g, '')))));
                 loading.classList.add('hidden');
+                const safeContent = btoa(unescape(encodeURIComponent(contentObj.content)));
                 actual.innerHTML = `
                     <div class="flex justify-between items-center mb-6">
                         <span class="text-[10px] text-pink-200 font-bold">${item.date}</span>
@@ -359,7 +360,7 @@ async function uploadToGithub(file) {
                     <h1 class="text-2xl font-bold text-gray-800 mb-8">${item.title}</h1>
                     <div class="ql-editor p-0 text-gray-700 leading-8 text-[15px]">${contentObj.content}</div>
                     <div class="mt-12 pt-8 border-t border-pink-50 flex gap-6">
-                        <button onclick="openEditor(\`${contentObj.content.replace(/`/g, "\\`").replace(/\$/g, "\\$")}\`)" class="text-pink-400 text-xs font-bold uppercase tracking-widest">EDIT</button>
+                        <button onclick="prepareEdit('${safeContent}')" class="text-pink-400 text-xs font-bold uppercase tracking-widest">EDIT</button>
                         <button onclick="handleDelete()" class="text-red-300 text-xs font-bold uppercase tracking-widest">DELETE</button>
                         <button onclick="goBack()" class="text-gray-300 text-xs font-bold uppercase tracking-widest ml-auto">CLOSE</button>
                     </div>`;
@@ -547,6 +548,7 @@ async function uploadToGithub(file) {
 </script>
 </body>
 </html>
+
 
 
 
