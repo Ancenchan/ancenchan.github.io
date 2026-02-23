@@ -99,20 +99,10 @@ textarea,
 
         .loading-spin { border: 2px solid #f3f3f3; border-top: 2px solid #ffb1c1; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; display: inline-block; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-/* 1. 直接点名道姓地改写 Tailwind 的内置类 */
-.cursor-pointer {
-    cursor: url('ani767.cur'), pointer !important;
-}
+[class*="cursor-pointer"] {
 
-/* 2. 也要改写这个类的悬停状态 */
-.cursor-pointer:hover {
-    cursor: url('ani767.cur'), pointer !important;
-}
+cursor: url('ani767.cur'), pointer !important;
 
-/* 3. 针对你日记列表里那种 div 包裹的情况，
-   确保 div 里的所有文字和子元素也听话 */
-.cursor-pointer * {
-    cursor: inherit !important;
 }
     </style>
 </head>
@@ -470,6 +460,7 @@ textarea,
 </script>
 </body>
 </html>
+
 
 
 
