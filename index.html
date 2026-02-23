@@ -286,7 +286,7 @@ async function uploadToGithub(file) {
             const username = REPO.split('/')[0];
             const repoName = REPO.split('/')[1];
             // 注意：这里默认你开启了 GitHub Pages
-            return `https://${repoName}/${path}`;
+            return `https://${username}.github.io/${path}`;
         } else {
             const err = await res.json();
             console.error("上传错误详情:", err);
@@ -547,6 +547,7 @@ async function uploadToGithub(file) {
 </script>
 </body>
 </html>
+
 
 
 
