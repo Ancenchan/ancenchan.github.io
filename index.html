@@ -38,7 +38,14 @@
 }
 a, button {
     /* 如果还没下载猫爪，就先用系统手势，确保不报错 */
-    cursor: pointer !important;
+    cursor: url('images/ani1039.cur'), pointer !important;
+}
+input, 
+textarea, 
+.ql-editor, 
+[contenteditable="true"] {
+    /* 建议：输入状态可以用一个更细长、像笔尖的指针，或者保持猫爪 */
+    cursor: url('ani1053.cur'), text !important;
 }
     /* 解决部分浏览器下 display: -webkit-box 与 white-space 的冲突 */
     display: block !important; 
@@ -441,6 +448,7 @@ a, button {
 </script>
 </body>
 </html>
+
 
 
 
