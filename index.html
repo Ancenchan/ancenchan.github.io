@@ -36,15 +36,24 @@
     /* 假设文件在根目录，直接写文件名 */
     cursor: url('ani1053.cur'), auto !important;
 }
-a, button, 
+          
+a, a *, 
+button, button *, 
 [onclick], 
 .cursor-pointer, 
 .ql-action, 
 #music-ctrl, 
-#pet-container {
-    /* 如果还没下载猫爪，就先用系统手势，确保不报错 */
+#pet-container,
+input[type="button"],
+input[type="submit"] {
     cursor: url('ani1039.cur'), pointer !important;
 }
+
+/* 专门针对悬停瞬间的强制处理 */
+a:hover, button:hover, [onclick]:hover {
+    cursor: url('ani1039.cur'), pointer !important;
+}
+          
 input, 
 textarea, 
 .ql-editor, 
@@ -453,6 +462,7 @@ textarea,
 </script>
 </body>
 </html>
+
 
 
 
