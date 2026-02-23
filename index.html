@@ -210,25 +210,27 @@ const quill = new Quill('#editor-container', {
             ],
             handlers: {
                 image: function() {
-                    const input = document.createElement('input');
-                    input.setAttribute('type', 'file');
-                    input.setAttribute('accept', 'image/*');
-                    input.click();
+    const range = this.quill.getSelection(); // 1. 先获取当前光标位置
+    const input = document.createElement('input');
+    input.setAttribute('type', 'file');
+    input.setAttribute('accept', 'image/*');
+    input.click();
 
-                    input.onchange = async () => {
-                        const file = input.files[0];
-                        if (!file) return;
+    input.onchange = async () => {
+        const file = input.files[0];
+        if (!file) return;
 
-                        petSpeak("正在把照片存入星海... ☁️");
-                        const url = await uploadToGithub(file);
-                        
-                        if (url) {
-                            // 使用 quill 变量直接操作，避免 this 指向错误
-                            const range = quill.getSelection();
-                            quill.insertEmbed(range.index, 'image', url);
-                            petSpeak("同步成功！🐾");
-                        } else {
-                            petSpeak("同步失败了... 😿");
+        petSpeak("正在把照片存入星海... ☁️");
+        const url = await uploadToGithub(file);
+        
+        if (url) {
+            // 2. 如果上传后 range 丢失了（比如手机端），默认插在最后或重新聚焦
+            const insertIdx = range ? range.index : quill.getLength(); 
+            quill.insertEmbed(insertIdx, 'image', url);
+            quill.setSelection(insertIdx + 1); // 3. 光标后移一位，方便继续写字
+            petSpeak("同步成功！🐾");
+        } else {
+            petSpeak("同步失败了... 😿");
                         }
                     };
                 }
@@ -548,6 +550,7 @@ async function uploadToGithub(file) {
 </script>
 </body>
 </html>
+
 
 
 
