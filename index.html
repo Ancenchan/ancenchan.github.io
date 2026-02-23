@@ -198,8 +198,7 @@ textarea,
     let diaryList = [], listSha = "", filterTag = null, editIndex = null, currentPage = 1;
     const pageSize = 6;
     const kohaneQuotes = ["我会努力唱好的！", "这就是……街头音乐吗？", "哪怕害羞，我也想传达心情！", "大家都在努力，我也不能落后！", "谢谢你一直陪着我 ✨"];
-
-const quill = new Quill('#editor-container', {
+    const quill = new Quill('#editor-container', {
     theme: 'snow',
     modules: {
         toolbar: {
@@ -209,36 +208,56 @@ const quill = new Quill('#editor-container', {
                 [{ 'header': [2, 3, false] }]
             ],
             handlers: {
+                // 1. 直接在这里定义 image 处理器
                 image: function() {
-    const range = this.quill.getSelection(); // 1. 先获取当前光标位置
-    const input = document.createElement('input');
-    input.setAttribute('type', 'file');
-    input.setAttribute('accept', 'image/*');
-    input.click();
+                    const range = quill.getSelection();
+                    const input = document.createElement('input');
+                    input.setAttribute('type', 'file');
+                    input.setAttribute('accept', 'image/*');
+                    input.click();
 
-    input.onchange = async () => {
-        const file = input.files[0];
-        if (!file) return;
+                    input.onchange = async () => {
+                        const file = input.files[0];
+                        if (!file) return;
 
-        petSpeak("正在把照片存入星海... ☁️");
-        const url = await uploadToGithub(file);
-        
-        if (url) {
-            // 2. 如果上传后 range 丢失了（比如手机端），默认插在最后或重新聚焦
-            const insertIdx = range ? range.index : quill.getLength(); 
-            quill.insertEmbed(insertIdx, 'image', url);
-            quill.setSelection(insertIdx + 1); // 3. 光标后移一位，方便继续写字
-            petSpeak("同步成功！🐾");
-        } else {
-            petSpeak("同步失败了... 😿");
+                        // 状态提示：开始
+                        petSpeak("正在同步星海进度：0%... ☁️");
+                        
+                        let progress = 0;
+                        const timer = setInterval(() => {
+                            progress += 10;
+                            if (progress < 90) petSpeak(`正在同步星海进度：${progress}%... ☁️`);
+                        }, 200);
+
+                        // 2. 调用上传逻辑（确认为真正的异步等待）
+                        const url = await uploadToGithub(file);
+                        
+                        clearInterval(timer);
+
+                        if (url) {
+                            // 3. 只有拿到 URL（成功）才执行预览插入
+                            petSpeak("同步成功！100% 🌟");
+                            const index = range ? range.index : quill.getLength();
+                            
+                            // 插入到编辑器
+                            quill.insertEmbed(index, 'image', url);
+                            
+                            // 预加载检查，防止问号
+                            const img = new Image();
+                            img.src = url;
+                            img.onload = () => {
+                                quill.setSelection(index + 1);
+                                console.log("图片预览加载完成");
+                            };
+                        } else {
+                            petSpeak("同步失败，请检查网络或 Token 😿");
                         }
                     };
                 }
             }
         }
     }
-}); // 结尾只有这一组，非常干净
-
+});
     // 1. 获取目录
     async function fetchCloudData() {
         const t = localStorage.getItem('gh_token'), h = t ? { 'Authorization': `Bearer ${t}` } : {};
@@ -258,11 +277,9 @@ async function uploadToGithub(file) {
     const t = localStorage.getItem('gh_token');
     if (!t) { alert("请先设置 Token"); return null; }
 
-    // 生成文件名：img_时间戳.png
     const fileName = `img_${Date.now()}.png`;
-    const path = `images/posts/${fileName}`; // 确保你仓库里有 images/posts 文件夹
+    const path = `images/posts/${fileName}`;
     
-    // 将文件读取为 Base64 字符串
     const reader = new FileReader();
     const base64Promise = new Promise(resolve => {
         reader.onload = () => resolve(reader.result.split(',')[1]);
@@ -273,29 +290,21 @@ async function uploadToGithub(file) {
     try {
         const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, {
             method: 'PUT',
-            headers: { 
-                'Authorization': `Bearer ${t}`, 
-                'Content-Type': 'application/json' 
-            },
-            body: JSON.stringify({
-                message: `Upload image: ${fileName}`,
-                content: content
-            })
+            headers: { 'Authorization': `Bearer ${t}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: `Upload: ${fileName}`, content: content })
         });
 
         if (res.ok) {
-            // 返回你的 GitHub Pages 访问链接
-            const username = REPO.split('/')[0];
-            const repoName = REPO.split('/')[1];
-            // 注意：这里默认你开启了 GitHub Pages
-            return `https://${username}.github.io/${path}`;
+            // 关键：只有 res.ok 才会返回地址
+            // 使用 raw 链接确保图片能立刻显示，不等待 Pages 部署
+            return `https://raw.githubusercontent.com/${REPO}/main/images/posts/${fileName}`;
         } else {
             const err = await res.json();
-            console.error("上传错误详情:", err);
+            petSpeak("上传失败：" + err.message);
             return null;
         }
     } catch (e) {
-        console.error("网络请求失败:", e);
+        petSpeak("网络错误，上传中断");
         return null;
     }
 }
