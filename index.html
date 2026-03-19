@@ -235,9 +235,7 @@
     function render() {
         const listEl = document.getElementById('diaryList'), cloud = document.getElementById('tagCloud'), tagMap = {};
         
-        // 确保 ID 为数字类型进行精确排序
         diaryList.forEach(d => {
-            d.id = Number(d.id);
             if(d.tags) d.tags.forEach(t => tagMap[t] = (tagMap[t] || 0) + 1);
         });
         
@@ -245,10 +243,11 @@
             <button class="text-[11px] text-left p-2 rounded-xl transition-all ${filterTag===t?'bg-pink-100 text-pink-500 font-bold':'text-gray-400 hover:bg-white'}" onclick="setFilter('${t}')">🌸 ${t} (${tagMap[t]})</button>
         `).join('');
 
-        // 核心修复：更严谨的排序逻辑（置顶在前，其次 ID 倒序即最新在前）
+        // --- 核心修改：按数组物理顺序排列 (JSON里谁在前谁就显示在前) ---
+        // 仅保留置顶逻辑：如果某项被标记为 pinned，则依然强行排在最前面
         const sorted = diaryList.slice().sort((a,b) => {
             if (a.pinned !== b.pinned) return a.pinned ? -1 : 1;
-            return b.id - a.id;
+            return 0; // 0 表示不改变它们在原数组中的相对物理位置
         });
 
         const filtered = filterTag ? sorted.filter(d => d.tags && d.tags.includes(filterTag)) : sorted;
@@ -350,7 +349,7 @@
         btn.innerText = "SYNCING..."; btn.disabled = true;
 
         const tags = tagsInput.split(/[\s,，]+/).filter(t => t.trim() !== "");
-        const id = editIndex !== null ? Number(diaryList[editIndex].id) : Date.now();
+        const id = editIndex !== null ? diaryList[editIndex].id : Date.now();
         const date = editIndex !== null ? diaryList[editIndex].date : new Date().toLocaleDateString();
         const summary = quill.getText(0, 100).trim() + (quill.getLength() > 100 ? '...' : '');
         const pinned = editIndex !== null ? (diaryList[editIndex].pinned || false) : false;
@@ -372,10 +371,10 @@
             const latestList = await fetch(`https://api.github.com/repos/${REPO}/contents/${LIST_PATH}?v=${Date.now()}`, { headers: { 'Authorization': `Bearer ${t}` } });
             if (latestList.ok) { const d = await latestList.json(); listSha = d.sha; }
 
+            // 这里是关键：新增项使用 unshift 插入到数组第 0 位
             if(editIndex !== null) { 
                 diaryList[editIndex] = { id, title, tags, date, summary, pinned }; 
             } else { 
-                // 新增时重置页码为1，确保能看到第一页的最新内容
                 diaryList.unshift({ id, title, tags, date, summary, pinned: false });
                 currentPage = 1; 
             }
