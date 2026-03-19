@@ -363,7 +363,7 @@
             if (latestList.ok) { const d = await latestList.json(); listSha = d.sha; }
 
             if(editIndex !== null) { diaryList[editIndex] = { id, title, tags, date, summary, pinned }; }
-            else { diaryList.push({ id, title, tags, date, summary, pinned: false }); }
+            else { diaryList.unshift({ id, title, tags, date, summary, pinned: false }); }
 
             const listBody = btoa(unescape(encodeURIComponent(JSON.stringify(diaryList, null, 2))));
             const listUpdateRes = await fetch(`https://api.github.com/repos/${REPO}/contents/${LIST_PATH}`, {
