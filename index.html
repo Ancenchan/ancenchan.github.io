@@ -75,6 +75,7 @@ body { background-color: var(--f-bg); background-image: url("https://www.transpa
 
                     <div class="text-left text-pink-200 tracking-widest mb-3 uppercase font-bold">Tools</div>
                     <div class="flex flex-col gap-1 text-left text-gray-400">
+                        <button onclick="setToken()" class="bg-amber-50/60 p-2 rounded-xl hover:bg-amber-100/60 transition-colors block text-left w-full font-medium text-amber-600">🔑 设置 Token</button>
                         <a href="https://bakabakamiao.streamlit.app/" target="_blank" class="bg-blue-50/40 p-2 rounded-xl hover:bg-blue-100/50 transition-colors block">✨ 表情包分割</a>
                         <a href="https://ancenchan.github.io/bakautaten/index.html" target="_blank" class="bg-purple-50/40 p-2 rounded-xl hover:bg-purple-100/50 transition-colors block">❤️ utaten歌词跳转</a>
                         <a href="https://ancenchan.github.io/jplearn/index.html" target="_blank" class="bg-blue-50/40 p-2 rounded-xl hover:bg-blue-100/50 transition-colors block">🐕 歌词翻译</a>
@@ -186,8 +187,8 @@ body { background-color: var(--f-bg); background-image: url("https://www.transpa
     }
 
     async function uploadToGithub(file) {
-        const t = localStorage.getItem('gh_token');
-        if (!t) { alert("请先设置 Token"); return null; }
+        let t = localStorage.getItem('gh_token');
+        if (!t) { if (!(await ensureToken())) return null; t = localStorage.getItem('gh_token'); }
         const fileName = `img_${Date.now()}.png`;
         const path = `images/posts/${fileName}`;
         const reader = new FileReader();
@@ -202,8 +203,11 @@ body { background-color: var(--f-bg); background-image: url("https://www.transpa
                 headers: { 'Authorization': `Bearer ${t}`, 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message: `Upload: ${fileName}`, content: content })
             });
-            return res.ok ? `https://raw.githubusercontent.com/${REPO}/main/images/posts/${fileName}` : null;
-        } catch (e) { return null; }
+            if (res.ok) return `https://raw.githubusercontent.com/${REPO}/main/images/posts/${fileName}`;
+            if (authError(res)) alert(tokenErrorMessage(res));
+            else alert("上传图片失败（HTTP " + res.status + "）");
+            return null;
+        } catch (e) { alert("上传图片出错：" + e.message); return null; }
     }
 
     function render() {
@@ -280,8 +284,8 @@ body { background-color: var(--f-bg); background-image: url("https://www.transpa
     }
 
     async function handlePin() {
-        const t = getToken();
-        if (!t) return;
+        let t = localStorage.getItem('gh_token');
+        if (!t) { if (!(await ensureToken())) return; t = localStorage.getItem('gh_token'); }
         const item = diaryList[editIndex];
         item.pinned = !item.pinned;
         petSpeak(item.pinned ? "Pinned to the top! 📌" : "Unpinned. ☁️");
@@ -289,31 +293,32 @@ body { background-color: var(--f-bg); background-image: url("https://www.transpa
         try {
             const latest = await fetch(`https://api.github.com/repos/${REPO}/contents/${LIST_PATH}?v=${Date.now()}`, { headers: { 'Authorization': `Bearer ${t}` } });
             if (latest.ok) { const d = await latest.json(); listSha = d.sha; }
+            else if (authError(latest)) { alert(tokenErrorMessage(latest)); item.pinned = !item.pinned; return; }
 
             const listBody = btoa(unescape(encodeURIComponent(JSON.stringify(diaryList, null, 2))));
-            await fetch(`https://api.github.com/repos/${REPO}/contents/${LIST_PATH}`, {
+            const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${LIST_PATH}`, {
                 method: 'PUT',
                 headers: { 'Authorization': `Bearer ${t}`, 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message: "Toggle Pin", content: listBody, sha: listSha })
             });
-            showDetail(editIndex);
-            render();
-        } catch (e) { alert("Pin failed"); }
+            if (res.ok) { showDetail(editIndex); render(); }
+            else { alert(authError(res) ? tokenErrorMessage(res) : "Pin 失败（HTTP " + res.status + "）"); item.pinned = !item.pinned; }
+        } catch (e) { alert("Pin failed: " + e.message); item.pinned = !item.pinned; }
     }
 
     async function handleSave() {
         const title = document.getElementById('diaryTitle').value;
         const tagsInput = document.getElementById('diaryTags').value;
         const fullContent = quill.root.innerHTML;
-        const t = localStorage.getItem('gh_token');
         
         if(!title || fullContent === "<p><br></p>") return alert("Empty!");
-        if(!t) return getToken();
+        let t = localStorage.getItem('gh_token');
+        if (!t) { if (!(await ensureToken())) return; t = localStorage.getItem('gh_token'); }
 
         const btn = document.getElementById('saveBtn');
         btn.innerText = "SYNCING..."; btn.disabled = true;
 
-        const tags = tagsInput.split(/[\s,，]+/).filter(t => t.trim() !== "");
+        const tags = tagsInput.split(/[\s,，]+/).filter(x => x.trim() !== "");
         const id = editIndex !== null ? diaryList[editIndex].id : Date.now();
         const date = editIndex !== null ? diaryList[editIndex].date : new Date().toLocaleDateString();
         const summary = quill.getText(0, 100).trim() + (quill.getLength() > 100 ? '...' : '');
@@ -321,20 +326,21 @@ body { background-color: var(--f-bg); background-image: url("https://www.transpa
 
         try {
             let postSha = "";
-            try {
-                const checkPost = await fetch(`https://api.github.com/repos/${REPO}/contents/${POSTS_DIR}/${id}.json`, { headers: { 'Authorization': `Bearer ${t}` } });
-                if (checkPost.ok) { const d = await checkPost.json(); postSha = d.sha; }
-            } catch (e) {}
+            const checkPost = await fetch(`https://api.github.com/repos/${REPO}/contents/${POSTS_DIR}/${id}.json`, { headers: { 'Authorization': `Bearer ${t}` } });
+            if (checkPost.ok) { const d = await checkPost.json(); postSha = d.sha; }
+            else if (authError(checkPost)) throw new Error(tokenErrorMessage(checkPost));
 
             const contentBody = btoa(unescape(encodeURIComponent(JSON.stringify({ content: fullContent }))));
-            await fetch(`https://api.github.com/repos/${REPO}/contents/${POSTS_DIR}/${id}.json`, {
+            const postRes = await fetch(`https://api.github.com/repos/${REPO}/contents/${POSTS_DIR}/${id}.json`, {
                 method: 'PUT',
                 headers: { 'Authorization': `Bearer ${t}`, 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message: `Post ${id}`, content: contentBody, sha: postSha })
             });
+            if (!postRes.ok) throw new Error(authError(postRes) ? tokenErrorMessage(postRes) : "保存文章内容失败（HTTP " + postRes.status + "）");
 
             const latestList = await fetch(`https://api.github.com/repos/${REPO}/contents/${LIST_PATH}?v=${Date.now()}`, { headers: { 'Authorization': `Bearer ${t}` } });
             if (latestList.ok) { const d = await latestList.json(); listSha = d.sha; }
+            else if (authError(latestList)) throw new Error(tokenErrorMessage(latestList));
 
             if(editIndex !== null) { diaryList[editIndex] = { id, title, tags, date, summary, pinned }; }
             else { diaryList.unshift({ id, title, tags, date, summary, pinned: false }); }
@@ -351,18 +357,26 @@ body { background-color: var(--f-bg); background-image: url("https://www.transpa
                 editIndex = null; render();
                 if(!document.getElementById('page-detail').classList.contains('hidden')) goBack();
                 petSpeak("Synced to Starsea! 🐾");
+            } else {
+                throw new Error(authError(listUpdateRes) ? tokenErrorMessage(listUpdateRes) : "更新列表失败（HTTP " + listUpdateRes.status + "）");
             }
-        } catch (e) { alert("Sync failed: " + e.message); }
+        } catch (e) {
+            alert("Sync failed: " + e.message);
+            petSpeak("同步失败 😿");
+        }
         btn.innerText = "Sync to Starsea"; btn.disabled = false;
     }
 
     async function handleDelete() {
-        const t = getToken();
-        if (!t || !confirm("Erase this memory forever?")) return;
-        diaryList.splice(editIndex, 1);
+        let t = localStorage.getItem('gh_token');
+        if (!t) { if (!(await ensureToken())) return; t = localStorage.getItem('gh_token'); }
+        if (!confirm("Erase this memory forever?")) return;
+        const backupIndex = editIndex;
+        const removed = diaryList.splice(editIndex, 1)[0];
         try {
             const latest = await fetch(`https://api.github.com/repos/${REPO}/contents/${LIST_PATH}?v=${Date.now()}`, { headers: { 'Authorization': `Bearer ${t}` } });
             if (latest.ok) { const d = await latest.json(); listSha = d.sha; }
+            else if (authError(latest)) { alert(tokenErrorMessage(latest)); diaryList.splice(backupIndex, 0, removed); return; }
             const listBody = btoa(unescape(encodeURIComponent(JSON.stringify(diaryList, null, 2))));
             const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${LIST_PATH}`, {
                 method: 'PUT',
@@ -370,12 +384,14 @@ body { background-color: var(--f-bg); background-image: url("https://www.transpa
                 body: JSON.stringify({ message: "Delete post", content: listBody, sha: listSha })
             });
             if (res.ok) { petSpeak("Memory erased. 🌌"); setTimeout(() => { goBack(); render(); }, 1000); }
-        } catch (e) { alert("Delete failed"); }
+            else { alert(authError(res) ? tokenErrorMessage(res) : "Delete 失败（HTTP " + res.status + "）"); diaryList.splice(backupIndex, 0, removed); }
+        } catch (e) { alert("Delete failed: " + e.message); diaryList.splice(backupIndex, 0, removed); }
     }
 
-    function prepareEdit(encodedContent) {
+    async function prepareEdit(encodedContent) {
         try {
             const originalContent = decodeURIComponent(escape(atob(encodedContent)));
+            if (!(await ensureToken())) return;
             openEditor(originalContent);
         } catch (e) { petSpeak("读取失败... 😿"); }
     }
@@ -414,12 +430,65 @@ body { background-color: var(--f-bg); background-image: url("https://www.transpa
 
     function setFilter(tag) { filterTag = (filterTag === tag) ? null : tag; currentPage = 1; render(); }
     function changePage(dir) { currentPage += dir; render(); window.scrollTo(0, 400); }
-    function getToken() { 
-        let t = localStorage.getItem('gh_token'); 
-        if(!t){ t = prompt("GitHub Token:"); if(t) localStorage.setItem('gh_token', t); } 
-        return t; 
+
+    // 判断 GitHub 接口返回是否因 Token 问题失败（认证失败或权限不足）
+    function authError(res) {
+        return res.status === 401 || res.status === 403;
     }
-    function checkAdminThenOpen() { editIndex = null; openEditor(); }
+    function tokenErrorMessage(res) {
+        if (res.status === 401) return "Token 无效或已过期，请点击侧边栏「🔑 设置 Token」重新输入正确的 Token。";
+        if (res.status === 403) return "Token 权限不足（或触发接口限流）：请确认该 Token 拥有此仓库的写入（repo）权限。";
+        return "操作失败（HTTP " + res.status + "）。";
+    }
+    // 仅读取已保存的 Token，不再自动静默保存未校验的值
+    function getToken() { return localStorage.getItem('gh_token'); }
+
+    // 校验 Token：调用仓库接口，检查认证与 push 权限，通过才保存到 localStorage
+    async function validateAndSaveToken(token) {
+        petSpeak("正在验证 Token... ⏳");
+        try {
+            const res = await fetch(`https://api.github.com/repos/${REPO}`, { headers: { 'Authorization': `Bearer ${token}` } });
+            if (res.status === 401) { alert("❌ Token 无效：认证失败。请检查是否完整复制、或是否已过期 / 被撤销。"); petSpeak("Token 无效 😿"); return false; }
+            if (res.status === 403) { alert("❌ Token 权限不足或被限流：请确认该 Token 拥有此仓库的写入（repo）权限。"); petSpeak("Token 权限不足 😿"); return false; }
+            if (!res.ok) { alert("❌ 验证失败（HTTP " + res.status + "），请稍后重试。"); return false; }
+            const data = await res.json();
+            if (!data.permissions || !data.permissions.push) {
+                alert("❌ 该 Token 没有此仓库的写入（push）权限，请使用拥有 repo 权限的 Token。");
+                petSpeak("Token 无写入权限 😿");
+                return false;
+            }
+            localStorage.setItem('gh_token', token);
+            petSpeak("Token 已保存 ✅");
+            return true;
+        } catch (e) {
+            alert("❌ 无法连接 GitHub 验证 Token：" + e.message);
+            return false;
+        }
+    }
+
+    // 确保存在一个可用的 Token；没有则弹出输入框并校验
+    async function ensureToken() {
+        if (localStorage.getItem('gh_token')) return true;
+        const input = prompt("请输入 GitHub Token（用于新增 / 修改 / 删除记忆）：");
+        if (input === null || !input.trim()) return false;
+        return await validateAndSaveToken(input.trim());
+    }
+
+    // 侧边栏「🔑 设置 Token」按钮：可设置、重设或清除 Token
+    async function setToken() {
+        const current = localStorage.getItem('gh_token');
+        const input = prompt("请输入 GitHub Token（留空可清除当前 Token）：", current || "");
+        if (input === null) return;
+        const token = input.trim();
+        if (!token) { localStorage.removeItem('gh_token'); petSpeak("Token 已清除 🔓"); alert("已清除已保存的 Token。"); return; }
+        const ok = await validateAndSaveToken(token);
+        if (ok) {
+            alert("✅ Token 已保存并验证通过，现在可以新增 / 修改 / 保存记忆了！");
+            fetchCloudData();
+        }
+    }
+
+    async function checkAdminThenOpen() { editIndex = null; if (await ensureToken()) openEditor(); }
 
     window.onload = fetchCloudData;
 </script>
