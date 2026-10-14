@@ -46,6 +46,9 @@ body { background-color: var(--f-bg); background-image: url("https://www.transpa
 .nickname {
   font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
+.page-btn {
+  color: var(--f-accent); background-blend-mode: normal; text-decoration-line: none; text-decoration-thickness: initial; text-decoration-style: initial; text-decoration-color: initial; font-weight: 700;
+}
 </style>
 </head>
 <body>
@@ -55,7 +58,7 @@ body { background-color: var(--f-bg); background-image: url("https://www.transpa
 <div id="page-list">
     <div class="header-banner" style="height: 220px; background: linear-gradient(to bottom, #ffdee9cc, #ffffff22), url('https://api.paugram.com/wallpaper?source=gh') center/cover no-repeat; border-radius: 0 0 50px 50px;"></div>
     
-    <div class="max-w-6xl mx-auto px-4 sm:px-8 -mt-12 relative pb-24">
+    <div class="max-w-6xl mx-auto px-4 sm:px-8 -mt-12 relative pb-24" style="top: -4px;">
         <div class="flex flex-col lg:flex-row gap-8">
             <aside class="w-full lg:w-64">
                 <div class="f-card p-6 text-center sticky top-8">
@@ -69,8 +72,9 @@ body { background-color: var(--f-bg); background-image: url("https://www.transpa
                     <div class="text-left text-pink-200 tracking-widest mb-3 uppercase font-bold">Connect</div>
                     <div class="flex flex-col gap-1 text-left text-gray-400 mb-6">
                         <a href="https://space.bilibili.com/330870" target="_blank" class="bg-blue-50/40 p-2 rounded-xl hover:bg-blue-100/50 transition-colors block">📺 Bili: 安尘子 (330870)</a>
-                        <div class="bg-pink-50/40 p-2 rounded-xl">🎨 WB: kurofu</div>
-                        <div class="bg-red-50/40 p-2 rounded-xl">📖 XHS: 1166142003</div>
+                        <a href="https://xhslink.cn/o/5mTttKvCU2a" target="_blank" class="bg-pink-50/40 p-2 rounded-xl hover:bg-pink-100/50 transition-colors block">📖 XHS: 1166142003</a>
+                        <a href="mqqapi://card/show_pslcard?src_type=internal&amp;version=1&amp;uin=843379688&amp;card_type=person" target="_blank" class="bg-purple-50/40 p-2 rounded-xl hover:bg-purple-100/50 transition-colors block">🐧 QQ: 843379688</a>  
+                        <button onclick="copyWX(this)" class="bg-purple-50/40 p-2 rounded-xl hover:bg-purple-100/50 transition-colors block text-left w-full">🐹 WX: fuwafuwako</button>
                     </div>
 
                     <div class="text-left text-pink-200 tracking-widest mb-3 uppercase font-bold">Tools</div>
@@ -87,8 +91,8 @@ body { background-color: var(--f-bg); background-image: url("https://www.transpa
 
             <main class="flex-1">
                 <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-pink-200 tracking-widest font-bold uppercase">Memory Stream</h3>
-                    <button onclick="checkAdminThenOpen()" class="bg-white px-5 py-2 rounded-2xl border border-pink-100 text-pink-400 shadow-sm hover:bg-pink-400 hover:text-white transition-all font-medium">NEW MEMORY ✨</button>
+                    <h3 class="text-pink-200 tracking-widest font-bold uppercase">MEMORY</h3>
+                    <button onclick="checkAdminThenOpen()" class="bg-white px-5 py-2 rounded-2xl border border-pink-100 text-pink-400 shadow-sm hover:bg-pink-400 hover:text-white transition-all font-medium">NEW MEMORY</button>
                 </div>
                 
                 <div id="diaryList" class="space-y-6"></div>
@@ -98,10 +102,9 @@ body { background-color: var(--f-bg); background-image: url("https://www.transpa
                     <span id="pageInfo" class="text-pink-200 font-bold">Page 1</span>
                     <button id="nextPage" onclick="changePage(1)" class="page-btn">Next →</button>
                 </div>
-            </main>
+            </main></div></div>
         </div>
     </div>
-</div>
 
 <div id="page-detail" class="hidden p-4 sm:p-8">
     <div class="max-w-4xl mx-auto pt-8">
@@ -409,6 +412,14 @@ body { background-color: var(--f-bg); background-image: url("https://www.transpa
             document.getElementById('diaryTags').value = "";
             quill.root.innerHTML = "";
         }
+    }
+
+    function copyWX(btn) {
+        navigator.clipboard.writeText('fuwafuwako').then(() => {
+            const orig = btn.innerHTML;
+            btn.innerHTML = '✅ 已复制微信号';
+            setTimeout(() => btn.innerHTML = orig, 1500);
+        }).catch(() => prompt('复制失败，请手动复制：', 'fuwafuwako'));
     }
 
     function toggleMusic() {
