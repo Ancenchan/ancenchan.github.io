@@ -176,17 +176,30 @@ body { background-color: var(--f-bg); background-image: url("https://www.transpa
         }
     });
 
+    // 读取仓库中的 JSON 文件：优先走 API（带 Token），401 自动清除坏 Token 重试，403 限流时回退 raw 直链
+    async function readRepoJson(path) {
+        const t = localStorage.getItem('gh_token');
+        const apiUrl = `https://api.github.com/repos/${REPO}/contents/${path}?v=${Date.now()}`;
+        let res = await fetch(apiUrl, { headers: t ? { 'Authorization': `Bearer ${t}` } : {} });
+        if (res.status === 401 && t) { localStorage.removeItem('gh_token'); res = await fetch(apiUrl, {}); }
+        if (res.ok) {
+            const data = await res.json();
+            return { json: JSON.parse(decodeURIComponent(escape(atob(data.content.replace(/\s/g, ''))))), sha: data.sha };
+        }
+        if (res.status === 403) {
+            const raw = await fetch(`https://raw.githubusercontent.com/${REPO}/main/${path}?v=${Date.now()}`);
+            if (raw.ok) return { json: await raw.json(), sha: null };
+        }
+        throw new Error('HTTP ' + res.status);
+    }
+
     async function fetchCloudData() {
-        const t = localStorage.getItem('gh_token'), h = t ? { 'Authorization': `Bearer ${t}` } : {};
         try {
-            const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${LIST_PATH}?v=${Date.now()}`, { headers: h });
-            if (res.ok) { 
-                const data = await res.json(); 
-                listSha = data.sha; 
-                diaryList = JSON.parse(decodeURIComponent(escape(atob(data.content.replace(/\s/g, ''))))); 
-                render(); 
-            } else { diaryList = []; render(); }
-        } catch (e) { petSpeak("Connect Error"); }
+            const { json, sha } = await readRepoJson(LIST_PATH);
+            if (sha) listSha = sha;
+            diaryList = json;
+            render();
+        } catch (e) { diaryList = []; render(); petSpeak("Connect Error"); }
     }
 
     async function uploadToGithub(file) {
@@ -259,14 +272,10 @@ body { background-color: var(--f-bg); background-image: url("https://www.transpa
         window.scrollTo(0, 0);
 
         try {
-            const t = localStorage.getItem('gh_token'), h = t ? { 'Authorization': `Bearer ${t}` } : {};
-            const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${POSTS_DIR}/${item.id}.json?v=${Date.now()}`, { headers: h });
-            if (res.ok) {
-                const data = await res.json();
-                const contentObj = JSON.parse(decodeURIComponent(escape(atob(data.content.replace(/\s/g, '')))));
-                loading.classList.add('hidden');
-                const safeContent = btoa(unescape(encodeURIComponent(contentObj.content)));
-                actual.innerHTML = `
+            const { json: contentObj } = await readRepoJson(`${POSTS_DIR}/${item.id}.json`);
+            loading.classList.add('hidden');
+            const safeContent = btoa(unescape(encodeURIComponent(contentObj.content)));
+            actual.innerHTML = `
                     <div class="flex justify-between items-center mb-6">
                         <span class="text-pink-200 font-bold">${item.pinned?'★ PINNED · ':''}${item.date}</span>
                         <div class="flex gap-2">${(item.tags||[]).map(t => `<span class="bg-pink-50 text-pink-400 px-3 py-1 rounded-full">#${t}</span>`).join('')}</div>
@@ -279,7 +288,6 @@ body { background-color: var(--f-bg); background-image: url("https://www.transpa
                         <button onclick="handleDelete()" class="text-red-300 font-bold uppercase tracking-widest">DELETE</button>
                         <button onclick="goBack()" class="text-gray-300 font-bold uppercase tracking-widest ml-auto">CLOSE</button>
                     </div>`;
-            } else { throw new Error(); }
         } catch (e) {
             loading.classList.add('hidden');
             actual.innerHTML = `<div class="text-center py-20 text-gray-400">Content file not found.</div>`;
